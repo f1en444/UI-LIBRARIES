@@ -1,6290 +1,4613 @@
-local COLOR = 1
-local COLOR1 = 2
-local COLOR2 = 3
-local COMBOBOX = 4
-local TOGGLE = 5
-local KEYBIND = 6
-local DROPBOX = 7
-local COLORPICKER = 8
-local DOUBLE_COLORPICKERS = 9
-local SLIDER = 10
-local BUTTON = 11
-local LIST = 12
-local IMAGE = 13
-local TEXTBOX = 14 -- menu type enums and shit
-
-if not BBOT then
-    BBOT = { username = "dev" }
-end
-
-local menu
-assert(getgenv().v2 == nil)
-getgenv().v2 = true
-makefolder("bitchbot")
-local MenuName = isfile("bitchbot/menuname.txt") and readfile("bitchbot/menuname.txt") or nil
-local loadstart = tick()
-local Nate = isfile("cole.mak")
-
-local customChatSpam = {}
-local customKillSay = {}
-local e = 2.718281828459045
-local placeholderImage = "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"
--- please keep this here
-local PingStat = game:service("Stats").PerformanceStats.Ping
-local function GetLatency()
-    return PingStat:GetValue() / 1000
-end
-placeholderImage = crypt.base64.decode(placeholderImage)
-if not isfile("bitchbot/chatspam.txt") then --idk help the user out lol, prevent stupid errors --well it would kinda ig
-    writefile(
-        "bitchbot/chatspam.txt",
-        [[
-WSUP FOOL
-GET OWNED KID
-BBOAT ON TOP
-I LOVE BBOT YEAH
-PLACEHOLDER TEXT
-dear bbot user, edit your chat spam
-    ]]
-    )
-end
-
-if not isfile("bitchbot/killsay.txt") then
-    writefile(
-        "bitchbot/killsay.txt",
-        [[
-WSUP FOOL [name]
-GET OWNED [name]
-[name] just died to my [weapon] everybody laugh
-[name] got owned roflsauce
-PLACEHOLDER TEXT
-dear bbot user, edit your kill say
-    ]]
-    )
-end
-
-do
-    local customtxt = readfile("bitchbot/chatspam.txt")
-    for s in customtxt:gmatch("[^\n]+") do -- I'm Love String:Match
-        table.insert(customChatSpam, s) -- I'm care
-    end
-    customtxt = readfile("bitchbot/killsay.txt")
-    for s in customtxt:gmatch("[^\n]+") do -- I'm Love String:Match
-        table.insert(customKillSay, s)
-    end
-end
-
-local function map(N, OldMin, OldMax, Min, Max)
-    return (N - OldMin) / (OldMax - OldMin) * (Max - Min) + Min
-end
-
-local function reverse_table(tbl) -- THANKS FINI <33333
-    local new_tbl = {}
-    for i = 1, #tbl do
-        new_tbl[#tbl + 1 - i] = tbl[i]
-    end
-    return new_tbl
-end
-
-local NotifLogs = {}
-local CreateNotification
-do
-    local notes = {}
-    local function DrawingObject(t, col)
-        local d = Drawing.new(t)
-
-        d.Visible = true
-        d.Transparency = 1
-        d.Color = col
-
-        return d
-    end
-
-    local function Rectangle(sizex, sizey, fill, col)
-        local s = DrawingObject("Square", col)
-
-        s.Filled = fill
-        s.Thickness = 1
-        s.Position = Vector2.new()
-        s.Size = Vector2.new(sizex, sizey)
-
-        return s
-    end
-
-    local function Text(text)
-        local s = DrawingObject("Text", Color3.new(1, 1, 1))
-
-        s.Text = text
-        s.Size = 13
-        s.Center = false
-        s.Outline = true
-        s.Position = Vector2.new()
-        s.Font = 2
-
-        return s
-    end
-
-    CreateNotification = function(t, customcolor) -- TODO i want some kind of prioritized message to the notification list, like a warning or something. warnings have icons too maybe? idk??
-        table.insert(NotifLogs, string.format("[%s]: %s", os.date("%X"), t))
-        local gap = 25
-        local width = 18
-
-        local alpha = 255
-        local time = 0
-        local estep = 0
-        local eestep = 0.02
-
-        local insety = 0
-
-        local Note = {
-
-            enabled = true,
-
-            targetPos = Vector2.new(50, 33),
-
-            size = Vector2.new(200, width),
-
-            drawings = {
-                outline = Rectangle(202, width + 2, false, Color3.new(0, 0, 0)),
-                fade = Rectangle(202, width + 2, false, Color3.new(0, 0, 0)),
-            },
-
-            Remove = function(self, d)
-                if d.Position.x < d.Size.x then
-                    for k, drawing in pairs(self.drawings) do
-                        drawing:Remove()
-                        drawing = false
-                    end
-                    self.enabled = false
-                end
-            end,
-
-            Update = function(self, num, listLength, dt)
-                local pos = self.targetPos
-
-                local indexOffset = (listLength - num) * gap
-                if insety < indexOffset then
-                    insety -= (insety - indexOffset) * 0.2
-                else
-                    insety = indexOffset
-                end
-                local size = self.size
-
-                local tpos = Vector2.new(pos.x - size.x / time - map(alpha, 0, 255, size.x, 0), pos.y + insety)
-                self.pos = tpos
-
-                local locRect = {
-                    x = math.ceil(tpos.x),
-                    y = math.ceil(tpos.y),
-                    w = math.floor(size.x - map(255 - alpha, 0, 255, 0, 70)),
-                    h = size.y,
-                }
-                --pos.set(-size.x / fc - map(alpha, 0, 255, size.x, 0), pos.y)
-
-                local fade = math.min(time * 12, alpha)
-                fade = fade > 255 and 255 or fade < 0 and 0 or fade
-
-                if self.enabled then
-                    local linenum = 1
-                    for i, drawing in pairs(self.drawings) do
-                        drawing.Transparency = fade / 255
-
-                        if type(i) == "number" then
-                            drawing.Position = Vector2.new(locRect.x + 1, locRect.y + i)
-                            drawing.Size = Vector2.new(locRect.w - 2, 1)
-                        elseif i == "text" then
-                            drawing.Position = tpos + Vector2.new(6, 2)
-                        elseif i == "outline" then
-                            drawing.Position = Vector2.new(locRect.x, locRect.y)
-                            drawing.Size = Vector2.new(locRect.w, locRect.h)
-                        elseif i == "fade" then
-                            drawing.Position = Vector2.new(locRect.x - 1, locRect.y - 1)
-                            drawing.Size = Vector2.new(locRect.w + 2, locRect.h + 2)
-                            local t = (200 - fade) / 255 / 3
-                            drawing.Transparency = t < 0.4 and 0.4 or t
-                        elseif i:find("line") then
-                            drawing.Position = Vector2.new(locRect.x + linenum, locRect.y + 1)
-                            if menu then
-                                local mencol = customcolor or (
-                                        menu:GetVal("Settings", "Cheat Settings", "Menu Accent") and Color3.fromRGB(unpack(menu:GetVal("Settings", "Cheat Settings", "Menu Accent", COLOR))) or Color3.fromRGB(127, 72, 163)
-                                    )
-                                local color = linenum == 1 and mencol or Color3.fromRGB(mencol.R * 255 - 40, mencol.G * 255 - 40, mencol.B * 255 - 40) -- super shit
-                                if drawing.Color ~= color then
-                                    drawing.Color = color
-                                end
-                            end
-                            linenum += 1
-                        end
-                    end
-
-                    time += estep * dt * 128 -- TODO need to do the duration
-                    estep += eestep * dt * 64
-                end
-            end,
-
-            Fade = function(self, num, len, dt)
-                if self.pos.x > self.targetPos.x - 0.2 * len or self.fading then
-                    if not self.fading then
-                        estep = 0
-                    end
-                    self.fading = true
-                    alpha -= estep / 4 * len * dt * 50
-                    eestep += 0.01 * dt * 100
-                end
-                if alpha <= 0 then
-                    self:Remove(self.drawings[1])
-                end
-            end,
-        }
-
-        for i = 1, Note.size.y - 2 do
-            local c = 0.28 - i / 80
-            Note.drawings[i] = Rectangle(200, 1, true, Color3.new(c, c, c))
-        end
-        local color = (menu and menu.GetVal) and customcolor or menu:GetVal("Settings", "Cheat Settings", "Menu Accent") and Color3.fromRGB(unpack(menu:GetVal("Settings", "Cheat Settings", "Menu Accent", COLOR))) or Color3.fromRGB(127, 72, 163)
-
-        Note.drawings.text = Text(t)
-        if Note.drawings.text.TextBounds.x + 7 > Note.size.x then -- expand the note size to fit if it's less than the default size
-            Note.size = Vector2.new(Note.drawings.text.TextBounds.x + 7, Note.size.y)
-        end
-        Note.drawings.line = Rectangle(1, Note.size.y - 2, true, color)
-        Note.drawings.line1 = Rectangle(1, Note.size.y - 2, true, color)
-
-        notes[#notes + 1] = Note
-    end
-
-    renderStepped = game:GetService("RunService").RenderStepped:Connect(function(dt)
-        Camera = workspace.CurrentCamera
-        local smallest = math.huge
-        for k = 1, #notes do
-            local v = notes[k]
-            if v and v.enabled then
-                smallest = k < smallest and k or smallest
-            else
-                table.remove(notes, k)
-            end
-        end
-        local length = #notes
-        for k = 1, #notes do
-            local note = notes[k]
-            note:Update(k, length, dt)
-            if k <= math.ceil(length / 10) or note.fading then
-                note:Fade(k, length, dt)
-            end
-        end
-    end)
-    --ANCHOR how to create notification
-    --CreateNotification("Loading...")
-end
-
---validity check
---SECTION commented these out for development
-
--- make_synreadonly(syn)
--- make_synreadonly(Drawing)
--- protectfunction(getgenv)
--- protectfunction(getgc)
-
--- local init
--- if syn then
---     init = getfenv(saveinstance).script
--- end
-
--- script.Name = "\1"
--- local function search_hookfunc(tbl)
---     for i,v in pairs(tbl) do
---         local s = getfenv(v).script
---         if is_synapse_function(v) and islclosure(v) and s and s ~= script and s.Name ~= "\1" and s ~= init then
---             if tostring(unpack(debug.getconstants(v))):match("hookfunc") or tostring(unpack(debug.getconstants(v))):match("hookfunction") then
---                 writefile("poop.text", "did the funny")
---                 SX_CRASH()
---                 break
---             end
---         end
---     end
--- end
--- search_hookfunc(getgc())
--- search_hookfunc = nil
-
---if syn.crypt.derive(BBOT.username, 32) ~= BBOT.check then SX_CRASH() end
-
---!SECTION
-local menuWidth, menuHeight = 500, 600
-menu = { -- this is for menu stuffs n shi
-    w = menuWidth,
-    h = menuHeight,
-    x = 0,
-    y = 0,
-    columns = {
-        width = math.floor((menuWidth - 40) / 2),
-        left = 17,
-        right = math.floor((menuWidth - 20) / 2) + 13,
-    },
-    activetab = 1,
-    open = true,
-    fadestart = 0,
-    fading = false,
-    mousedown = false,
-    postable = {},
-    options = {},
-    clrs = {
-        norm = {},
-        dark = {},
-        togz = {},
-    },
-    mc = { 127, 72, 163 },
-    watermark = {},
-    connections = {},
-    list = {},
-    unloaded = false,
-    copied_clr = nil,
-    game = "uni",
-    tabnames = {}, -- its used to change the tab num to the string (did it like this so its dynamic if u add or remove tabs or whatever :D)
-    friends = {},
-    priority = {},
-    muted = {},
-    spectating = false,
-    stat_menu = false,
-    load_time = 0,
-    log_multi = nil,
-    mgrouptabz = {},
-    backspaceheld = false,
-    backspacetime = -1,
-    backspaceflags = 0,
-    selectall = false,
-    modkeys = {
-        alt = {
-            direction = nil,
-        },
-        shift = {
-            direction = nil,
-        },
-    },
-    modkeydown = function(self, key, direction)
-        local keydata = self.modkeys[key]
-        return keydata.direction and keydata.direction == direction or false
-    end,
-    keybinds = {},
-    values = {}
-}
-
-local function round(num, numDecimalPlaces)
-    local mult = 10 ^ (numDecimalPlaces or 0)
-    return math.floor(num * mult + 0.5) / mult
-end
-
-local function average(t)
-    local sum = 0
-    for _, v in pairs(t) do -- Get the sum of all numbers in t
-        sum = sum + v
-    end
-    return sum / #t
-end
-
-local function clamp(a, lowerNum, higher) -- DONT REMOVE this clamp is better then roblox's because it doesnt error when its not lower or heigher
-    if a > higher then
-        return higher
-    elseif a < lowerNum then
-        return lowerNum
-    else
-        return a
-    end
-end
-
-local function CreateThread(func, ...) -- improved... yay.
-    local thread = coroutine.create(func)
-    coroutine.resume(thread, ...)
-    return thread
-end
-
-local function MultiThreadList(obj, ...)
-    local n = #obj
-    if n > 0 then
-        for i = 1, n do
-            local t = obj[i]
-            if type(t) == "table" then
-                local d = #t
-                assert(d ~= 0, "table inserted was not an array or was empty")
-                assert(d < 3, ("invalid number of arguments (%d)"):format(d))
-                local thetype = type(t[1])
-                assert(
-                    thetype == "function",
-                    ("invalid argument #1: expected 'function', got '%s'"):format(tostring(thetype))
-                )
-
-                CreateThread(t[1], unpack(t[2]))
-            else
-                CreateThread(t, ...)
-            end
-        end
-    else
-        for i, v in pairs(obj) do
-            CreateThread(v, ...)
-        end
-    end
-end
-
-local DeepRestoreTableFunctions, DeepCleanupTable
-
-DeepRestoreTableFunctions = function(tbl)
-    for k, v in next, tbl do
-        if type(v) == "function" and is_synapse_function(v) then
-            for k1, v1 in next, getupvalues(v) do
-                if type(v1) == "function" and islclosure(v1) and not is_synapse_function(v1) then
-                    tbl[k] = v1
-                end
-            end
-        end
-
-        if type(v) == "table" then
-            DeepRestoreTableFunctions(v)
-        end
-    end
-end
-
-DeepCleanupTable = function(tbl)
-    local numTable = #tbl
-    local isTableArray = numTable > 0
-    if isTableArray then
-        for i = 1, numTable do
-            local entry = tbl[i]
-            local entryType = type(entry)
-
-            if entryType == "table" then
-                DeepCleanupTable(tbl)
-            end
-
-            tbl[i] = nil
-            entry = nil
-            entryType = nil
-        end
-    else
-        for k, v in next, tbl do
-            if type(v) == "table" then
-                DeepCleanupTable(tbl)
-            end
-        end
-
-        tbl[k] = nil
-    end
-
-    numTable = nil
-    isTableArray = nil
-end
-
-local event = {}
-
-local allevent = {}
-
-function event.new(eventname, eventtable, requirename) -- fyi you can put in a table of choice to make the table you want an "event" pretty cool its like doing & in c lol!
-    if eventname then
-        assert(
-            allevent[eventname] == nil,
-            ("the event '%s' already exists in the event table"):format(eventname)
-        )
-    end
-    local newevent = eventtable or {}
-    local funcs = {}
-    local disconnectlist = {}
-    function newevent:fire(...)
-        allevent[eventname].fire(...)
-    end
-    function newevent:connect(func)
-        funcs[#funcs + 1] = func
-        local disconnected = false
-        local function disconnect()
-            if not disconnected then
-                disconnected = true
-                disconnectlist[func] = true
-            end
-        end
-        return disconnect
-    end
-
-    local function fire(...)
-        local n = #funcs
-        local j = 0
-        for i = 1, n do
-            local func = funcs[i]
-            if disconnectlist[func] then
-                disconnectlist[func] = nil
-            else
-                j = j + 1
-                funcs[j] = func
-            end
-        end
-        for i = j + 1, n do
-            funcs[i] = nil
-        end
-        for i = 1, j do
-            CreateThread(function(...)
-                pcall(funcs[i], ...)
-            end, ...)
-        end
-    end
-
-    if eventname then
-        allevent[eventname] = {
-            event = newevent,
-            fire = fire,
-        }
-    end
-
-    return newevent, fire
-end
-
-local function FireEvent(eventname, ...)
-    if allevent[eventname] then
-        return allevent[eventname].fire(...)
-    else
-        --warn(("Event %s does not exist!"):format(eventname))
-    end
-end
-
-local function GetEvent(eventname)
-    return allevent[eventname]
-end
-
-local BBOT_IMAGES = {}
-MultiThreadList({
-    function()
-        BBOT_IMAGES[1] = game:HttpGet("https://i.imgur.com/9NMuFcQ.png")
-    end,
-    function()
-        BBOT_IMAGES[2] = game:HttpGet("https://i.imgur.com/jG3NjxN.png")
-    end,
-    function()
-        BBOT_IMAGES[3] = game:HttpGet("https://i.imgur.com/2Ty4u2O.png")
-    end,
-    function()
-        BBOT_IMAGES[4] = game:HttpGet("https://i.imgur.com/kNGuTlj.png")
-    end,
-    function()
-        BBOT_IMAGES[5] = game:HttpGet("https://i.imgur.com/OZUR3EY.png")
-    end,
-    function()
-        BBOT_IMAGES[6] = game:HttpGet("https://i.imgur.com/3HGuyVa.png")
-    end,
-})
-
--- MULTITHREAD DAT LOADING SO FAST!!!!
-local loaded = {}
-do
-    local function Loopy_Image_Checky()
-        for i = 1, 6 do
-            local v = BBOT_IMAGES[i]
-            if v == nil then
-                return true
-            elseif not loaded[i] then
-                loaded[i] = true
-            end
-        end
-        return false
-    end
-    while Loopy_Image_Checky() do
-        wait(0)
-    end
-end
-
-
-loadstart = tick()
-
--- nate i miss u D:
--- im back
-local NETWORK = game:service("NetworkClient")
-local NETWORK_SETTINGS = settings().Network
-NETWORK:SetOutgoingKBPSLimit(0)
-
-setfpscap(getgenv().maxfps or 144)
-
-if not isfolder("bitchbot") then
-    makefolder("bitchbot")
-    if not isfile("bitchbot/relations.bb") then
-        writefile("bitchbot/relations.bb", "bb:{{friends:}{priority:}")
-    end
-else
-    if not isfile("bitchbot/relations.bb") then
-        writefile("bitchbot/relations.bb", "bb:{{friends:}{priority:}")
-    end
-    writefile("bitchbot/debuglog.bb", "")
-end
-
-if not isfolder("bitchbot/" .. menu.game) then
-    makefolder("bitchbot/" .. menu.game)
-end
-
-local configs = {}
-
-local function GetConfigs()
-    local result = {}
-    local directory = "bitchbot\\" .. menu.game
-    for k, v in pairs(listfiles(directory)) do
-        local clipped = v:sub(#directory + 2)
-        if clipped:sub(#clipped - 2) == ".bb" then
-            clipped = clipped:sub(0, #clipped - 3)
-            result[k] = clipped
-            configs[k] = v
-        end
-    end
-    if #result <= 0 then
-        writefile("bitchbot/" .. menu.game .. "/Default.bb", "")
-    end
-    return result
-end
-
-local Players = game:GetService("Players")
-local LIGHTING = game:GetService("Lighting")
-local stats = game:GetService("Stats")
-
-local function UnpackRelations()
-    local str = isfile("bitchbot/relations.bb") and readfile("bitchbot/relations.bb") or nil
-    local final = {
-        friends = {},
-        priority = {},
-    }
-    if str then
-        if str:find("bb:{{") then
-            writefile("bitchbot/relations.bb", "friends:\npriority:")
-            return
-        end
-
-        local friends, frend = str:find("friends:")
-        local priority, priend = str:find("\npriority:")
-        local friendslist = str:sub(frend + 1, priority - 1)
-        local prioritylist = str:sub(priend + 1)
-        for i in friendslist:gmatch("[^,]+") do
-            if not table.find(final.friends, i) then
-                table.insert(final.friends, i)
-            end
-        end
-        for i in prioritylist:gmatch("[^,]+") do
-            if not table.find(final.priority, i) then
-                table.insert(final.priority, i)
-            end
-        end
-    end
-    if not menu then
-        repeat
-            game:GetService("RunService").Heartbeat:Wait()
-        until menu
-    end
-    menu.friends = final.friends
-    if not table.find(menu.friends, Players.LocalPlayer.Name) then
-        table.insert(menu.friends, Players.LocalPlayer.Name)
-    end
-    menu.priority = final.priority
-end
-
-local function WriteRelations()
-    local str = "friends:"
-
-    for k, v in next, menu.friends do
-        local playerobj
-        local userid
-        local pass, ret = pcall(function()
-            playerobj = Players[v]
-        end)
-
-        if not pass then
-            local newpass, newret = pcall(function()
-                userid = v
-            end)
-        end
-
-        if userid then
-            str ..= tostring(userid) .. ","
-        else
-            str ..= tostring(playerobj.Name) .. ","
-        end
-    end
-
-    str ..= "\npriority:"
-
-    for k, v in next, menu.priority do
-        local playerobj
-        local userid
-        local pass, ret = pcall(function()
-            playerobj = Players[v]
-        end)
-
-        if not pass then
-            local newpass, newret = pcall(function()
-                userid = v
-            end)
-        end
-
-        if userid then
-            str ..= tostring(userid) .. ","
-        else
-            str ..= tostring(playerobj.Name) .. ","
-        end
-    end
-
-    writefile("bitchbot/relations.bb", str)
-end
-CreateThread(function()
-    if (not menu or not menu.GetVal) then
-        repeat
-            game:GetService("RunService").Heartbeat:Wait()
-        until (menu and menu.GetVal)
-    end
-    wait(2)
-    UnpackRelations()
-    WriteRelations()
-end)
-
-local LOCAL_PLAYER = Players.LocalPlayer
-local LOCAL_MOUSE = LOCAL_PLAYER:GetMouse()
-local TEAMS = game:GetService("Teams")
-local INPUT_SERVICE = game:GetService("UserInputService")
-local TELEPORT_SERVICE = game:GetService("TeleportService")
-local GAME_SETTINGS = UserSettings():GetService("UserGameSettings")
-local CACHED_VEC3 = Vector3.new()
-local Camera = workspace.CurrentCamera
-local SCREEN_SIZE = Camera.ViewportSize
---[[ local ButtonPressed = Instance.new("BindableEvent")
-local TogglePressed = Instance.new("BindableEvent") ]]
-
-local ButtonPressed = event.new("bb_buttonpressed")
-local TogglePressed = event.new("bb_togglepressed")
-local MouseMoved = event.new("bb_mousemoved")
-
---local PATHFINDING = game:GetService("PathfindingService")
-local GRAVITY = Vector3.new(0, -192.6, 0)
-
-menu.x = math.floor((SCREEN_SIZE.x / 2) - (menu.w / 2))
-menu.y = math.floor((SCREEN_SIZE.y / 2) - (menu.h / 2))
-
-local Lerp = function(delta, from, to) -- wtf why were these globals thats so exploitable!
-    if (delta > 1) then
-        return to
-    end
-    if (delta < 0) then
-        return from
-    end
-    return from + (to - from) * delta
-end
-
-local ColorRange = function(value, ranges) -- ty tony for dis function u a homie
-    if value <= ranges[1].start then
-        return ranges[1].color
-    end
-    if value >= ranges[#ranges].start then
-        return ranges[#ranges].color
-    end
-
-    local selected = #ranges
-    for i = 1, #ranges - 1 do
-        if value < ranges[i + 1].start then
-            selected = i
-            break
-        end
-    end
-    local minColor = ranges[selected]
-    local maxColor = ranges[selected + 1]
-    local lerpValue = (value - minColor.start) / (maxColor.start - minColor.start)
-    return Color3.new(
-        Lerp(lerpValue, minColor.color.r, maxColor.color.r),
-        Lerp(lerpValue, minColor.color.g, maxColor.color.g),
-        Lerp(lerpValue, minColor.color.b, maxColor.color.b)
-    )
-end
-
-local bVector2 = {}
-do -- vector functions
-    function bVector2:getRotate(Vec, Rads)
-        local vec = Vec.Unit
-        --x2 = cos β x1 − sin β y1
-        --y2 = sin β x1 + cos β y1
-        local sin = math.sin(Rads)
-        local cos = math.cos(Rads)
-        local x = (cos * vec.x) - (sin * vec.y)
-        local y = (sin * vec.x) + (cos * vec.y)
-
-        return Vector2.new(x, y).Unit * Vec.Magnitude
-    end
-end
-local bColor = {}
-do -- color functions
-    function bColor:Mult(col, mult)
-        return Color3.new(col.R * mult, col.G * mult, col.B * mult)
-    end
-    function bColor:Add(col, num)
-        return Color3.new(col.R + num, col.G + num, col.B + num)
-    end
-end
-local function string_cut(s1, num)
-    return num == 0 and s1 or string.sub(s1, 1, num)
-end
-
-local textBoxLetters = {
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z",
-}
-
-local keyNames = {
-    One = "1",
-    Two = "2",
-    Three = "3",
-    Four = "4",
-    Five = "5",
-    Six = "6",
-    Seven = "7",
-    Eight = "8",
-    Nine = "9",
-    Zero = "0",
-    LeftBracket = "[",
-    RightBracket = "]",
-    Semicolon = ";",
-    BackSlash = "\\",
-    Slash = "/",
-    Minus = "-",
-    Equals = "=",
-    Return = "Enter",
-    Backquote = "`",
-    CapsLock = "Caps",
-    LeftShift = "LShift",
-    RightShift = "RShift",
-    LeftControl = "LCtrl",
-    RightControl = "RCtrl",
-    LeftAlt = "LAlt",
-    RightAlt = "RAlt",
-    Backspace = "Back",
-    Plus = "+",
-    Multiplaye = "x",
-    PageUp = "PgUp",
-    PageDown = "PgDown",
-    Delete = "Del",
-    Insert = "Ins",
-    NumLock = "NumL",
-    Comma = ",",
-    Period = ".",
-}
-local colemak = {
-    E = "F",
-    R = "P",
-    T = "G",
-    Y = "J",
-    U = "L",
-    I = "U",
-    O = "Y",
-    P = ";",
-    S = "R",
-    D = "S",
-    F = "T",
-    G = "D",
-    J = "N",
-    K = "E",
-    L = "I",
-    [";"] = "O",
-    N = "K",
-}
-
-local keymodifiernames = {
-    ["`"] = "~",
-    ["1"] = "!",
-    ["2"] = "@",
-    ["3"] = "#",
-    ["4"] = "$",
-    ["5"] = "%",
-    ["6"] = "^",
-    ["7"] = "&",
-    ["8"] = "*",
-    ["9"] = "(",
-    ["0"] = ")",
-    ["-"] = "_",
-    ["="] = "+",
-    ["["] = "{",
-    ["]"] = "}",
-    ["\\"] = "|",
-    [";"] = ":",
-    ["'"] = '"',
-    [","] = "<",
-    ["."] = ".",
-    ["/"] = "?",
-}
-
-local function KeyEnumToName(key) -- did this all in a function cuz why not
-    if key == nil then
-        return "None"
-    end
-    local _key = tostring(key) .. "."
-    local _key = _key:gsub("%.", ",")
-    local keyname = nil
-    local looptime = 0
-    for w in _key:gmatch("(.-),") do
-        looptime = looptime + 1
-        if looptime == 3 then
-            keyname = w
-        end
-    end
-    if string.match(keyname, "Keypad") then
-        keyname = string.gsub(keyname, "Keypad", "")
-    end
-
-    if keyname == "Unknown" or key.Value == 27 then
-        return "None"
-    end
-
-    if keyNames[keyname] then
-        keyname = keyNames[keyname]
-    end
-    if Nate then
-        return colemak[keyname] or keyname
-    else
-        return keyname
-    end
-end
-
-local invalidfilekeys = {
-    ["\\"] = true,
-    ["/"] = true,
-    [":"] = true,
-    ["*"] = true,
-    ["?"] = true,
-    ['"'] = true,
-    ["<"] = true,
-    [">"] = true,
-    ["|"] = true,
-}
-
-local function KeyModifierToName(key, filename)
-    if keymodifiernames[key] ~= nil then
-        if filename then
-            if invalidfilekeys[keymodifiernames[key]] then
-                return ""
-            else
-                return keymodifiernames[key]
-            end
-        else
-            return keymodifiernames[key]
-        end
-    else
-        return ""
-    end
-end
-
-local allrender = {}
-
-local RGB = Color3.fromRGB
-local Draw = {}
-do
-    function Draw:UnRender()
-        for k, v in pairs(allrender) do
-            for k1, v1 in pairs(v) do
-                --warn(k1, v1)
-                -- ANCHOR WHAT THE FUCK IS GOING ON WITH THIS WHY IS THIS ERRORING BECAUSE OF NUMBER
-                if v1 and type(v1) ~= "number" and v1.__OBJECT_EXISTS then
-                    v1:Remove()
-                else
-                    --rconsolewarn(tostring(k),tostring(v),tostring(k1),tostring(v1)) -- idfk why but this shit doesn't print anything out. might as well have it commented out though -nata april 1 21
-                end
-            end
-        end
-    end
-
-    function Draw:OutlinedRect(visible, pos_x, pos_y, width, height, clr, tablename)
-        local temptable = Drawing.new("Square")
-        temptable.Visible = visible
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Size = Vector2.new(width, height)
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        temptable.Filled = false
-        temptable.Thickness = 0
-        temptable.Transparency = clr[4] / 255
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:FilledRect(visible, pos_x, pos_y, width, height, clr, tablename)
-        local temptable = Drawing.new("Square")
-        temptable.Visible = visible
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Size = Vector2.new(width, height)
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        temptable.Filled = true
-        temptable.Thickness = 0
-        temptable.Transparency = clr[4] / 255
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:Line(visible, thickness, start_x, start_y, end_x, end_y, clr, tablename)
-        temptable = Drawing.new("Line")
-        temptable.Visible = visible
-        temptable.Thickness = thickness
-        temptable.From = Vector2.new(start_x, start_y)
-        temptable.To = Vector2.new(end_x, end_y)
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        temptable.Transparency = clr[4] / 255
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:Image(visible, imagedata, pos_x, pos_y, width, height, transparency, tablename)
-        local temptable = Drawing.new("Image")
-        temptable.Visible = visible
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Size = Vector2.new(width, height)
-        temptable.Transparency = transparency
-        temptable.Data = imagedata or placeholderImage
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:Text(text, font, visible, pos_x, pos_y, size, centered, clr, tablename)
-        local temptable = Drawing.new("Text")
-        temptable.Text = text
-        temptable.Visible = visible
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Size = size
-        temptable.Center = centered
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        temptable.Transparency = clr[4] / 255
-        temptable.Outline = false
-        temptable.Font = font
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:OutlinedText(text, font, visible, pos_x, pos_y, size, centered, clr, clr2, tablename)
-        local temptable = Drawing.new("Text")
-        temptable.Text = text
-        temptable.Visible = visible
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Size = size
-        temptable.Center = centered
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        temptable.Transparency = clr[4] / 255
-        temptable.Outline = true
-        temptable.OutlineColor = RGB(clr2[1], clr2[2], clr2[3])
-        temptable.Font = font
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-        if tablename then
-            table.insert(tablename, temptable)
-        end
-        return temptable
-    end
-
-    function Draw:Triangle(visible, filled, pa, pb, pc, clr, tablename)
-        clr = clr or { 255, 255, 255, 1 }
-        local temptable = Drawing.new("Triangle")
-        temptable.Visible = visible
-        temptable.Transparency = clr[4] or 1
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        temptable.Thickness = 4.1
-        if pa and pb and pc then
-            temptable.PointA = Vector2.new(pa[1], pa[2])
-            temptable.PointB = Vector2.new(pb[1], pb[2])
-            temptable.PointC = Vector2.new(pc[1], pc[2])
-        end
-        temptable.Filled = filled
-        table.insert(tablename, temptable)
-        if tablename and not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:Circle(visible, pos_x, pos_y, size, thickness, sides, clr, tablename)
-        local temptable = Drawing.new("Circle")
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Visible = visible
-        temptable.Radius = size
-        temptable.Thickness = thickness
-        temptable.NumSides = sides
-        temptable.Transparency = clr[4]
-        temptable.Filled = false
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    function Draw:FilledCircle(visible, pos_x, pos_y, size, thickness, sides, clr, tablename)
-        local temptable = Drawing.new("Circle")
-        temptable.Position = Vector2.new(pos_x, pos_y)
-        temptable.Visible = visible
-        temptable.Radius = size
-        temptable.Thickness = thickness
-        temptable.NumSides = sides
-        temptable.Transparency = clr[4]
-        temptable.Filled = true
-        temptable.Color = RGB(clr[1], clr[2], clr[3])
-        table.insert(tablename, temptable)
-        if not table.find(allrender, tablename) then
-            table.insert(allrender, tablename)
-        end
-    end
-
-    --ANCHOR MENU ELEMENTS
-
-    function Draw:MenuOutlinedRect(visible, pos_x, pos_y, width, height, clr, tablename)
-        Draw:OutlinedRect(visible, pos_x + menu.x, pos_y + menu.y, width, height, clr, tablename)
-        table.insert(menu.postable, { tablename[#tablename], pos_x, pos_y })
-
-        if menu.log_multi ~= nil then
-            table.insert(menu.mgrouptabz[menu.log_multi[1]][menu.log_multi[2]], tablename[#tablename])
-        end
-    end
-
-    function Draw:MenuFilledRect(visible, pos_x, pos_y, width, height, clr, tablename)
-        Draw:FilledRect(visible, pos_x + menu.x, pos_y + menu.y, width, height, clr, tablename)
-        table.insert(menu.postable, { tablename[#tablename], pos_x, pos_y })
-
-        if menu.log_multi ~= nil then
-            table.insert(menu.mgrouptabz[menu.log_multi[1]][menu.log_multi[2]], tablename[#tablename])
-        end
-    end
-
-    function Draw:MenuImage(visible, imagedata, pos_x, pos_y, width, height, transparency, tablename)
-        Draw:Image(visible, imagedata, pos_x + menu.x, pos_y + menu.y, width, height, transparency, tablename)
-        table.insert(menu.postable, { tablename[#tablename], pos_x, pos_y })
-
-        if menu.log_multi ~= nil then
-            table.insert(menu.mgrouptabz[menu.log_multi[1]][menu.log_multi[2]], tablename[#tablename])
-        end
-    end
-
-    function Draw:MenuBigText(text, visible, centered, pos_x, pos_y, tablename)
-        local text = Draw:OutlinedText(
-            text,
-            2,
-            visible,
-            pos_x + menu.x,
-            pos_y + menu.y,
-            13,
-            centered,
-            { 255, 255, 255, 255 },
-            { 0, 0, 0 },
-            tablename
-        )
-        table.insert(menu.postable, { tablename[#tablename], pos_x, pos_y })
-
-        if menu.log_multi ~= nil then
-            table.insert(menu.mgrouptabz[menu.log_multi[1]][menu.log_multi[2]], tablename[#tablename])
-        end
-
-        return text
-    end
-
-    function Draw:CoolBox(name, x, y, width, height, tab)
-        Draw:MenuOutlinedRect(true, x, y, width, height, { 0, 0, 0, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, width - 2, height - 2, { 20, 20, 20, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 2, y + 2, width - 3, 1, { 127, 72, 163, 255 }, tab)
-        table.insert(menu.clrs.norm, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 2, y + 3, width - 3, 1, { 87, 32, 123, 255 }, tab)
-        table.insert(menu.clrs.dark, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 2, y + 4, width - 3, 1, { 20, 20, 20, 255 }, tab)
-
-        for i = 0, 7 do
-            Draw:MenuFilledRect(true, x + 2, y + 5 + (i * 2), width - 4, 2, { 45, 45, 45, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(45, 45, 45) }, [2] = { start = 7, color = RGB(35, 35, 35) } }
-            )
-        end
-
-        Draw:MenuBigText(name, true, false, x + 6, y + 5, tab)
-    end
-
-    function Draw:CoolMultiBox(names, x, y, width, height, tab)
-        Draw:MenuOutlinedRect(true, x, y, width, height, { 0, 0, 0, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, width - 2, height - 2, { 20, 20, 20, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 2, y + 2, width - 3, 1, { 127, 72, 163, 255 }, tab)
-        table.insert(menu.clrs.norm, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 2, y + 3, width - 3, 1, { 87, 32, 123, 255 }, tab)
-        table.insert(menu.clrs.dark, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 2, y + 4, width - 3, 1, { 20, 20, 20, 255 }, tab)
-
-        --{35, 35, 35, 255}
-
-        Draw:MenuFilledRect(true, x + 2, y + 5, width - 4, 18, { 30, 30, 30, 255 }, tab)
-        Draw:MenuFilledRect(true, x + 2, y + 21, width - 4, 2, { 20, 20, 20, 255 }, tab)
-
-        local selected = {}
-        for i = 0, 8 do
-            Draw:MenuFilledRect(true, x + 2, y + 5 + (i * 2), width - 159, 2, { 45, 45, 45, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 8, color = RGB(35, 35, 35) } }
-            )
-            table.insert(selected, { postable = #menu.postable, drawn = tab[#tab] })
-        end
-
-        local length = 2
-        local selected_pos = {}
-        local click_pos = {}
-        local nametext = {}
-        for i, v in ipairs(names) do
-            Draw:MenuBigText(v, true, false, x + 4 + length, y + 5, tab)
-            if i == 1 then
-                tab[#tab].Color = RGB(255, 255, 255)
-            else
-                tab[#tab].Color = RGB(170, 170, 170)
-            end
-            table.insert(nametext, tab[#tab])
-
-            Draw:MenuFilledRect(true, x + length + tab[#tab].TextBounds.X + 8, y + 5, 2, 16, { 20, 20, 20, 255 }, tab)
-            table.insert(selected_pos, { pos = x + length, length = tab[#tab - 1].TextBounds.X + 8 })
-            table.insert(click_pos, {
-                x = x + length,
-                y = y + 5,
-                width = tab[#tab - 1].TextBounds.X + 8,
-                height = 18,
-                name = v,
-                num = i,
-            })
-            length += tab[#tab - 1].TextBounds.X + 10
-        end
-
-        local settab = 1
-        for k, v in pairs(selected) do
-            menu.postable[v.postable][2] = selected_pos[settab].pos
-            v.drawn.Size = Vector2.new(selected_pos[settab].length, 2)
-        end
-
-        return { bar = selected, barpos = selected_pos, click_pos = click_pos, nametext = nametext }
-
-        --Draw:MenuBigText(str, true, false, x + 6, y + 5, tab)
-    end
-
-    function Draw:Toggle(name, value, unsafe, x, y, tab)
-        Draw:MenuOutlinedRect(true, x, y, 12, 12, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, 10, 10, { 0, 0, 0, 255 }, tab)
-
-        local temptable = {}
-        for i = 0, 3 do
-            Draw:MenuFilledRect(true, x + 2, y + 2 + (i * 2), 8, 2, { 0, 0, 0, 255 }, tab)
-            table.insert(temptable, tab[#tab])
-            if value then
-                tab[#tab].Color = ColorRange(i, {
-                    [1] = { start = 0, color = RGB(menu.mc[1], menu.mc[2], menu.mc[3]) },
-                    [2] = { start = 3, color = RGB(menu.mc[1] - 40, menu.mc[2] - 40, menu.mc[3] - 40) },
-                })
-            else
-                tab[#tab].Color = ColorRange(i, {
-                    [1] = { start = 0, color = RGB(50, 50, 50) },
-                    [2] = { start = 3, color = RGB(30, 30, 30) },
-                })
-            end
-        end
-
-        Draw:MenuBigText(name, true, false, x + 16, y - 1, tab)
-        if unsafe == true then
-            tab[#tab].Color = RGB(245, 239, 120)
-        end
-        table.insert(temptable, tab[#tab])
-        return temptable
-    end
-
-    function Draw:Keybind(key, x, y, tab)
-        local temptable = {}
-        Draw:MenuFilledRect(true, x, y, 44, 16, { 25, 25, 25, 255 }, tab)
-        Draw:MenuBigText(KeyEnumToName(key), true, true, x + 22, y + 1, tab)
-        table.insert(temptable, tab[#tab])
-        Draw:MenuOutlinedRect(true, x, y, 44, 16, { 30, 30, 30, 255 }, tab)
-        table.insert(temptable, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, 42, 14, { 0, 0, 0, 255 }, tab)
-
-        return temptable
-    end
-
-    function Draw:ColorPicker(color, x, y, tab)
-        local temptable = {}
-
-        Draw:MenuOutlinedRect(true, x, y, 28, 14, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, 26, 12, { 0, 0, 0, 255 }, tab)
-
-        Draw:MenuFilledRect(true, x + 2, y + 2, 24, 10, { color[1], color[2], color[3], 255 }, tab)
-        table.insert(temptable, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 2, y + 2, 24, 10, { color[1] - 40, color[2] - 40, color[3] - 40, 255 }, tab)
-        table.insert(temptable, tab[#tab])
-        Draw:MenuOutlinedRect(true, x + 3, y + 3, 22, 8, { color[1] - 40, color[2] - 40, color[3] - 40, 255 }, tab)
-        table.insert(temptable, tab[#tab])
-
-        return temptable
-    end
-
-    function Draw:Slider(name, stradd, value, minvalue, maxvalue, customvals, rounded, x, y, length, tab)
-        Draw:MenuBigText(name, true, false, x, y - 3, tab)
-
-        for i = 0, 3 do
-            Draw:MenuFilledRect(true, x + 2, y + 14 + (i * 2), length - 4, 2, { 0, 0, 0, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 3, color = RGB(30, 30, 30) } }
-            )
-        end
-
-        local temptable = {}
-        for i = 0, 3 do
-            Draw:MenuFilledRect(
-                true,
-                x + 2,
-                y + 14 + (i * 2),
-                (length - 4) * ((value - minvalue) / (maxvalue - minvalue)),
-                2,
-                { 0, 0, 0, 255 },
-                tab
-            )
-            table.insert(temptable, tab[#tab])
-            tab[#tab].Color = ColorRange(i, {
-                [1] = { start = 0, color = RGB(menu.mc[1], menu.mc[2], menu.mc[3]) },
-                [2] = { start = 3, color = RGB(menu.mc[1] - 40, menu.mc[2] - 40, menu.mc[3] - 40) },
-            })
-        end
-        Draw:MenuOutlinedRect(true, x, y + 12, length, 12, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 13, length - 2, 10, { 0, 0, 0, 255 }, tab)
-
-        local textstr = ""
-
-        if stradd == nil then
-            stradd = ""
-        end
-
-        local decplaces = rounded and string.rep("0", math.log(1 / rounded) / math.log(10)) or 1
-        if rounded and value == math.floor(value * decplaces) then
-            textstr = tostring(value) .. "." .. decplaces .. stradd
-        else
-            textstr = tostring(value) .. stradd
-        end
-
-        Draw:MenuBigText(customvals[value] or textstr, true, true, x + (length * 0.5), y + 11, tab)
-        table.insert(temptable, tab[#tab])
-        table.insert(temptable, stradd)
-        return temptable
-    end
-
-    function Draw:Dropbox(name, value, values, x, y, length, tab)
-        local temptable = {}
-        Draw:MenuBigText(name, true, false, x, y - 3, tab)
-
-        for i = 0, 7 do
-            Draw:MenuFilledRect(true, x + 2, y + 14 + (i * 2), length - 4, 2, { 0, 0, 0, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 7, color = RGB(35, 35, 35) } }
-            )
-        end
-
-        Draw:MenuOutlinedRect(true, x, y + 12, length, 22, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 13, length - 2, 20, { 0, 0, 0, 255 }, tab)
-
-        Draw:MenuBigText(tostring(values[value]), true, false, x + 6, y + 16, tab)
-        table.insert(temptable, tab[#tab])
-
-        Draw:MenuBigText("-", true, false, x - 17 + length, y + 16, tab)
-        table.insert(temptable, tab[#tab])
-
-        return temptable
-    end
-
-    function Draw:Combobox(name, values, x, y, length, tab)
-        local temptable = {}
-        Draw:MenuBigText(name, true, false, x, y - 3, tab)
-
-        for i = 0, 7 do
-            Draw:MenuFilledRect(true, x + 2, y + 14 + (i * 2), length - 4, 2, { 0, 0, 0, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 7, color = RGB(35, 35, 35) } }
-            )
-        end
-
-        Draw:MenuOutlinedRect(true, x, y + 12, length, 22, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 13, length - 2, 20, { 0, 0, 0, 255 }, tab)
-        local textthing = ""
-        for k, v in pairs(values) do
-            if v[2] then
-                if textthing == "" then
-                    textthing = v[1]
-                else
-                    textthing ..= ", " .. v[1]
-                end
-            end
-        end
-        textthing = string_cut(textthing, 25)
-        textthing = textthing ~= "" and textthing or "None"
-        Draw:MenuBigText(textthing, true, false, x + 6, y + 16, tab)
-        table.insert(temptable, tab[#tab])
-
-        Draw:MenuBigText("...", true, false, x - 27 + length, y + 16, tab)
-        table.insert(temptable, tab[#tab])
-
-        return temptable
-    end
-
-    function Draw:Button(name, x, y, length, tab)
-        local temptable = {}
-
-        for i = 0, 8 do
-            Draw:MenuFilledRect(true, x + 2, y + 2 + (i * 2), length - 4, 2, { 0, 0, 0, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 8, color = RGB(35, 35, 35) } }
-            )
-            table.insert(temptable, tab[#tab])
-        end
-
-        Draw:MenuOutlinedRect(true, x, y, length, 22, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, length - 2, 20, { 0, 0, 0, 255 }, tab)
-        temptable.text = Draw:MenuBigText(name, true, true, x + math.floor(length * 0.5), y + 4, tab)
-
-        return temptable
-    end
-
-    function Draw:List(name, x, y, length, maxamount, columns, tab)
-        local temptable = { uparrow = {}, downarrow = {}, liststuff = { rows = {}, words = {} } }
-
-        for i, v in ipairs(name) do
-            Draw:MenuBigText(
-                v,
-                true,
-                false,
-                (math.floor(length / columns) * i) - math.floor(length / columns) + 30,
-                y - 3,
-                tab
-            )
-        end
-
-        Draw:MenuOutlinedRect(true, x, y + 12, length, 22 * maxamount + 4, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 13, length - 2, 22 * maxamount + 2, { 0, 0, 0, 255 }, tab)
-
-        Draw:MenuFilledRect(true, x + length - 7, y + 16, 1, 1, { menu.mc[1], menu.mc[2], menu.mc[3], 255 }, tab)
-        table.insert(temptable.uparrow, tab[#tab])
-        table.insert(menu.clrs.norm, tab[#tab])
-        Draw:MenuFilledRect(true, x + length - 8, y + 17, 3, 1, { menu.mc[1], menu.mc[2], menu.mc[3], 255 }, tab)
-        table.insert(temptable.uparrow, tab[#tab])
-        table.insert(menu.clrs.norm, tab[#tab])
-        Draw:MenuFilledRect(true, x + length - 9, y + 18, 5, 1, { menu.mc[1], menu.mc[2], menu.mc[3], 255 }, tab)
-        table.insert(temptable.uparrow, tab[#tab])
-        table.insert(menu.clrs.norm, tab[#tab])
-
-        Draw:MenuFilledRect(
-            true,
-            x + length - 7,
-            y + 16 + (22 * maxamount + 4) - 9,
-            1,
-            1,
-            { menu.mc[1], menu.mc[2], menu.mc[3], 255 },
-            tab
-        )
-        table.insert(temptable.downarrow, tab[#tab])
-        table.insert(menu.clrs.norm, tab[#tab])
-        Draw:MenuFilledRect(
-            true,
-            x + length - 8,
-            y + 16 + (22 * maxamount + 4) - 10,
-            3,
-            1,
-            { menu.mc[1], menu.mc[2], menu.mc[3], 255 },
-            tab
-        )
-        table.insert(temptable.downarrow, tab[#tab])
-        table.insert(menu.clrs.norm, tab[#tab])
-        Draw:MenuFilledRect(
-            true,
-            x + length - 9,
-            y + 16 + (22 * maxamount + 4) - 11,
-            5,
-            1,
-            { menu.mc[1], menu.mc[2], menu.mc[3], 255 },
-            tab
-        )
-        table.insert(temptable.downarrow, tab[#tab])
-        table.insert(menu.clrs.norm, tab[#tab])
-
-        for i = 1, maxamount do
-            temptable.liststuff.rows[i] = {}
-            if i ~= maxamount then
-                Draw:MenuOutlinedRect(true, x + 4, (y + 13) + (22 * i), length - 8, 2, { 20, 20, 20, 255 }, tab)
-                table.insert(temptable.liststuff.rows[i], tab[#tab])
-            end
-
-            if columns ~= nil then
-                for i1 = 1, columns - 1 do
-                    Draw:MenuOutlinedRect(
-                        true,
-                        x + math.floor(length / columns) * i1,
-                        (y + 13) + (22 * i) - 18,
-                        2,
-                        16,
-                        { 20, 20, 20, 255 },
-                        tab
-                    )
-                    table.insert(temptable.liststuff.rows[i], tab[#tab])
-                end
-            end
-
-            temptable.liststuff.words[i] = {}
-            if columns ~= nil then
-                for i1 = 1, columns do
-                    Draw:MenuBigText(
-                        "",
-                        true,
-                        false,
-                        (x + math.floor(length / columns) * i1) - math.floor(length / columns) + 5,
-                        (y + 13) + (22 * i) - 16,
-                        tab
-                    )
-                    table.insert(temptable.liststuff.words[i], tab[#tab])
-                end
-            else
-                Draw:MenuBigText("", true, false, x + 5, (y + 13) + (22 * i) - 16, tab)
-                table.insert(temptable.liststuff.words[i], tab[#tab])
-            end
-        end
-
-        return temptable
-    end
-
-    function Draw:ImageWithText(size, image, text, x, y, tab)
-        local temptable = {}
-        Draw:MenuOutlinedRect(true, x, y, size + 4, size + 4, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, size + 2, size + 2, { 0, 0, 0, 255 }, tab)
-        Draw:MenuFilledRect(true, x + 2, y + 2, size, size, { 40, 40, 40, 255 }, tab)
-
-        Draw:MenuBigText(text, true, false, x + size + 8, y, tab)
-        table.insert(temptable, tab[#tab])
-
-        Draw:MenuImage(true, BBOT_IMAGES[5], x + 2, y + 2, size, size, 1, tab)
-        table.insert(temptable, tab[#tab])
-
-        return temptable
-    end
-
-    function Draw:TextBox(name, text, x, y, length, tab)
-        for i = 0, 8 do
-            Draw:MenuFilledRect(true, x + 2, y + 2 + (i * 2), length - 4, 2, { 0, 0, 0, 255 }, tab)
-            tab[#tab].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 8, color = RGB(35, 35, 35) } }
-            )
-        end
-
-        Draw:MenuOutlinedRect(true, x, y, length, 22, { 30, 30, 30, 255 }, tab)
-        Draw:MenuOutlinedRect(true, x + 1, y + 1, length - 2, 20, { 0, 0, 0, 255 }, tab)
-        Draw:MenuBigText(text, true, false, x + 6, y + 4, tab)
-
-        return tab[#tab]
-    end
-end
-
---funny graf
-local networkin = {
-    incoming = {},
-    outgoing = {},
-}
-
-for i = 1, 21 do
-    networkin.incoming[i] = 20
-    networkin.outgoing[i] = 2
-end
-local lasttick = tick()
-
-local infopos = 400
-
-local graphs = {
-    incoming = {
-        pos = {
-            x = 35,
-            y = infopos,
-        },
-        sides = {},
-        graph = {},
-    },
-    outgoing = {
-        pos = {
-            x = 35,
-            y = infopos + 97,
-        },
-        sides = {},
-        graph = {},
-    },
-    other = {},
-}
---- incoming
-Draw:OutlinedText(
-    "incoming kbps: 20",
-    2,
-    false,
-    graphs.incoming.pos.x - 1,
-    graphs.incoming.pos.y - 15,
-    13,
-    false,
-    { 255, 255, 255, 255 },
-    { 10, 10, 10 },
-    graphs.incoming.sides
-)
-Draw:OutlinedText(
-    "80",
-    2,
-    false,
-    graphs.incoming.pos.x - 21,
-    graphs.incoming.pos.y - 7,
-    13,
-    false,
-    { 255, 255, 255, 255 },
-    { 10, 10, 10 },
-    graphs.incoming.sides
-)
-
-Draw:FilledRect(
-    false,
-    graphs.incoming.pos.x - 1,
-    graphs.incoming.pos.y - 1,
-    222,
-    82,
-    { 10, 10, 10, 50 },
-    graphs.incoming.sides
-)
-
-Draw:Line(
-    false,
-    3,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y - 1,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y + 82,
-    { 20, 20, 20, 225 },
-    graphs.incoming.sides
-)
-Draw:Line(
-    false,
-    3,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y + 80,
-    graphs.incoming.pos.x + 221,
-    graphs.incoming.pos.y + 80,
-    { 20, 20, 20, 225 },
-    graphs.incoming.sides
-)
-Draw:Line(
-    false,
-    3,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y,
-    graphs.incoming.pos.x - 6,
-    graphs.incoming.pos.y,
-    { 20, 20, 20, 225 },
-    graphs.incoming.sides
-)
-
-Draw:Line(
-    false,
-    1,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y + 80,
-    { 255, 255, 255, 225 },
-    graphs.incoming.sides
-)
-Draw:Line(
-    false,
-    1,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y + 80,
-    graphs.incoming.pos.x + 220,
-    graphs.incoming.pos.y + 80,
-    { 255, 255, 255, 225 },
-    graphs.incoming.sides
-)
-Draw:Line(
-    false,
-    1,
-    graphs.incoming.pos.x,
-    graphs.incoming.pos.y,
-    graphs.incoming.pos.x - 5,
-    graphs.incoming.pos.y,
-    { 255, 255, 255, 225 },
-    graphs.incoming.sides
-)
-
-for i = 1, 20 do
-    Draw:Line(false, 1, 10, 10, 10, 10, { 255, 255, 255, 225 }, graphs.incoming.graph)
-end
-
-Draw:Line(false, 1, 10, 10, 10, 10, { 68, 255, 0, 255 }, graphs.incoming.graph)
-Draw:OutlinedText("avg: 20", 2, false, 20, 20, 13, false, { 68, 255, 0, 255 }, { 10, 10, 10 }, graphs.incoming.graph)
-
---- outgoing
-Draw:OutlinedText(
-    "outgoing kbps: 5",
-    2,
-    false,
-    graphs.outgoing.pos.x - 1,
-    graphs.outgoing.pos.y - 15,
-    13,
-    false,
-    { 255, 255, 255, 255 },
-    { 10, 10, 10 },
-    graphs.outgoing.sides
-)
-Draw:OutlinedText(
-    "10",
-    2,
-    false,
-    graphs.outgoing.pos.x - 21,
-    graphs.outgoing.pos.y - 7,
-    13,
-    false,
-    { 255, 255, 255, 255 },
-    { 10, 10, 10 },
-    graphs.outgoing.sides
-)
-
-Draw:FilledRect(
-    false,
-    graphs.outgoing.pos.x - 1,
-    graphs.outgoing.pos.y - 1,
-    222,
-    82,
-    { 10, 10, 10, 50 },
-    graphs.outgoing.sides
-)
-
-Draw:Line(
-    false,
-    3,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y - 1,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y + 82,
-    { 20, 20, 20, 225 },
-    graphs.outgoing.sides
-)
-Draw:Line(
-    false,
-    3,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y + 80,
-    graphs.outgoing.pos.x + 221,
-    graphs.outgoing.pos.y + 80,
-    { 20, 20, 20, 225 },
-    graphs.outgoing.sides
-)
-Draw:Line(
-    false,
-    3,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y,
-    graphs.outgoing.pos.x - 6,
-    graphs.outgoing.pos.y,
-    { 20, 20, 20, 225 },
-    graphs.outgoing.sides
-)
-
-Draw:Line(
-    false,
-    1,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y + 80,
-    { 255, 255, 255, 225 },
-    graphs.outgoing.sides
-)
-Draw:Line(
-    false,
-    1,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y + 80,
-    graphs.outgoing.pos.x + 220,
-    graphs.outgoing.pos.y + 80,
-    { 255, 255, 255, 225 },
-    graphs.outgoing.sides
-)
-Draw:Line(
-    false,
-    1,
-    graphs.outgoing.pos.x,
-    graphs.outgoing.pos.y,
-    graphs.outgoing.pos.x - 5,
-    graphs.outgoing.pos.y,
-    { 255, 255, 255, 225 },
-    graphs.outgoing.sides
-)
-
-for i = 1, 20 do
-    Draw:Line(false, 1, 10, 10, 10, 10, { 255, 255, 255, 225 }, graphs.outgoing.graph)
-end
-
-Draw:Line(false, 1, 10, 10, 10, 10, { 68, 255, 0, 255 }, graphs.outgoing.graph)
-Draw:OutlinedText("avg: 20", 2, false, 20, 20, 13, false, { 68, 255, 0, 255 }, { 10, 10, 10 }, graphs.outgoing.graph)
--- the fuckin fps and stuff i think xDDDDDd
-
-Draw:OutlinedText(
-    "loading...",
-    2,
-    false,
-    35,
-    infopos + 180,
-    13,
-    false,
-    { 255, 255, 255, 255 },
-    { 10, 10, 10 },
-    graphs.other
-)
-
-Draw:OutlinedText(
-    "[DEBUG LOGS]",
-    2,
-    false,
-    35,
-    infopos - 200,
-    13,
-    false,
-    { 255, 255, 255, 255 },
-    { 10, 10, 10 },
-    graphs.other
-)
-
--- finish
-
-local loadingthing = Draw:OutlinedText(
-    "Loading...",
-    2,
-    true,
-    math.floor(SCREEN_SIZE.x / 16),
-    math.floor(SCREEN_SIZE.y / 16),
-    13,
-    true,
-    { 255, 50, 200, 255 },
-    { 0, 0, 0 }
-)
-
-local tabz = {}
-local tabs = {} -- i like tabby catz 🐱🐱🐱
-
-function menu.Initialize(menutable)
-    local bbmenu = {} -- this one is for the rendering n shi
-    do
-        Draw:MenuOutlinedRect(true, 0, 0, menu.w, menu.h, { 0, 0, 0, 255 }, bbmenu) -- first gradent or whatever
-        Draw:MenuOutlinedRect(true, 1, 1, menu.w - 2, menu.h - 2, { 20, 20, 20, 255 }, bbmenu)
-        Draw:MenuOutlinedRect(true, 2, 2, menu.w - 3, 1, { 127, 72, 163, 255 }, bbmenu)
-        table.insert(menu.clrs.norm, bbmenu[#bbmenu])
-        Draw:MenuOutlinedRect(true, 2, 3, menu.w - 3, 1, { 87, 32, 123, 255 }, bbmenu)
-        table.insert(menu.clrs.dark, bbmenu[#bbmenu])
-        Draw:MenuOutlinedRect(true, 2, 4, menu.w - 3, 1, { 20, 20, 20, 255 }, bbmenu)
-
-        for i = 0, 19 do
-            Draw:MenuFilledRect(true, 2, 5 + i, menu.w - 4, 1, { 20, 20, 20, 255 }, bbmenu)
-            bbmenu[6 + i].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 20, color = RGB(35, 35, 35) } }
-            )
-        end
-        Draw:MenuFilledRect(true, 2, 25, menu.w - 4, menu.h - 27, { 35, 35, 35, 255 }, bbmenu)
-
-        Draw:MenuBigText(MenuName or "Bitch Bot", true, false, 6, 6, bbmenu)
-
-        Draw:MenuOutlinedRect(true, 8, 22, menu.w - 16, menu.h - 30, { 0, 0, 0, 255 }, bbmenu) -- all this shit does the 2nd gradent
-        Draw:MenuOutlinedRect(true, 9, 23, menu.w - 18, menu.h - 32, { 20, 20, 20, 255 }, bbmenu)
-        Draw:MenuOutlinedRect(true, 10, 24, menu.w - 19, 1, { 127, 72, 163, 255 }, bbmenu)
-        table.insert(menu.clrs.norm, bbmenu[#bbmenu])
-        Draw:MenuOutlinedRect(true, 10, 25, menu.w - 19, 1, { 87, 32, 123, 255 }, bbmenu)
-        table.insert(menu.clrs.dark, bbmenu[#bbmenu])
-        Draw:MenuOutlinedRect(true, 10, 26, menu.w - 19, 1, { 20, 20, 20, 255 }, bbmenu)
-
-        for i = 0, 14 do
-            Draw:MenuFilledRect(true, 10, 27 + (i * 2), menu.w - 20, 2, { 45, 45, 45, 255 }, bbmenu)
-            bbmenu[#bbmenu].Color = ColorRange(
-                i,
-                { [1] = { start = 0, color = RGB(50, 50, 50) }, [2] = { start = 15, color = RGB(35, 35, 35) } }
-            )
-        end
-        Draw:MenuFilledRect(true, 10, 57, menu.w - 20, menu.h - 67, { 35, 35, 35, 255 }, bbmenu)
-    end
-    -- ok now the cool part :D
-    --ANCHOR menu stuffz
-
-    for i = 1, #menutable do
-        tabz[i] = {}
-    end
-
-    menu.multigroups = {}
-
-    for k, v in pairs(menutable) do
-        Draw:MenuFilledRect(
-            true,
-            10 + ((k - 1) * ((menu.w - 20) / #menutable)),
-            27,
-            ((menu.w - 20) / #menutable),
-            32,
-            { 30, 30, 30, 255 },
-            bbmenu
-        )
-        Draw:MenuOutlinedRect(
-            true,
-            10 + ((k - 1) * ((menu.w - 20) / #menutable)),
-            27,
-            ((menu.w - 20) / #menutable),
-            32,
-            { 20, 20, 20, 255 },
-            bbmenu
-        )
-        Draw:MenuBigText(
-            v.name,
-            true,
-            true,
-            math.floor(10 + ((k - 1) * ((menu.w - 20) / #menutable)) + (((menu.w - 20) / #menutable) * 0.5)),
-            35,
-            bbmenu
-        )
-        table.insert(tabs, { bbmenu[#bbmenu - 2], bbmenu[#bbmenu - 1], bbmenu[#bbmenu] })
-        table.insert(menu.tabnames, v.name)
-
-        menu.options[v.name] = {}
-        menu.multigroups[v.name] = {}
-        menu.mgrouptabz[v.name] = {}
-
-        local y_offies = { left = 66, right = 66 }
-        if v.content ~= nil then
-            for k1, v1 in pairs(v.content) do
-                if v1.autopos ~= nil then
-                    v1.width = menu.columns.width
-                    if v1.autopos == "left" then
-                        v1.x = menu.columns.left
-                        v1.y = y_offies.left
-                    elseif v1.autopos == "right" then
-                        v1.x = menu.columns.right
-                        v1.y = y_offies.right
-                    end
-                end
-
-                local groups = {}
-
-                if type(v1.name) == "table" then
-                    groups = v1.name
-                else
-                    table.insert(groups, v1.name)
-                end
-
-                local y_pos = 24
-
-                for g_ind, g_name in ipairs(groups) do
-                    menu.options[v.name][g_name] = {}
-                    if type(v1.name) == "table" then
-                        menu.mgrouptabz[v.name][g_name] = {}
-                        menu.log_multi = { v.name, g_name }
-                    end
-
-                    local content = nil
-                    if type(v1.name) == "table" then
-                        y_pos = 28
-                        content = v1[g_ind].content
-                    else
-                        y_pos = 24
-                        content = v1.content
-                    end
-
-
-                    if content ~= nil then
-                        for k2, v2 in pairs(content) do
-                            if v2.type == TOGGLE then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                local unsafe = false
-                                if v2.unsafe then
-                                    unsafe = true
-                                end
-                                menu.options[v.name][g_name][v2.name][4] = Draw:Toggle(v2.name, v2.value, unsafe, v1.x + 8, v1.y + y_pos, tabz[k])
-                                menu.options[v.name][g_name][v2.name][1] = v2.value
-                                menu.options[v.name][g_name][v2.name][7] = v2.value
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name][3] = { v1.x + 7, v1.y + y_pos - 1 }
-                                menu.options[v.name][g_name][v2.name][6] = unsafe
-                                menu.options[v.name][g_name][v2.name].tooltip = v2.tooltip or nil
-                                if v2.extra ~= nil then
-                                    if v2.extra.type == KEYBIND then
-                                        menu.options[v.name][g_name][v2.name][5] = {}
-                                        menu.options[v.name][g_name][v2.name][5][4] = Draw:Keybind(
-                                            v2.extra.key,
-                                            v1.x + v1.width - 52,
-                                            y_pos + v1.y - 2,
-                                            tabz[k]
-                                        )
-                                        menu.options[v.name][g_name][v2.name][5][1] = v2.extra.key
-                                        menu.options[v.name][g_name][v2.name][5][2] = v2.extra.type
-                                        menu.options[v.name][g_name][v2.name][5][3] = { v1.x + v1.width - 52, y_pos + v1.y - 2 }
-                                        menu.options[v.name][g_name][v2.name][5][5] = false
-                                        menu.options[v.name][g_name][v2.name][5].toggletype = v2.extra.toggletype == nil and 1 or v2.extra.toggletype
-                                        menu.options[v.name][g_name][v2.name][5].relvalue = false
-                                        local event = event.new(("%s %s %s"):format(v.name, g_name, v2.name))
-                                        event:connect(function(newval)
-                                            if menu:GetVal("Visuals", "Keybinds" ,"Log Keybinds") then
-                                                CreateNotification(("%s %s %s has been set to %s"):format(v.name, g_name, v2.name, newval and "true" or "false"))
-                                            end
-                                        end)
-                                        menu.options[v.name][g_name][v2.name][5].event = event
-                                        menu.options[v.name][g_name][v2.name][5].bind = table.insert(menu.keybinds, {
-                                                menu.options[v.name][g_name][v2.name],
-                                                tostring(v2.name),
-                                                tostring(g_name),
-                                                tostring(v.name),
-                                            })
-                                    elseif v2.extra.type == COLORPICKER then
-                                        menu.options[v.name][g_name][v2.name][5] = {}
-                                        menu.options[v.name][g_name][v2.name][5][4] = Draw:ColorPicker(
-                                            v2.extra.color,
-                                            v1.x + v1.width - 38,
-                                            y_pos + v1.y - 1,
-                                            tabz[k]
-                                        )
-                                        menu.options[v.name][g_name][v2.name][5][1] = v2.extra.color
-                                        menu.options[v.name][g_name][v2.name][5][2] = v2.extra.type
-                                        menu.options[v.name][g_name][v2.name][5][3] = { v1.x + v1.width - 38, y_pos + v1.y - 1 }
-                                        menu.options[v.name][g_name][v2.name][5][5] = false
-                                        menu.options[v.name][g_name][v2.name][5][6] = v2.extra.name
-                                    elseif v2.extra.type == DOUBLE_COLORPICKER then
-                                        menu.options[v.name][g_name][v2.name][5] = {}
-                                        menu.options[v.name][g_name][v2.name][5][1] = {}
-                                        menu.options[v.name][g_name][v2.name][5][1][1] = {}
-                                        menu.options[v.name][g_name][v2.name][5][1][2] = {}
-                                        menu.options[v.name][g_name][v2.name][5][2] = v2.extra.type
-                                        for i = 1, 2 do
-                                            menu.options[v.name][g_name][v2.name][5][1][i][4] = Draw:ColorPicker(
-                                                v2.extra.color[i],
-                                                v1.x + v1.width - 38 - ((i - 1) * 34),
-                                                y_pos + v1.y - 1,
-                                                tabz[k]
-                                            )
-                                            menu.options[v.name][g_name][v2.name][5][1][i][1] = v2.extra.color[i]
-                                            menu.options[v.name][g_name][v2.name][5][1][i][3] = { v1.x + v1.width - 38 - ((i - 1) * 34), y_pos + v1.y - 1 }
-                                            menu.options[v.name][g_name][v2.name][5][1][i][5] = false
-                                            menu.options[v.name][g_name][v2.name][5][1][i][6] = v2.extra.name[i]
-                                        end
-                                    end
-                                end
-                                y_pos += 18
-                            elseif v2.type == SLIDER then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][4] = Draw:Slider(
-                                    v2.name,
-                                    v2.stradd,
-                                    v2.value,
-                                    v2.minvalue,
-                                    v2.maxvalue,
-                                    v2.custom or {},
-                                    v2.decimal,
-                                    v1.x + 8,
-                                    v1.y + y_pos,
-                                    v1.width - 16,
-                                    tabz[k]
-                                )
-                                menu.options[v.name][g_name][v2.name][1] = v2.value
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name][3] = { v1.x + 7, v1.y + y_pos - 1, v1.width - 16 }
-                                menu.options[v.name][g_name][v2.name][5] = false
-                                menu.options[v.name][g_name][v2.name][6] = { v2.minvalue, v2.maxvalue }
-                                menu.options[v.name][g_name][v2.name][7] = { v1.x + 7 + v1.width - 38, v1.y + y_pos - 1 }
-                                menu.options[v.name][g_name][v2.name].decimal = v2.decimal == nil and nil or v2.decimal
-                                menu.options[v.name][g_name][v2.name].stepsize = v2.stepsize
-                                menu.options[v.name][g_name][v2.name].shift_stepsize = v2.shift_stepsize
-                                menu.options[v.name][g_name][v2.name].custom = v2.custom or {}
-
-                                y_pos += 30
-                            elseif v2.type == DROPBOX then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][1] = v2.value
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name][5] = false
-                                menu.options[v.name][g_name][v2.name][6] = v2.values
-
-                                if v2.x == nil then
-                                    menu.options[v.name][g_name][v2.name][3] = { v1.x + 7, v1.y + y_pos - 1, v1.width - 16 }
-                                    menu.options[v.name][g_name][v2.name][4] = Draw:Dropbox(
-                                        v2.name,
-                                        v2.value,
-                                        v2.values,
-                                        v1.x + 8,
-                                        v1.y + y_pos,
-                                        v1.width - 16,
-                                        tabz[k]
-                                    )
-                                    y_pos += 40
-                                else
-                                    menu.options[v.name][g_name][v2.name][3] = { v2.x + 7, v2.y - 1, v2.w }
-                                    menu.options[v.name][g_name][v2.name][4] = Draw:Dropbox(v2.name, v2.value, v2.values, v2.x + 8, v2.y, v2.w, tabz[k])
-                                end
-                            elseif v2.type == COMBOBOX then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][4] = Draw:Combobox(
-                                        v2.name,
-                                        v2.values,
-                                        v1.x + 8,
-                                        v1.y + y_pos,
-                                        v1.width - 16,
-                                        tabz[k]
-                                    )
-                                menu.options[v.name][g_name][v2.name][1] = v2.values
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name][3] = { v1.x + 7, v1.y + y_pos - 1, v1.width - 16 }
-                                menu.options[v.name][g_name][v2.name][5] = false
-                                y_pos += 40
-                            elseif v2.type == BUTTON then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][1] = false
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name].name = v2.name
-                                menu.options[v.name][g_name][v2.name].groupbox = g_name
-                                menu.options[v.name][g_name][v2.name].tab = v.name -- why is it all v, v1, v2 so ugly
-                                menu.options[v.name][g_name][v2.name].doubleclick = v2.doubleclick
-
-                                if v2.x == nil then
-                                    menu.options[v.name][g_name][v2.name][3] = { v1.x + 7, v1.y + y_pos - 1, v1.width - 16 }
-                                    menu.options[v.name][g_name][v2.name][4] = Draw:Button(v2.name, v1.x + 8, v1.y + y_pos, v1.width - 16, tabz[k])
-                                    y_pos += 28
-                                else
-                                    menu.options[v.name][g_name][v2.name][3] = { v2.x + 7, v2.y - 1, v2.w }
-                                    menu.options[v.name][g_name][v2.name][4] = Draw:Button(v2.name, v2.x + 8, v2.y, v2.w, tabz[k])
-                                end
-                            elseif v2.type == TEXTBOX then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][4] = Draw:TextBox(v2.name, v2.text, v1.x + 8, v1.y + y_pos, v1.width - 16, tabz[k])
-                                menu.options[v.name][g_name][v2.name][1] = v2.text
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name][3] = { v1.x + 7, v1.y + y_pos - 1, v1.width - 16 }
-                                menu.options[v.name][g_name][v2.name][5] = false
-                                menu.options[v.name][g_name][v2.name][6] = v2.file and true or false
-                                y_pos += 28
-                            elseif v2.type == "list" then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][4] = Draw:List(
-                                    v2.multiname,
-                                    v1.x + 8,
-                                    v1.y + y_pos,
-                                    v1.width - 16,
-                                    v2.size,
-                                    v2.columns,
-                                    tabz[k]
-                                )
-                                menu.options[v.name][g_name][v2.name][1] = nil
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                                menu.options[v.name][g_name][v2.name][3] = 1
-                                menu.options[v.name][g_name][v2.name][5] = {}
-                                menu.options[v.name][g_name][v2.name][6] = v2.size
-                                menu.options[v.name][g_name][v2.name][7] = v2.columns
-                                menu.options[v.name][g_name][v2.name][8] = { v1.x + 8, v1.y + y_pos, v1.width - 16 }
-                                y_pos += 22 + (22 * v2.size)
-                            elseif v2.type == IMAGE then
-                                menu.options[v.name][g_name][v2.name] = {}
-                                menu.options[v.name][g_name][v2.name][1] = Draw:ImageWithText(v2.size, nil, v2.text, v1.x + 8, v1.y + y_pos, tabz[k])
-                                menu.options[v.name][g_name][v2.name][2] = v2.type
-                            end
-                        end
-                    end
-
-                    menu.log_multi = nil
-                end
-
-                y_pos += 2
-
-                if type(v1.name) ~= "table" then
-                    if v1.autopos == nil then
-                        Draw:CoolBox(v1.name, v1.x, v1.y, v1.width, v1.height, tabz[k])
-                    else
-                        if v1.autofill then
-                            y_pos = (menu.h - 17) - v1.y
-                        elseif v1.size ~= nil then
-                            y_pos = v1.size
-                        end
-                        Draw:CoolBox(v1.name, v1.x, v1.y, v1.width, y_pos, tabz[k])
-                        y_offies[v1.autopos] += y_pos + 6
-                    end
-                else
-                    if v1.autofill then
-                        y_pos = (menu.h - 17) - v1.y
-                        y_offies[v1.autopos] += y_pos + 6
-                    elseif v1.size ~= nil then
-                        y_pos = v1.size
-                        y_offies[v1.autopos] += y_pos + 6
-                    end
-
-                    local drawn
-
-                    if v1.autopos == nil then
-                        drawn = Draw:CoolMultiBox(v1.name, v1.x, v1.y, v1.width, v1.height, tabz[k])
-                    else
-                        drawn = Draw:CoolMultiBox(v1.name, v1.x, v1.y, v1.width, y_pos, tabz[k])
-                    end
-
-                    local group_vals = {}
-
-                    for _i, _v in ipairs(v1.name) do
-                        if _i == 1 then
-                            group_vals[_v] = true
-                        else
-                            group_vals[_v] = false
-                        end
-                    end
-                    table.insert(menu.multigroups[v.name], { vals = group_vals, drawn = drawn })
-                end
-            end
-        end
-    end
-
-    menu.list.addval = function(list, option)
-        table.insert(list[5], option)
-    end
-
-    menu.list.removeval = function(list, optionnum)
-        if list[1] == optionnum then
-            list[1] = nil
-        end
-        table.remove(list[5], optionnum)
-    end
-
-    menu.list.removeall = function(list)
-        list[5] = {}
-        for k, v in pairs(list[4].liststuff) do
-            for i, v1 in ipairs(v) do
-                for i1, v2 in ipairs(v1) do
-                    v2.Visible = false
-                end
-            end
-        end
-    end
-
-    menu.list.setval = function(list, value)
-        list[1] = value
-    end
-
-    Draw:MenuOutlinedRect(true, 10, 59, menu.w - 20, menu.h - 69, { 20, 20, 20, 255 }, bbmenu)
-
-    Draw:MenuOutlinedRect(true, 11, 58, ((menu.w - 20) / #menutable) - 2, 2, { 35, 35, 35, 255 }, bbmenu)
-    local barguy = { bbmenu[#bbmenu], menu.postable[#menu.postable] }
-
-    local function setActiveTab(slot)
-        barguy[1].Position = Vector2.new(
-            (menu.x + 11 + ((((menu.w - 20) / #menutable) - 2) * (slot - 1))) + ((slot - 1) * 2),
-            menu.y + 58
-        )
-        barguy[2][2] = (11 + ((((menu.w - 20) / #menutable) - 2) * (slot - 1))) + ((slot - 1) * 2)
-        barguy[2][3] = 58
-
-        for k, v in pairs(tabs) do
-            if k == slot then
-                v[1].Visible = false
-                v[3].Color = RGB(255, 255, 255)
-            else
-                v[3].Color = RGB(170, 170, 170)
-                v[1].Visible = true
-            end
-        end
-
-        for k, v in pairs(tabz) do
-            if k == slot then
-                for k1, v1 in pairs(v) do
-                    v1.Visible = true
-                end
-            else
-                for k1, v1 in pairs(v) do
-                    v1.Visible = false
-                end
-            end
-        end
-
-        for k, v in pairs(menu.multigroups) do
-            if menu.tabnames[menu.activetab] == k then
-                for k1, v1 in pairs(v) do
-                    for k2, v2 in pairs(v1.vals) do
-                        for k3, v3 in pairs(menu.mgrouptabz[k][k2]) do
-                            v3.Visible = v2
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    setActiveTab(menu.activetab)
-
-    local plusminus = {}
-
-    Draw:OutlinedText("_", 1, false, 10, 10, 14, false, { 225, 225, 225, 255 }, { 20, 20, 20 }, plusminus)
-    Draw:OutlinedText("+", 1, false, 10, 10, 14, false, { 225, 225, 225, 255 }, { 20, 20, 20 }, plusminus)
-
-    function menu:SetPlusMinus(value, x, y)
-        for i, v in ipairs(plusminus) do
-            if value == 0 then
-                v.Visible = false
-            else
-                v.Visible = true
-            end
-        end
-
-        if value ~= 0 then
-            plusminus[1].Position = Vector2.new(x + 3 + menu.x, y - 5 + menu.y)
-            plusminus[2].Position = Vector2.new(x + 13 + menu.x, y - 1 + menu.y)
-
-            if value == 1 then
-                for i, v in ipairs(plusminus) do
-                    v.Color = RGB(225, 225, 225)
-                    v.OutlineColor = RGB(20, 20, 20)
-                end
-            else
-                for i, v in ipairs(plusminus) do
-                    if i + 1 == value then
-                        v.Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                    else
-                        v.Color = RGB(255, 255, 255)
-                    end
-                    v.OutlineColor = RGB(0, 0, 0)
-                end
-            end
-        end
-    end
-
-    menu:SetPlusMinus(0, 20, 20)
-
-    --DROP BOX THINGY
-    local dropboxthingy = {}
-    local dropboxtexty = {}
-
-    Draw:OutlinedRect(false, 20, 20, 100, 22, { 20, 20, 20, 255 }, dropboxthingy)
-    Draw:OutlinedRect(false, 21, 21, 98, 20, { 0, 0, 0, 255 }, dropboxthingy)
-    Draw:FilledRect(false, 22, 22, 96, 18, { 45, 45, 45, 255 }, dropboxthingy)
-
-    for i = 1, 30 do
-        Draw:OutlinedText("", 2, false, 20, 20, 13, false, { 255, 255, 255, 255 }, { 0, 0, 0 }, dropboxtexty)
-    end
-
-    function menu:SetDropBox(visible, x, y, length, value, values)
-        for k, v in pairs(dropboxthingy) do
-            v.Visible = visible
-        end
-
-        local size = Vector2.new(length, 21 * (#values + 1) + 3)
-        -- if y + size.y > SCREEN_SIZE.y then
-        --     y = SCREEN_SIZE.y - size.y
-        -- end
-        -- if x + size.x > SCREEN_SIZE.x then
-        --     x = SCREEN_SIZE.x - size.x
-        -- end
-        -- if y < 0 then
-        --     y = 0
-        -- end
-        -- if x < 0 then
-        --     x = 0
-        -- end
-
-        local pos = Vector2.new(x, y)
-        dropboxthingy[1].Position = pos
-        dropboxthingy[2].Position = Vector2.new(x + 1, y + 1)
-        dropboxthingy[3].Position = Vector2.new(x + 2, y + 22)
-
-        dropboxthingy[1].Size = size
-        dropboxthingy[2].Size = Vector2.new(length - 2, (21 * (#values + 1)) + 1)
-        dropboxthingy[3].Size = Vector2.new(length - 4, (21 * #values) + 1 - 1)
-
-
-       
-        if visible then
-            for i = 1, #values do
-                dropboxtexty[i].Position = Vector2.new(x + 6, y + 26 + ((i - 1) * 21))
-                dropboxtexty[i].Visible = true
-                dropboxtexty[i].Text = values[i]
-                if i == value then
-                    dropboxtexty[i].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                else
-                    dropboxtexty[i].Color = RGB(255, 255, 255)
-                end
-            end
-        else
-            for k, v in pairs(dropboxtexty) do
-                v.Visible = false
-            end
-        end
-        return pos
-    end
-
-    local function set_comboboxthingy(visible, x, y, length, values)
-        for k, v in pairs(dropboxthingy) do
-            v.Visible = visible
-        end
-        local size = Vector2.new(length, 22 * (#values + 1) + 2)
-
-        if y + size.y > SCREEN_SIZE.y then
-            y = SCREEN_SIZE.y - size.y
-        end
-        if x + size.x > SCREEN_SIZE.x then
-            x = SCREEN_SIZE.x - size.x
-        end
-        if y < 0 then
-            y = 0
-        end
-        if x < 0 then
-            x = 0
-        end
-        local pos = Vector2.new(x,y)
-        dropboxthingy[1].Position = pos
-        dropboxthingy[2].Position = Vector2.new(x + 1, y + 1)
-        dropboxthingy[3].Position = Vector2.new(x + 2, y + 22)
-
-        dropboxthingy[1].Size = size
-        dropboxthingy[2].Size = Vector2.new(length - 2, (22 * (#values + 1)))
-        dropboxthingy[3].Size = Vector2.new(length - 4, (22 * #values))
-
-        if visible then
-            for i = 1, #values do
-                dropboxtexty[i].Position = Vector2.new(x + 6, y + 26 + ((i - 1) * 22))
-                dropboxtexty[i].Visible = true
-                dropboxtexty[i].Text = values[i][1]
-                if values[i][2] then
-                    dropboxtexty[i].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                else
-                    dropboxtexty[i].Color = RGB(255, 255, 255)
-                end
-            end
-        else
-            for k, v in pairs(dropboxtexty) do
-                v.Visible = false
-            end
-        end
-        return pos
-    end
-
-    menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-
-    --MODE SELECT THING
-    local modeselect = {}
-
-    Draw:OutlinedRect(false, 20, 20, 100, 22, { 20, 20, 20, 255 }, modeselect)
-    Draw:OutlinedRect(false, 21, 21, 98, 20, { 0, 0, 0, 255 }, modeselect)
-    Draw:FilledRect(false, 22, 22, 96, 18, { 45, 45, 45, 255 }, modeselect)
-
-    local modeselecttext = { "Hold", "Toggle", "Hold Off", "Always" }
-    for i = 1, 4 do
-        Draw:OutlinedText(
-            modeselecttext[i],
-            2,
-            false,
-            20,
-            20,
-            13,
-            false,
-            { 255, 255, 255, 255 },
-            { 0, 0, 0 },
-            modeselect
-        )
-    end
-
-    function menu:SetKeybindSelect(visible, x, y, value)
-        for k, v in pairs(modeselect) do
-            v.Visible = visible
-        end
-
-        if visible then
-            modeselect[1].Position = Vector2.new(x, y)
-            modeselect[2].Position = Vector2.new(x + 1, y + 1)
-            modeselect[3].Position = Vector2.new(x + 2, y + 2)
-
-            modeselect[1].Size = Vector2.new(70, 22 * 4 - 1)
-            modeselect[2].Size = Vector2.new(70 - 2, 22 * 4 - 3)
-            modeselect[3].Size = Vector2.new(70 - 4, 22 * 4 - 5)
-
-            for i = 1, 4 do
-                modeselect[i + 3].Position = Vector2.new(x + 6, y + 4 + ((i - 1) * 21))
-                if value == i then
-                    modeselect[i + 3].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                else
-                    modeselect[i + 3].Color = RGB(255, 255, 255)
-                end
-            end
-        end
-    end
-
-    menu:SetKeybindSelect(false, 200, 400, 1)
-
-    --COLOR PICKER
-    local cp = {
-        x = 400,
-        y = 40,
-        w = 280,
-        h = 211,
-        alpha = false,
-        dragging_m = false,
-        dragging_r = false,
-        dragging_b = false,
-        hsv = {
-            h = 0,
-            s = 0,
-            v = 0,
-            a = 0,
-        },
-        postable = {},
-        drawings = {},
-    }
-
-    local function ColorpickerOutline(visible, pos_x, pos_y, width, height, clr, tablename) -- doing all this shit to make it easier for me to make this beat look nice and shit ya fell dog :dog_head:
-        Draw:OutlinedRect(visible, pos_x + cp.x, pos_y + cp.y, width, height, clr, tablename)
-        table.insert(cp.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    local function ColorpickerRect(visible, pos_x, pos_y, width, height, clr, tablename)
-        Draw:FilledRect(visible, pos_x + cp.x, pos_y + cp.y, width, height, clr, tablename)
-        table.insert(cp.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    local function ColorpickerImage(visible, imagedata, pos_x, pos_y, width, height, transparency, tablename)
-        Draw:Image(visible, imagedata, pos_x, pos_y, width, height, transparency, tablename)
-        table.insert(cp.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    local function ColorpickerText(text, visible, centered, pos_x, pos_y, tablename)
-        Draw:OutlinedText(
-            text,
-            2,
-            visible,
-            pos_x + cp.x,
-            pos_y + cp.y,
-            13,
-            centered,
-            { 255, 255, 255, 255 },
-            { 0, 0, 0 },
-            tablename
-        )
-        table.insert(cp.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    ColorpickerRect(false, 1, 1, cp.w, cp.h, { 35, 35, 35, 255 }, cp.drawings)
-    ColorpickerOutline(false, 1, 1, cp.w, cp.h, { 0, 0, 0, 255 }, cp.drawings)
-    ColorpickerOutline(false, 2, 2, cp.w - 2, cp.h - 2, { 20, 20, 20, 255 }, cp.drawings)
-    ColorpickerOutline(false, 3, 3, cp.w - 3, 1, { 127, 72, 163, 255 }, cp.drawings)
-    table.insert(menu.clrs.norm, cp.drawings[#cp.drawings])
-    ColorpickerOutline(false, 3, 4, cp.w - 3, 1, { 87, 32, 123, 255 }, cp.drawings)
-    table.insert(menu.clrs.dark, cp.drawings[#cp.drawings])
-    ColorpickerOutline(false, 3, 5, cp.w - 3, 1, { 20, 20, 20, 255 }, cp.drawings)
-    ColorpickerText("color picker :D", false, false, 7, 6, cp.drawings)
-
-    ColorpickerText("x", false, false, 268, 4, cp.drawings)
-
-    ColorpickerOutline(false, 10, 23, 160, 160, { 30, 30, 30, 255 }, cp.drawings)
-    ColorpickerOutline(false, 11, 24, 158, 158, { 0, 0, 0, 255 }, cp.drawings)
-    ColorpickerRect(false, 12, 25, 156, 156, { 0, 0, 0, 255 }, cp.drawings)
-    local maincolor = cp.drawings[#cp.drawings]
-    ColorpickerImage(false, BBOT_IMAGES[1], 12, 25, 156, 156, 1, cp.drawings)
-
-    --https://i.imgur.com/jG3NjxN.png
-    local alphabar = {}
-    ColorpickerOutline(false, 10, 189, 160, 14, { 30, 30, 30, 255 }, cp.drawings)
-    table.insert(alphabar, cp.drawings[#cp.drawings])
-    ColorpickerOutline(false, 11, 190, 158, 12, { 0, 0, 0, 255 }, cp.drawings)
-    table.insert(alphabar, cp.drawings[#cp.drawings])
-    ColorpickerImage(false, BBOT_IMAGES[2], 12, 191, 159, 10, 1, cp.drawings)
-    table.insert(alphabar, cp.drawings[#cp.drawings])
-
-    ColorpickerOutline(false, 176, 23, 14, 160, { 30, 30, 30, 255 }, cp.drawings)
-    ColorpickerOutline(false, 177, 24, 12, 158, { 0, 0, 0, 255 }, cp.drawings)
-    --https://i.imgur.com/2Ty4u2O.png
-    ColorpickerImage(false, BBOT_IMAGES[3], 178, 25, 10, 156, 1, cp.drawings)
-
-    ColorpickerText("New Color", false, false, 198, 23, cp.drawings)
-    ColorpickerOutline(false, 197, 37, 75, 40, { 30, 30, 30, 255 }, cp.drawings)
-    ColorpickerOutline(false, 198, 38, 73, 38, { 0, 0, 0, 255 }, cp.drawings)
-    ColorpickerImage(false, BBOT_IMAGES[4], 199, 39, 71, 36, 1, cp.drawings)
-
-    ColorpickerRect(false, 199, 39, 71, 36, { 255, 0, 0, 255 }, cp.drawings)
-    local newcolor = cp.drawings[#cp.drawings]
-
-    ColorpickerText("copy", false, true, 198 + 36, 41, cp.drawings)
-    ColorpickerText("paste", false, true, 198 + 37, 56, cp.drawings)
-    local newcopy = { cp.drawings[#cp.drawings - 1], cp.drawings[#cp.drawings] }
-
-    ColorpickerText("Old Color", false, false, 198, 77, cp.drawings)
-    ColorpickerOutline(false, 197, 91, 75, 40, { 30, 30, 30, 255 }, cp.drawings)
-    ColorpickerOutline(false, 198, 92, 73, 38, { 0, 0, 0, 255 }, cp.drawings)
-    ColorpickerImage(false, BBOT_IMAGES[4], 199, 93, 71, 36, 1, cp.drawings)
-
-    ColorpickerRect(false, 199, 93, 71, 36, { 255, 0, 0, 255 }, cp.drawings)
-    local oldcolor = cp.drawings[#cp.drawings]
-
-    ColorpickerText("copy", false, true, 198 + 36, 103, cp.drawings)
-    local oldcopy = { cp.drawings[#cp.drawings] }
-
-    --ColorpickerRect(false, 197, cp.h - 25, 75, 20, {30, 30, 30, 255}, cp.drawings)
-    ColorpickerText("[ Apply ]", false, true, 235, cp.h - 23, cp.drawings)
-    local applytext = cp.drawings[#cp.drawings]
-
-    local function set_newcolor(r, g, b, a)
-        newcolor.Color = RGB(r, g, b)
-        if a ~= nil then
-            newcolor.Transparency = a / 255
-        else
-            newcolor.Transparency = 1
-        end
-    end
-
-    local function set_oldcolor(r, g, b, a)
-        oldcolor.Color = RGB(r, g, b)
-        cp.oldcolor = oldcolor.Color
-        cp.oldcoloralpha = a
-        if a ~= nil then
-            oldcolor.Transparency = a / 255
-        else
-            oldcolor.Transparency = 1
-        end
-    end
-    -- all this color picker shit is disgusting, why can't it be in it's own fucking scope. these are all global
-    local dragbar_r = {}
-    Draw:OutlinedRect(true, 30, 30, 16, 5, { 0, 0, 0, 255 }, cp.drawings)
-    table.insert(dragbar_r, cp.drawings[#cp.drawings])
-    Draw:OutlinedRect(true, 31, 31, 14, 3, { 255, 255, 255, 255 }, cp.drawings)
-    table.insert(dragbar_r, cp.drawings[#cp.drawings])
-
-    local dragbar_b = {}
-    Draw:OutlinedRect(true, 30, 30, 5, 16, { 0, 0, 0, 255 }, cp.drawings)
-    table.insert(dragbar_b, cp.drawings[#cp.drawings])
-    table.insert(alphabar, cp.drawings[#cp.drawings])
-    Draw:OutlinedRect(true, 31, 31, 3, 14, { 255, 255, 255, 255 }, cp.drawings)
-    table.insert(dragbar_b, cp.drawings[#cp.drawings])
-    table.insert(alphabar, cp.drawings[#cp.drawings])
-
-    local dragbar_m = {}
-    Draw:OutlinedRect(true, 30, 30, 5, 5, { 0, 0, 0, 255 }, cp.drawings)
-    table.insert(dragbar_m, cp.drawings[#cp.drawings])
-    Draw:OutlinedRect(true, 31, 31, 3, 3, { 255, 255, 255, 255 }, cp.drawings)
-    table.insert(dragbar_m, cp.drawings[#cp.drawings])
-
-    function menu:SetDragBarR(x, y)
-        dragbar_r[1].Position = Vector2.new(x, y)
-        dragbar_r[2].Position = Vector2.new(x + 1, y + 1)
-    end
-
-    function menu:SetDragBarB(x, y)
-        dragbar_b[1].Position = Vector2.new(x, y)
-        dragbar_b[2].Position = Vector2.new(x + 1, y + 1)
-    end
-
-    function menu:SetDragBarM(x, y)
-        dragbar_m[1].Position = Vector2.new(x, y)
-        dragbar_m[2].Position = Vector2.new(x + 1, y + 1)
-    end
-
-    function menu:SetColorPicker(visible, color, value, alpha, text, x, y)
-        for k, v in pairs(cp.drawings) do
-            v.Visible = visible
-        end
-        cp.oldalpha = alpha
-        if visible then
-            cp.x = clamp(x, 0, SCREEN_SIZE.x - cp.w)
-            cp.y = clamp(y, 0, SCREEN_SIZE.y - cp.h)
-            for k, v in pairs(cp.postable) do
-                v[1].Position = Vector2.new(cp.x + v[2], cp.y + v[3])
-            end
-
-            local tempclr = RGB(color[1], color[2], color[3])
-            local h, s, v = tempclr:ToHSV()
-            cp.hsv.h = h
-            cp.hsv.s = s
-            cp.hsv.v = v
-
-            menu:SetDragBarR(cp.x + 175, cp.y + 23 + math.floor((1 - h) * 156))
-            menu:SetDragBarM(cp.x + 9 + math.floor(s * 156), cp.y + 23 + math.floor((1 - v) * 156))
-            if not alpha then
-                set_newcolor(color[1], color[2], color[3])
-                set_oldcolor(color[1], color[2], color[3])
-                cp.alpha = false
-                for k, v in pairs(alphabar) do
-                    v.Visible = false
-                end
-                cp.h = 191
-                for i = 1, 2 do
-                    cp.drawings[i].Size = Vector2.new(cp.w, cp.h)
-                end
-                cp.drawings[3].Size = Vector2.new(cp.w - 2, cp.h - 2)
-            else
-                cp.hsv.a = color[4]
-                cp.alpha = true
-                set_newcolor(color[1], color[2], color[3], color[4])
-                set_oldcolor(color[1], color[2], color[3], color[4])
-                cp.h = 211
-                for i = 1, 2 do
-                    cp.drawings[i].Size = Vector2.new(cp.w, cp.h)
-                end
-                cp.drawings[3].Size = Vector2.new(cp.w - 2, cp.h - 2)
-                menu:SetDragBarB(cp.x + 12 + math.floor(156 * (color[4] / 255)), cp.y + 188)
-            end
-
-            applytext.Position = Vector2.new(235 + cp.x, cp.y + cp.h - 23)
-            maincolor.Color = Color3.fromHSV(h, 1, 1)
-            cp.drawings[7].Text = text
-        end
-    end
-
-    menu:SetColorPicker(false, { 255, 0, 0 }, nil, false, "", 0, 0)
-
-    --TOOL TIP
-    local tooltip = {
-        x = 0,
-        y = 0,
-        time = 0,
-        active = false,
-        text = "This does this and that i guess\npooping 24/7",
-        drawings = {},
-        postable = {},
-    }
-
-    local function ttOutline(visible, pos_x, pos_y, width, height, clr, tablename)
-        Draw:OutlinedRect(visible, pos_x + tooltip.x, pos_y + tooltip.y, width, height, clr, tablename)
-        table.insert(tooltip.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    local function ttRect(visible, pos_x, pos_y, width, height, clr, tablename)
-        Draw:FilledRect(visible, pos_x + tooltip.x, pos_y + tooltip.y, width, height, clr, tablename)
-        table.insert(tooltip.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    local function ttText(text, visible, centered, pos_x, pos_y, tablename)
-        Draw:OutlinedText(
-            text,
-            2,
-            visible,
-            pos_x + tooltip.x,
-            pos_y + tooltip.y,
-            13,
-            centered,
-            { 255, 255, 255, 255 },
-            { 0, 0, 0 },
-            tablename
-        )
-        table.insert(tooltip.postable, { tablename[#tablename], pos_x, pos_y })
-    end
-
-    ttRect(
-        false,
-        tooltip.x + 1,
-        tooltip.y + 1,
-        1,
-        28,
-        { menu.mc[1], menu.mc[2], menu.mc[3], 255 },
-        tooltip.drawings
-    )
-    ttRect(
-        false,
-        tooltip.x + 2,
-        tooltip.y + 1,
-        1,
-        28,
-        { menu.mc[1] - 40, menu.mc[2] - 40, menu.mc[3] - 40, 255 },
-        tooltip.drawings
-    )
-    ttOutline(false, tooltip.x, tooltip.y, 4, 30, { 20, 20, 20, 255 }, tooltip.drawings)
-    ttRect(false, tooltip.x + 4, tooltip.y, 100, 30, { 40, 40, 40, 255 }, tooltip.drawings)
-    ttOutline(false, tooltip.x - 1, tooltip.y - 1, 102, 32, { 0, 0, 0, 255 }, tooltip.drawings)
-    ttOutline(false, tooltip.x + 3, tooltip.y, 102, 30, { 20, 20, 20, 255 }, tooltip.drawings)
-    ttText(tooltip.text, false, false, tooltip.x + 7, tooltip.y + 1, tooltip.drawings)
-
-    local bbmouse = {}
-    function menu:SetToolTip(x, y, text, visible, dt)
-        dt = dt or 0
-        x = x or tooltip.x
-        y = y or tooltip.y
-        tooltip.x = x
-        tooltip.y = y
-        if tooltip.time < 1 and visible then
-            if tooltip.time < -1 then
-                tooltip.time = -1
-            end
-            tooltip.time += dt
-        else
-            tooltip.time -= dt
-            if tooltip.time < -1 then
-                tooltip.time = -1
-            end
-        end
-        if not visible and tooltip.time < 0 then
-            tooltip.time = -1
-        end
-        if tooltip.time > 1 then
-            tooltip.time = 1
-        end
-        for k, v in ipairs(tooltip.drawings) do
-            v.Visible = tooltip.time > 0
-        end
-
-        tooltip.active = visible
-        if text then
-            tooltip.drawings[7].Text = text
-        end
-        for k, v in pairs(tooltip.postable) do
-            v[1].Position = Vector2.new(x + v[2], y + v[3])
-            v[1].Transparency = math.min((0.3 + tooltip.time) ^ 3 - 1, menu.fade_amount or 1)
-        end
-        tooltip.drawings[1].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-        tooltip.drawings[2].Color = RGB(menu.mc[1] - 40, menu.mc[2] - 40, menu.mc[3] - 40)
-
-        local tb = tooltip.drawings[7].TextBounds
-
-        tooltip.drawings[1].Size = Vector2.new(1, tb.Y + 3)
-        tooltip.drawings[2].Size = Vector2.new(1, tb.Y + 3)
-        tooltip.drawings[3].Size = Vector2.new(4, tb.Y + 5)
-        tooltip.drawings[4].Size = Vector2.new(tb.X + 6, tb.Y + 5)
-        tooltip.drawings[5].Size = Vector2.new(tb.X + 12, tb.Y + 7)
-        tooltip.drawings[6].Size = Vector2.new(tb.X + 7, tb.Y + 5)
-        if bbmouse[#bbmouse] then
-            bbmouse[#bbmouse].Visible = visible
-            bbmouse[#bbmouse].Transparency = 1 - tooltip.time
-        end
-    end
-
-    menu:SetToolTip(500, 500, "", false)
-
-    -- mouse shiz
-    local mousie = {
-        x = 100,
-        y = 240,
-    }
-    Draw:Triangle(
-        true,
-        true,
-        { mousie.x, mousie.y },
-        { mousie.x, mousie.y + 15 },
-        { mousie.x + 10, mousie.y + 10 },
-        { 127, 72, 163, 255 },
-        bbmouse
-    )
-    table.insert(menu.clrs.norm, bbmouse[#bbmouse])
-    Draw:Triangle(
-        true,
-        false,
-        { mousie.x, mousie.y },
-        { mousie.x, mousie.y + 15 },
-        { mousie.x + 10, mousie.y + 10 },
-        { 0, 0, 0, 255 },
-        bbmouse
-    )
-    Draw:OutlinedText("", 2, false, 0, 0, 13, false, { 255, 255, 255, 255 }, { 15, 15, 15 }, bbmouse)
-    Draw:OutlinedText("?", 2, false, 0, 0, 13, false, { 255, 255, 255, 255 }, { 15, 15, 15 }, bbmouse)
-
-    local lastMousePos = Vector2.new()
-    function menu:SetMousePosition(x, y)
-        FireEvent("bb_mousemoved", lastMousePos ~= Vector2.new(x, y))
-        for k = 1, #bbmouse do
-            local v = bbmouse[k]
-            if k ~= #bbmouse and k ~= #bbmouse - 1 then
-                v.PointA = Vector2.new(x, y + 36)
-                v.PointB = Vector2.new(x, y + 36 + 15)
-                v.PointC = Vector2.new(x + 10, y + 46)
-            else
-                v.Position = Vector2.new(x + 10, y + 46)
-            end
-        end
-        lastMousePos = Vector2.new(x, y)
-    end
-
-    function menu:SetColor(r, g, b)
-        menu.watermark.rect[1].Color = RGB(r - 40, g - 40, b - 40)
-        menu.watermark.rect[2].Color = RGB(r, g, b)
-
-        for k, v in pairs(menu.clrs.norm) do
-            v.Color = RGB(r, g, b)
-        end
-        for k, v in pairs(menu.clrs.dark) do
-            v.Color = RGB(r - 40, g - 40, b - 40)
-        end
-        local menucolor = { r, g, b }
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == TOGGLE then
-                        if not v2[1] then
-                            for i = 0, 3 do
-                                v2[4][i + 1].Color = ColorRange(i, {
-                                    [1] = { start = 0, color = RGB(50, 50, 50) },
-                                    [2] = { start = 3, color = RGB(30, 30, 30) },
-                                })
-                            end
-                        else
-                            for i = 0, 3 do
-                                v2[4][i + 1].Color = ColorRange(i, {
-                                    [1] = { start = 0, color = RGB(menucolor[1], menucolor[2], menucolor[3]) },
-                                    [2] = {
-                                        start = 3,
-                                        color = RGB(menucolor[1] - 40, menucolor[2] - 40, menucolor[3] - 40),
-                                    },
-                                })
-                            end
-                        end
-                    elseif v2[2] == SLIDER then
-                        for i = 0, 3 do
-                            v2[4][i + 1].Color = ColorRange(i, {
-                                [1] = { start = 0, color = RGB(menucolor[1], menucolor[2], menucolor[3]) },
-                                [2] = {
-                                    start = 3,
-                                    color = RGB(menucolor[1] - 40, menucolor[2] - 40, menucolor[3] - 40),
-                                },
-                            })
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    local function UpdateConfigs()
-        local configthing = menu.options["Settings"]["Configuration"]["Configs"]
-
-        configthing[6] = GetConfigs()
-        if configthing[1] > #configthing[6] then
-            configthing[1] = #configthing[6]
-        end
-        configthing[4][1].Text = configthing[6][configthing[1]]
-    end
-
-    menu.keybind_open = nil
-
-    menu.dropbox_open = nil
-
-    menu.colorPickerOpen = false
-
-    menu.textboxopen = nil
-
-    local shooties = {}
-    local isPlayerScoped = false
-
-    function menu:InputBeganMenu(key) --ANCHOR menu input
-        if key.KeyCode == Enum.KeyCode.Delete and not loadingthing.Visible then
-            cp.dragging_m = false
-            cp.dragging_r = false
-            cp.dragging_b = false
-
-            customChatSpam = {}
-            customKillSay = {}
-            local customtxt = readfile("bitchbot/chatspam.txt")
-            for s in customtxt:gmatch("[^\n]+") do -- I'm Love String:Match
-                table.insert(customChatSpam, s)
-            end
-            customtxt = readfile("bitchbot/killsay.txt")
-            for s in customtxt:gmatch("[^\n]+") do -- I'm Love String:Match
-                table.insert(customKillSay, s)
-            end
-            UpdateConfigs()
-            if menu.open and not menu.fading then
-                for k = 1, #menu.options do
-                    local v = menu.options[k]
-                    for k1, v1 in pairs(v) do
-                        for k2, v2 in pairs(v1) do
-                            if v2[2] == SLIDER and v2[5] then
-                                v2[5] = false
-                            elseif v2[2] == DROPBOX and v2[5] then
-                                v2[5] = false
-                            elseif v2[2] == COMBOBOX and v2[5] then
-                                v2[5] = false
-                            elseif v2[2] == TOGGLE then
-                                if v2[5] ~= nil then
-                                    if v2[5][2] == KEYBIND and v2[5][5] then
-                                        v2[5][4][2].Color = RGB(30, 30, 30)
-                                        v2[5][5] = false
-                                    elseif v2[5][2] == COLORPICKER and v2[5][5] then
-                                        v2[5][5] = false
-                                    end
-                                end
-                            elseif v2[2] == BUTTON then
-                                if v2[1] then
-                                    for i = 0, 8 do
-                                        v2[4][i + 1].Color = ColorRange(i, {
-                                            [1] = { start = 0, color = RGB(50, 50, 50) },
-                                            [2] = { start = 8, color = RGB(35, 35, 35) },
-                                        })
-                                    end
-                                    v2[1] = false
-                                end
-                            end
-                        end
-                    end
-                end
-                menu.keybind_open = nil
-                menu:SetKeybindSelect(false, 20, 20, 1)
-                menu.dropbox_open = nil
-                menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-                menu.colorPickerOpen = nil
-                menu:SetToolTip(nil, nil, nil, false)
-                menu:SetColorPicker(false, { 255, 0, 0 }, nil, false, "hahaha", 400, 200)
-            end
-            if not menu.fading then
-                menu.fading = true
-                menu.fadestart = tick()
-            end
-        end
-
-        if menu == nil then
-            return
-        end
-
-        if menu.textboxopen then
-            if key.KeyCode == Enum.KeyCode.Delete or key.KeyCode == Enum.KeyCode.Return then
-                for k, v in pairs(menu.options) do
-                    for k1, v1 in pairs(v) do
-                        for k2, v2 in pairs(v1) do
-                            if v2[2] == TEXTBOX then
-                                if v2[5] then
-                                    v2[5] = false
-                                    v2[4].Color = RGB(255, 255, 255)
-                                    menu.textboxopen = false
-                                    v2[4].Text = v2[1]
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        if menu.open and not menu.fading then
-            for k, v in pairs(menu.options) do
-                for k1, v1 in pairs(v) do
-                    for k2, v2 in pairs(v1) do
-                        if v2[2] == TOGGLE then
-                            if v2[5] ~= nil then
-                                if v2[5][2] == KEYBIND and v2[5][5] and key.KeyCode.Value ~= 0 then
-                                    v2[5][4][2].Color = RGB(30, 30, 30)
-                                    v2[5][4][1].Text = KeyEnumToName(key.KeyCode)
-                                    if KeyEnumToName(key.KeyCode) == "None" then
-                                        v2[5][1] = nil
-                                    else
-                                        v2[5][1] = key.KeyCode
-                                    end
-                                    v2[5][5] = false
-                                end
-                            end
-                        elseif v2[2] == TEXTBOX then --ANCHOR TEXTBOXES
-                            if v2[5] then
-                                if not INPUT_SERVICE:IsKeyDown(Enum.KeyCode.LeftControl) then
-                                    if string.len(v2[1]) <= 28 then
-                                        if table.find(textBoxLetters, KeyEnumToName(key.KeyCode)) then
-                                            if INPUT_SERVICE:IsKeyDown(Enum.KeyCode.LeftShift) then
-                                                v2[1] ..= string.upper(KeyEnumToName(key.KeyCode))
-                                            else
-                                                v2[1] ..= string.lower(KeyEnumToName(key.KeyCode))
-                                            end
-                                        elseif KeyEnumToName(key.KeyCode) == "Space" then
-                                            v2[1] ..= " "
-                                        elseif keymodifiernames[KeyEnumToName(key.KeyCode)] ~= nil then
-                                            if INPUT_SERVICE:IsKeyDown(Enum.KeyCode.LeftShift) then
-                                                v2[1] ..= KeyModifierToName(KeyEnumToName(key.KeyCode), v2[6])
-                                            else
-                                                v2[1] ..= KeyEnumToName(key.KeyCode)
-                                            end
-                                        elseif KeyEnumToName(key.KeyCode) == "Back" and v2[1] ~= "" then
-                                            v2[1] = string.sub(v2[1], 0, #v2[1] - 1)
-                                        end
-                                    end
-                                    v2[4].Text = v2[1] .. "|"
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    function menu:InputBeganKeybinds(key) -- this is super shit because once we add mouse we need to change all this shit to be the contextaction stuff
-        if INPUT_SERVICE:GetFocusedTextBox() or menu.textboxopen then
-            return
-        end
-        for i = 1, #self.keybinds do
-            local value = self.keybinds[i][1]
-            if key.KeyCode == value[5][1] then
-                value[5].lastvalue = value[5].relvalue
-                if value[5].toggletype == 2 then
-                    value[5].relvalue = not value[5].relvalue
-                elseif value[5].toggletype == 1 then
-                    value[5].relvalue = true
-                elseif value[5].toggletype == 3 then
-                    value[5].relvalue = false
-                end
-            elseif value[5].toggletype == 4 then
-                value[5].relvalue = true
-            end
-            if value[5].lastvalue ~= value[5].relvalue then
-                value[5].event:fire(value[5].relvalue)
-            end
-        end
-    end
-
-    function menu:InputEndedKeybinds(key)
-        for i = 1, #self.keybinds do
-            local value = self.keybinds[i][1]
-            value[5].lastvalue = value[5].relvalue
-            if key.KeyCode == value[5][1] then
-                if value[5].toggletype == 1 then
-                    value[5].relvalue = false
-                elseif value[5].toggletype == 3 then
-                    value[5].relvalue = true
-                end
-            end
-            if value[5].lastvalue ~= value[5].relvalue then
-                value[5].event:fire(value[5].relvalue)
-            end
-        end
-    end
-
-    function menu:SetMenuPos(x, y)
-        for k, v in pairs(menu.postable) do
-            if v[1].Visible then
-                v[1].Position = Vector2.new(x + v[2], y + v[3])
-            end
-        end
-    end
-
-    function menu:MouseInArea(x, y, width, height)
-        return LOCAL_MOUSE.x > x and LOCAL_MOUSE.x < x + width and LOCAL_MOUSE.y > 36 + y and LOCAL_MOUSE.y < 36 + y + height
-    end
-
-    function menu:MouseInMenu(x, y, width, height)
-        return LOCAL_MOUSE.x > menu.x + x and LOCAL_MOUSE.x < menu.x + x + width and LOCAL_MOUSE.y > menu.y - 36 + y and LOCAL_MOUSE.y < menu.y - 36 + y + height
-    end
-
-    function menu:MouseInColorPicker(x, y, width, height)
-        return LOCAL_MOUSE.x > cp.x + x and LOCAL_MOUSE.x < cp.x + x + width and LOCAL_MOUSE.y > cp.y - 36 + y and LOCAL_MOUSE.y < cp.y - 36 + y + height
-    end
-
-    local keyz = {}
-    for k, v in pairs(Enum.KeyCode:GetEnumItems()) do
-        keyz[v.Value] = v
-    end
-
-
-    function menu:GetVal(tab, groupbox, name, ...)
-        local args = { ... }
-
-        local option = menu.options[tab][groupbox][name]
-        if not option then print(tab, groupbox, name) end
-        if args[1] == nil then
-            if option[2] == TOGGLE then
-                local lastval = option[7]
-                option[7] = option[1]
-                return option[1], lastval
-            elseif option[2] ~= COMBOBOX then
-                return option[1]
-            else
-                local temptable = {}
-                for k = 1, #option[1] do
-                    local v = option[1][k]
-                    table.insert(temptable, v[2])
-                end
-                return temptable
-            end
-        else
-            if args[1] == KEYBIND or args[1] == COLOR then
-                if args[2] then
-                    return RGB(option[5][1][1], option[5][1][2], option[5][1][3])
-                else
-                    return option[5][1]
-                end
-            elseif args[1] == COLOR1 then
-                if args[2] then
-                    return RGB(option[5][1][1][1][1], option[5][1][1][1][2], option[5][1][1][1][3])
-                else
-                    return option[5][1][1][1]
-                end
-            elseif args[1] == COLOR2 then
-                if args[2] then
-                    return RGB(option[5][1][2][1][1], option[5][1][2][1][2], option[5][1][2][1][3])
-                else
-                    return option[5][1][2][1]
-                end
-            end
-        end
-    end
-
-    function menu:GetKey(tab, groupbox, name)
-        local option = self.options[tab][groupbox][name][5]
-        local return1, return2, return3
-        if self:GetVal(tab, groupbox, name) then
-            if option.toggletype ~= 0 then
-                if option.lastvalue == nil then
-                    option.lastvalue = option.relvalue
-                end
-                return1, return2, return3 = option.relvalue, option.lastvalue, option.event
-                option.lastvalue = option.relvalue
-            end
-        end
-        return return1, return2, return3
-    end
-
-    function menu:SetKey(tab, groupbox, name, val)
-        val = val or false
-        local option = menu.options[tab][groupbox][name][5]
-        if option.toggletype ~= 0 then
-            option.lastvalue = option.relvalue
-            option.relvalue = val
-            if option.lastvalue ~= option.relvalue then
-                option.event:fire(option.relvalue)
-            end
-        end
-    end
-
-    local menuElementTypes = { [TOGGLE] = "toggle", [SLIDER] = "slider", [DROPBOX] = "dropbox", [TEXTBOX] = "textbox" }
-    local doubleclickDelay = 1
-    local buttonsInQue = {}
-
-    local function SaveCurSettings() --ANCHOR figgies
-        local figgy = "BitchBot v2\nmade with <3 by nata and bitch\n\n" -- screw zarzel XD (and json and classy)
-
-        for k, v in next, menuElementTypes do
-            figgy ..= v .. "s {\n"
-            for k1, v1 in pairs(menu.options) do
-                for k2, v2 in pairs(v1) do
-                    for k3, v3 in pairs(v2) do
-                        if v3[2] == k and k3 ~= "Configs" and k3 ~= "Player Status" and k3 ~= "ConfigName"
-                        then
-                            figgy ..= k1 .. "|" .. k2 .. "|" .. k3 .. "|" .. tostring(v3[1]) .. "\n"
-                        end
-                    end
-                end
-            end
-            figgy = figgy .. "}\n"
-        end
-        figgy = figgy .. "comboboxes {\n"
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == COMBOBOX then
-                        local boolz = ""
-                        for k3, v3 in pairs(v2[1]) do
-                            boolz = boolz .. tostring(v3[2]) .. ", "
-                        end
-                        figgy = figgy .. k .. "|" .. k1 .. "|" .. k2 .. "|" .. boolz .. "\n"
-                    end
-                end
-            end
-        end
-        figgy = figgy .. "}\n"
-        figgy = figgy .. "keybinds {\n"
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == TOGGLE then
-                        if v2[5] ~= nil then
-                            if v2[5][2] == KEYBIND then
-                                local toggletype = "|" .. tostring(v2[5].toggletype)
-
-                                if v2[5][1] == nil then
-                                    figgy = figgy
-                                        .. k
-                                        .. "|"
-                                        .. k1
-                                        .. "|"
-                                        .. k2
-                                        .. "|nil"
-                                        .. "|"
-                                        .. tostring(v2[5].toggletype)
-                                        .. "\n"
-                                else
-                                    figgy = figgy
-                                        .. k
-                                        .. "|"
-                                        .. k1
-                                        .. "|"
-                                        .. k2
-                                        .. "|"
-                                        .. tostring(v2[5][1].Value)
-                                        .. "|"
-                                        .. tostring(v2[5].toggletype)
-                                        .. "\n"
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        figgy = figgy .. "}\n"
-        figgy = figgy .. "colorpickers {\n"
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == TOGGLE then
-                        if v2[5] ~= nil then
-                            if v2[5][2] == COLORPICKER then
-                                local clrz = ""
-                                for k3, v3 in pairs(v2[5][1]) do
-                                    clrz = clrz .. tostring(v3) .. ", "
-                                end
-                                figgy = figgy .. k .. "|" .. k1 .. "|" .. k2 .. "|" .. clrz .. "\n"
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        figgy = figgy .. "}\n"
-        figgy = figgy .. "double colorpickers {\n"
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == TOGGLE then
-                        if v2[5] ~= nil then
-                            if v2[5][2] == DOUBLE_COLORPICKER then
-                                local clrz1 = ""
-                                for k3, v3 in pairs(v2[5][1][1][1]) do
-                                    clrz1 = clrz1 .. tostring(v3) .. ", "
-                                end
-                                local clrz2 = ""
-                                for k3, v3 in pairs(v2[5][1][2][1]) do
-                                    clrz2 = clrz2 .. tostring(v3) .. ", "
-                                end
-                                figgy = figgy .. k .. "|" .. k1 .. "|" .. k2 .. "|" .. clrz1 .. "|" .. clrz2 .. "\n"
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        figgy = figgy .. "}\n"
-
-        return figgy
-    end
-
-    local function LoadConfig(loadedcfg)
-        local lines = {}
-
-        for s in loadedcfg:gmatch("[^\r\n]+") do
-            table.insert(lines, s)
-        end
-
-        if lines[1] == "BitchBot v2" then
-            local start = nil
-            for i, v in next, lines do
-                if v == "toggles {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                then
-                    if tt[4] == "true" then
-                        menu.options[tt[1]][tt[2]][tt[3]][1] = true
-                    else
-                        menu.options[tt[1]][tt[2]][tt[3]][1] = false
-                    end
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "sliders {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                then
-                    menu.options[tt[1]][tt[2]][tt[3]][1] = tonumber(tt[4])
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "dropboxs {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                then
-                    local num = tonumber(tt[4])
-                    if num > #menu.options[tt[1]][tt[2]][tt[3]][6] then
-                        num = #menu.options[tt[1]][tt[2]][tt[3]][6]
-                    elseif num < 0 then
-                        num = 1
-                    end
-                    menu.options[tt[1]][tt[2]][tt[3]][1] = num
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "textboxs {" then
-                    start = i
-                    break
-                end
-            end
-            if start ~= nil then
-                local end_ = nil
-                for i, v in next, lines do
-                    if i > start and v == "}" then
-                        end_ = i
-                        break
-                    end
-                end
-                for i = 1, end_ - start - 1 do
-                    local tt = string.split(lines[i + start], "|")
-                    if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                    then
-                        menu.options[tt[1]][tt[2]][tt[3]][1] = tostring(tt[4])
-                    end
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "comboboxes {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                then
-                    local subs = string.split(tt[4], ",")
-
-                    for i, v in ipairs(subs) do
-                        local opt = string.gsub(v, " ", "")
-                        if opt == "true" then
-                            menu.options[tt[1]][tt[2]][tt[3]][1][i][2] = true
-                        else
-                            menu.options[tt[1]][tt[2]][tt[3]][1][i][2] = false
-                        end
-                        if i == #subs - 1 then
-                            break
-                        end
-                    end
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "keybinds {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]][5] ~= nil
-                then
-                    if tt[5] ~= nil then
-                        local toggletype = clamp(tonumber(tt[5]), 1, 4)
-                        if menu.options[tt[1]][tt[2]][tt[3]][5].toggletype ~= 0 then
-                            menu.options[tt[1]][tt[2]][tt[3]][5].toggletype = toggletype
-                        end
-                    end
-
-                    if tt[4] == "nil" then
-                        menu.options[tt[1]][tt[2]][tt[3]][5][1] = nil
-                    else
-                        menu.options[tt[1]][tt[2]][tt[3]][5][1] = keyz[tonumber(tt[4])]
-                    end
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "colorpickers {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                then
-                    local subs = string.split(tt[4], ",")
-
-                    if type(menu.options[tt[1]][tt[2]][tt[3]][5][1][1]) == "table" then
-                        continue
-                    end
-                    for i, v in ipairs(subs) do
-                        if menu.options[tt[1]][tt[2]][tt[3]][5][1][i] == nil then
-                            break
-                        end
-                        local opt = string.gsub(v, " ", "")
-                        menu.options[tt[1]][tt[2]][tt[3]][5][1][i] = tonumber(opt)
-                        if i == #subs - 1 then
-                            break
-                        end
-                    end
-               
-                end
-            end
-
-            local start = nil
-            for i, v in next, lines do
-                if v == "double colorpickers {" then
-                    start = i
-                    break
-                end
-            end
-            local end_ = nil
-            for i, v in next, lines do
-                if i > start and v == "}" then
-                    end_ = i
-                    break
-                end
-            end
-            for i = 1, end_ - start - 1 do
-                local tt = string.split(lines[i + start], "|")
-                if menu.options[tt[1]] ~= nil and menu.options[tt[1]][tt[2]] ~= nil and menu.options[tt[1]][tt[2]][tt[3]] ~= nil
-                then
-                    local subs = { string.split(tt[4], ","), string.split(tt[5], ",") }
-
-                    for i, v in ipairs(subs) do
-                        if type(menu.options[tt[1]][tt[2]][tt[3]][5][1][i]) == "number" then
-                            break
-                        end
-                        for i1, v1 in ipairs(v) do
-                           
-                               
-                            if menu.options[tt[1]][tt[2]][tt[3]][5][1][i][1][i1] == nil then
-                                break
-                            end
-                            local opt = string.gsub(v1, " ", "")
-                            menu.options[tt[1]][tt[2]][tt[3]][5][1][i][1][i1] = tonumber(opt)
-                            if i1 == #v - 1 then
-                                break
-                            end
-                        end
-                    end
-                end
-            end
-
-            for k, v in pairs(menu.options) do
-                for k1, v1 in pairs(v) do
-                    for k2, v2 in pairs(v1) do
-                        if v2[2] == TOGGLE then
-                            if not v2[1] then
-                                for i = 0, 3 do
-                                    v2[4][i + 1].Color = ColorRange(i, {
-                                        [1] = { start = 0, color = RGB(50, 50, 50) },
-                                        [2] = { start = 3, color = RGB(30, 30, 30) },
-                                    })
-                                end
-                            else
-                                for i = 0, 3 do
-                                    v2[4][i + 1].Color = ColorRange(i, {
-                                        [1] = { start = 0, color = RGB(menu.mc[1], menu.mc[2], menu.mc[3]) },
-                                        [2] = {
-                                            start = 3,
-                                            color = RGB(menu.mc[1] - 40, menu.mc[2] - 40, menu.mc[3] - 40),
-                                        },
-                                    })
-                                end
-                            end
-                            if v2[5] ~= nil then
-                                if v2[5][2] == KEYBIND then
-                                    v2[5][4][2].Color = RGB(30, 30, 30)
-                                    v2[5][4][1].Text = KeyEnumToName(v2[5][1])
-                                elseif v2[5][2] == COLORPICKER then
-                                    v2[5][4][1].Color = RGB(v2[5][1][1], v2[5][1][2], v2[5][1][3])
-                                    for i = 2, 3 do
-                                        v2[5][4][i].Color = RGB(v2[5][1][1] - 40, v2[5][1][2] - 40, v2[5][1][3] - 40)
-                                    end
-                                elseif v2[5][2] == DOUBLE_COLORPICKER then
-                                    if type(v2[5][1][1]) == "table" then
-                                        for i, v3 in ipairs(v2[5][1]) do
-                                            v3[4][1].Color = RGB(v3[1][1], v3[1][2], v3[1][3])
-                                            for i1 = 2, 3 do
-                                                v3[4][i1].Color = RGB(v3[1][1] - 40, v3[1][2] - 40, v3[1][3] - 40)
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        elseif v2[2] == SLIDER then
-                            if v2[1] < v2[6][1] then
-                                v2[1] = v2[6][1]
-                            elseif v2[1] > v2[6][2] then
-                                v2[1] = v2[6][2]
-                            end
-
-                            local decplaces = v2.decimal and string.rep("0", math.log(1 / v2.decimal) / math.log(10))
-                            if decplaces and math.abs(v2[1]) < v2.decimal then
-                                v2[1] = 0
-                            end
-                            v2[4][5].Text = v2.custom[v2[1]] or (v2[1] == math.floor(v2[1]) and v2.decimal) and tostring(v2[1]) .. "." .. decplaces .. v2[4][6] or tostring(v2[1]) .. v2[4][6]
-                            -- v2[4][5].Text = tostring(v2[1]).. v2[4][6]
-
-                            for i = 1, 4 do
-                                v2[4][i].Size = Vector2.new((v2[3][3] - 4) * ((v2[1] - v2[6][1]) / (v2[6][2] - v2[6][1])), 2)
-                            end
-                        elseif v2[2] == DROPBOX then
-                            if v2[6][v2[1]] == nil then
-                                v2[1] = 1
-                            end
-                            v2[4][1].Text = v2[6][v2[1]]
-                        elseif v2[2] == COMBOBOX then
-                            local textthing = ""
-                            for k3, v3 in pairs(v2[1]) do
-                                if v3[2] then
-                                    if textthing == "" then
-                                        textthing = v3[1]
-                                    else
-                                        textthing = textthing .. ", " .. v3[1]
-                                    end
-                                end
-                            end
-                            textthing = textthing ~= "" and textthing or "None"
-                            textthing = string_cut(textthing, 25)
-                            v2[4][1].Text = textthing
-                        elseif v2[2] == TEXTBOX then
-                            v2[4].Text = v2[1]
-                        end
-                    end
-                end
-            end
-        end
-    end
-    function menu.saveconfig()
-        local figgy = SaveCurSettings()
-        writefile(
-            "bitchbot/"
-                .. menu.game
-                .. "/"
-                .. menu.options["Settings"]["Configuration"]["ConfigName"][1]
-                .. ".bb",
-            figgy
-        )
-        CreateNotification('Saved "' .. menu.options["Settings"]["Configuration"]["ConfigName"][1] .. '.bb"!')
-        UpdateConfigs()
-    end
-   
-    function menu.loadconfig()
-        local configname = "bitchbot/"
-            .. menu.game
-            .. "/"
-            .. menu.options["Settings"]["Configuration"]["ConfigName"][1]
-            .. ".bb"
-        if not isfile(configname) then
-            CreateNotification(
-                '"'
-                    .. menu.options["Settings"]["Configuration"]["ConfigName"][1]
-                    .. '.bb" is not a valid config.'
-            )
-            return
-        end
-   
-        local curcfg = SaveCurSettings()
-        local loadedcfg = readfile(configname)
-   
-        if pcall(LoadConfig, loadedcfg) then
-            CreateNotification('Loaded "' .. menu.options["Settings"]["Configuration"]["ConfigName"][1] .. '.bb"!')
-        else
-            LoadConfig(curcfg)
-            CreateNotification(
-                'There was an issue loading "'
-                    .. menu.options["Settings"]["Configuration"]["ConfigName"][1]
-                    .. '.bb"'
-            )
-        end
-    end
-
-    local function buttonpressed(bp)
-        if bp.doubleclick then
-            if buttonsInQue[bp] and tick() - buttonsInQue[bp] < doubleclickDelay then
-                buttonsInQue[bp] = 0
-            else
-                for button, time in next, buttonsInQue do
-                    buttonsInQue[button] = 0
-                end
-                buttonsInQue[bp] = tick()
-                return
-            end
-        end
-        FireEvent("bb_buttonpressed", bp.tab, bp.groupbox, bp.name)
-        --ButtonPressed:Fire(bp.tab, bp.groupbox, bp.name)
-        if bp == menu.options["Settings"]["Cheat Settings"]["Unload Cheat"] then
-            menu.fading = true
-            wait()
-            menu:unload()
-        elseif bp == menu.options["Settings"]["Cheat Settings"]["Set Clipboard Game ID"] then
-            setclipboard(game.JobId)
-            CreateNotification("Set Clipboard Game ID! (".. tostring(game.JobId)..")")
-        elseif bp == menu.options["Settings"]["Configuration"]["Save Config"] then
-            menu.saveconfig()
-        elseif bp == menu.options["Settings"]["Configuration"]["Delete Config"] then
-            delfile(
-                "bitchbot/"
-                    .. menu.game
-                    .. "/"
-                    .. menu.options["Settings"]["Configuration"]["ConfigName"][1]
-                    .. ".bb"
-            )
-            CreateNotification('Deleted "' .. menu.options["Settings"]["Configuration"]["ConfigName"][1] .. '.bb"!')
-            UpdateConfigs()
-        elseif bp == menu.options["Settings"]["Configuration"]["Load Config"] then
-            menu.loadconfig()
-        end
-    end
-
-    local function MouseButton2Event()
-        if menu.colorPickerOpen or menu.dropbox_open then
-            return
-        end
-
-        for k, v in pairs(menu.options) do
-            if menu.tabnames[menu.activetab] == k then
-                for k1, v1 in pairs(v) do
-                    local pass = true
-                    for k3, v3 in pairs(menu.multigroups) do
-                        if k == k3 then
-                            for k4, v4 in pairs(v3) do
-                                for k5, v5 in pairs(v4.vals) do
-                                    if k1 == k5 then
-                                        pass = v5
-                                    end
-                                end
-                            end
-                        end
-                    end
-
-                    if pass then
-                        for k2, v2 in pairs(v1) do --ANCHOR more menu bs
-                            if v2[2] == TOGGLE then
-                                if v2[5] ~= nil then
-                                    if v2[5][2] == KEYBIND then
-                                        if menu:MouseInMenu(v2[5][3][1], v2[5][3][2], 44, 16) then
-                                            if menu.keybind_open ~= v2 and v2[5].toggletype ~= 0 then
-                                                menu.keybind_open = v2
-                                                menu:SetKeybindSelect(
-                                                    true,
-                                                    v2[5][3][1] + menu.x,
-                                                    v2[5][3][2] + 16 + menu.y,
-                                                    v2[5].toggletype
-                                                )
-                                            else
-                                                menu.keybind_open = nil
-                                                menu:SetKeybindSelect(false, 20, 20, 1)
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-    local function menucolor()
-        if menu.open then
-            if menu:GetVal("Settings", "Cheat Settings", "Menu Accent") then
-                local clr = menu:GetVal("Settings", "Cheat Settings", "Menu Accent", COLOR, true)
-                menu.mc = { clr.R * 255, clr.G * 255, clr.B * 255 }
-            else
-                menu.mc = { 127, 72, 163 }
-            end
-            menu:SetColor(menu.mc[1], menu.mc[2], menu.mc[3])
-
-            local wme = menu:GetVal("Settings", "Cheat Settings", "Watermark")
-            for k, v in pairs(menu.watermark.rect) do
-                v.Visible = wme
-            end
-            menu.watermark.text[1].Visible = wme
-        end
-    end
-    local function MouseButton1Event() --ANCHOR menu mouse down func
-        menu.dropbox_open = nil
-        menu.textboxopen = false
-
-        menu:SetKeybindSelect(false, 20, 20, 1)
-        if menu.keybind_open then
-            local key = menu.keybind_open
-            local foundkey = false
-            for i = 1, 4 do
-                if menu:MouseInMenu(key[5][3][1], key[5][3][2] + 16 + ((i - 1) * 21), 70, 21) then
-                    foundkey = true
-                    menu.keybind_open[5].toggletype = i
-                    menu.keybind_open[5].relvalue = false
-                end
-            end
-            menu.keybind_open = nil
-            if foundkey then
-                return
-            end
-        end
-
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == DROPBOX and v2[5] then
-                        if not menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 24 * (#v2[6] + 1) + 3) then
-                            menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-                            v2[5] = false
-                        else
-                            menu.dropbox_open = v2
-                        end
-                    end
-                    if v2[2] == COMBOBOX and v2[5] then
-                        if not menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 24 * (#v2[1] + 1) + 3) then
-                            menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-                            v2[5] = false
-                        else
-                            menu.dropbox_open = v2
-                        end
-                    end
-                    if v2[2] == TOGGLE then
-                        if v2[5] ~= nil then
-                            if v2[5][2] == KEYBIND then
-                                if v2[5][5] == true then
-                                    v2[5][4][2].Color = RGB(30, 30, 30)
-                                    v2[5][5] = false
-                                end
-                            elseif v2[5][2] == COLORPICKER then
-                                if v2[5][5] == true then
-                                    if not menu:MouseInColorPicker(0, 0, cp.w, cp.h) then
-                                        if menu.colorPickerOpen then
-                                           
-                                            local tempclr = cp.oldcolor
-                                            menu.colorPickerOpen[4][1].Color = tempclr
-                                            for i = 2, 3 do
-                                                menu.colorPickerOpen[4][i].Color = RGB(
-                                                    math.floor(tempclr.R * 255) - 40,
-                                                    math.floor(tempclr.G * 255) - 40,
-                                                    math.floor(tempclr.B * 255) - 40
-                                                )
-                                            end
-                                            if cp.alpha then
-                                                menu.colorPickerOpen[1] = {
-                                                    math.floor(tempclr.R * 255),
-                                                    math.floor(tempclr.G * 255),
-                                                    math.floor(tempclr.B * 255),
-                                                    cp.oldcoloralpha,
-                                                }
-                                            else
-                                                menu.colorPickerOpen[1] = {
-                                                    math.floor(tempclr.R * 255),
-                                                    math.floor(tempclr.G * 255),
-                                                    math.floor(tempclr.B * 255),
-                                                }
-                                            end
-                                        end
-                                        menu:SetColorPicker(false, { 255, 0, 0 }, nil, false, "hahaha", 400, 200)
-                                        v2[5][5] = false
-                                        menu.colorPickerOpen = nil -- close colorpicker
-                                    end
-                                end
-                            elseif v2[5][2] == DOUBLE_COLORPICKER then
-                                for k3, v3 in pairs(v2[5][1]) do
-                                    if v3[5] == true then
-                                        if not menu:MouseInColorPicker(0, 0, cp.w, cp.h) then
-                                            if menu.colorPickerOpen then
-                                                local tempclr = cp.oldcolor
-                                                menu.colorPickerOpen[4][1].Color = tempclr
-                                                for i = 2, 3 do
-                                                    menu.colorPickerOpen[4][i].Color = RGB(
-                                                        math.floor(tempclr.R * 255) - 40,
-                                                        math.floor(tempclr.G * 255) - 40,
-                                                        math.floor(tempclr.B * 255) - 40
-                                                    )
-                                                end
-                                                if cp.alpha then
-                                                    menu.colorPickerOpen[1] = {
-                                                        math.floor(tempclr.R * 255),
-                                                        math.floor(tempclr.G * 255),
-                                                        math.floor(tempclr.B * 255),
-                                                        cp.oldcoloralpha,
-                                                    }
-                                                else
-                                                    menu.colorPickerOpen[1] = {
-                                                        math.floor(tempclr.R * 255),
-                                                        math.floor(tempclr.G * 255),
-                                                        math.floor(tempclr.B * 255),
-                                                    }
-                                                end
-                                            end
-                                            menu:SetColorPicker(false, { 255, 0, 0 }, nil, false, "hahaha", 400, 200)
-                                            v3[5] = false
-                                            menu.colorPickerOpen = nil -- close colorpicker
-                                           
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    if v2[2] == TEXTBOX and v2[5] then
-                        v2[4].Color = RGB(255, 255, 255)
-                        v2[5] = false
-                        v2[4].Text = v2[1]
-                    end
-                end
-            end
-        end
-        for i = 1, #menutable do
-            if menu:MouseInMenu(
-                    10 + ((i - 1) * math.floor((menu.w - 20) / #menutable)),
-                    27,
-                    math.floor((menu.w - 20) / #menutable),
-                    32
-                )
-            then
-                menu.activetab = i
-                setActiveTab(menu.activetab)
-                menu:SetMenuPos(menu.x, menu.y)
-                menu:SetToolTip(nil, nil, nil, false)
-            end
-        end
-        if menu.colorPickerOpen then
-            if menu:MouseInColorPicker(197, cp.h - 25, 75, 20) then
-                --apply newcolor to oldcolor
-                local tempclr = Color3.fromHSV(cp.hsv.h, cp.hsv.s, cp.hsv.v)
-                menu.colorPickerOpen[4][1].Color = tempclr
-                for i = 2, 3 do
-                    menu.colorPickerOpen[4][i].Color = RGB(
-                        math.floor(tempclr.R * 255) - 40,
-                        math.floor(tempclr.G * 255) - 40,
-                        math.floor(tempclr.B * 255) - 40
-                    )
-                end
-                if cp.alpha then
-                    menu.colorPickerOpen[1] = {
-                        math.floor(tempclr.R * 255),
-                        math.floor(tempclr.G * 255),
-                        math.floor(tempclr.B * 255),
-                        cp.hsv.a,
-                    }
-                else
-                    menu.colorPickerOpen[1] = {
-                        math.floor(tempclr.R * 255),
-                        math.floor(tempclr.G * 255),
-                        math.floor(tempclr.B * 255),
-                    }
-                end
-                menu.colorPickerOpen = nil
-                menu:SetColorPicker(false, { 255, 0, 0 }, nil, false, "hahaha", 400, 200)
-            end
-            if menu:MouseInColorPicker(264, 2, 14, 14) then
-                -- x out
-                local tempclr = cp.oldcolor
-                menu.colorPickerOpen[4][1].Color = tempclr
-                for i = 2, 3 do
-                    menu.colorPickerOpen[4][i].Color = RGB(
-                        math.floor(tempclr.R * 255) - 40,
-                        math.floor(tempclr.G * 255) - 40,
-                        math.floor(tempclr.B * 255) - 40
-                    )
-                end
-                if cp.alpha then
-                    menu.colorPickerOpen[1] = {
-                        math.floor(tempclr.R * 255),
-                        math.floor(tempclr.G * 255),
-                        math.floor(tempclr.B * 255),
-                        cp.oldcoloralpha,
-                    }
-                else
-                    menu.colorPickerOpen[1] = {
-                        math.floor(tempclr.R * 255),
-                        math.floor(tempclr.G * 255),
-                        math.floor(tempclr.B * 255),
-                    }
-                end
-                menu.colorPickerOpen = nil
-                menu:SetColorPicker(false, { 255, 0, 0 }, nil, false, "hahaha", 400, 200)
-            end
-            if menu:MouseInColorPicker(10, 23, 160, 160) then
-                cp.dragging_m = true
-                --set value and saturation
-            elseif menu:MouseInColorPicker(176, 23, 14, 160) then
-                cp.dragging_r = true
-                --set hue
-            elseif menu:MouseInColorPicker(10, 189, 160, 14) and cp.alpha then
-                cp.dragging_b = true
-                --set transparency
-            end
-
-            if menu:MouseInColorPicker(197, 37, 75, 20) then
-                menu.copied_clr = newcolor.Color
-                --copy newcolor
-            elseif menu:MouseInColorPicker(197, 57, 75, 20) then
-                --paste newcolor
-                if menu.copied_clr ~= nil then
-                    local cpa = false
-                    local clrtable = { menu.copied_clr.R * 255, menu.copied_clr.G * 255, menu.copied_clr.B * 255 }
-                    if menu.colorPickerOpen[1][4] ~= nil then
-                        cpa = true
-                        table.insert(clrtable, menu.colorPickerOpen[1][4])
-                    end
-
-                    menu:SetColorPicker(true, clrtable, menu.colorPickerOpen, cpa, menu.colorPickerOpen[6], cp.x, cp.y)
-                    cp.oldclr = menu.colorPickerOpen[4][1].Color
-                    local oldclr = cp.oldclr
-                    if menu.colorPickerOpen[1][4] ~= nil then
-                        set_oldcolor(oldclr.R * 255, oldclr.G * 255, oldclr.B * 255, menu.colorPickerOpen[1][4])
-                    else
-                        set_oldcolor(oldclr.R * 255, oldclr.G * 255, oldclr.B * 255)
-                    end
-                end
-            end
-
-            if menu:MouseInColorPicker(197, 91, 75, 40) then
-                menu.copied_clr = oldcolor.Color --copy oldcolor
-            end
-        else
-            for k, v in pairs(menu.multigroups) do
-                if menu.tabnames[menu.activetab] == k then
-                    for k1, v1 in pairs(v) do
-                        local c_pos = v1.drawn.click_pos
-                        --local selected = v1.drawn.bar
-                        local selected_pos = v1.drawn.barpos
-
-                        for k2, v2 in pairs(v1.drawn.click_pos) do
-                            if menu:MouseInMenu(v2.x, v2.y, v2.width, v2.height) then
-                                for _k, _v in pairs(v1.vals) do
-                                    if _k == v2.name then
-                                        v1.vals[_k] = true
-                                    else
-                                        v1.vals[_k] = false
-                                    end
-                                end
-
-                                local settab = v2.num
-                                for _k, _v in pairs(v1.drawn.bar) do
-                                    menu.postable[_v.postable][2] = selected_pos[settab].pos
-                                    _v.drawn.Size = Vector2.new(selected_pos[settab].length, 2)
-                                end
-
-                                for i, v in pairs(v1.drawn.nametext) do
-                                    if i == v2.num then
-                                        v.Color = RGB(255, 255, 255)
-                                    else
-                                        v.Color = RGB(170, 170, 170)
-                                    end
-                                end
-
-                                menu:setMenuVisible(true)
-                                setActiveTab(menu.activetab)
-                                menu:SetMenuPos(menu.x, menu.y)
-                            end
-                        end
-                    end
-                end
-            end
-            local newdropbox_open
-            for k, v in pairs(menu.options) do
-                if menu.tabnames[menu.activetab] == k then
-                    for k1, v1 in pairs(v) do
-                        local pass = true
-                        for k3, v3 in pairs(menu.multigroups) do
-                            if k == k3 then
-                                for k4, v4 in pairs(v3) do
-                                    for k5, v5 in pairs(v4.vals) do
-                                        if k1 == k5 then
-                                            pass = v5
-                                        end
-                                    end
-                                end
-                            end
-                        end
-
-                        if pass then
-                            for k2, v2 in pairs(v1) do
-                                if v2[2] == TOGGLE and not menu.dropbox_open then
-                                    if menu:MouseInMenu(v2[3][1], v2[3][2], 30 + v2[4][5].TextBounds.x, 16) then
-                                        if v2[6] then
-                                            if menu:GetVal(
-                                                    "Settings",
-                                                    "Cheat Settings",
-                                                    "Allow Unsafe Features"
-                                                ) and v2[1] == false
-                                            then
-                                                v2[1] = true
-                                            else
-                                                v2[1] = false
-                                            end
-                                        else
-                                            v2[1] = not v2[1]
-                                        end
-                                        if not v2[1] then
-                                            for i = 0, 3 do
-                                                v2[4][i + 1].Color = ColorRange(i, {
-                                                    [1] = { start = 0, color = RGB(50, 50, 50) },
-                                                    [2] = { start = 3, color = RGB(30, 30, 30) },
-                                                })
-                                            end
-                                        else
-                                            for i = 0, 3 do
-                                                v2[4][i + 1].Color = ColorRange(i, {
-                                                    [1] = {
-                                                        start = 0,
-                                                        color = RGB(menu.mc[1], menu.mc[2], menu.mc[3]),
-                                                    },
-                                                    [2] = {
-                                                        start = 3,
-                                                        color = RGB(
-                                                            menu.mc[1] - 40,
-                                                            menu.mc[2] - 40,
-                                                            menu.mc[3] - 40
-                                                        ),
-                                                    },
-                                                })
-                                            end
-                                        end
-                                        --TogglePressed:Fire(k1, k2, v2)
-                                        FireEvent("bb_togglepressed", k1, k2, v2)
-                                    end
-                                    if v2[5] ~= nil then
-                                        if v2[5][2] == KEYBIND then
-                                            if menu:MouseInMenu(v2[5][3][1], v2[5][3][2], 44, 16) then
-                                                v2[5][4][2].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                                                v2[5][5] = true
-                                            end
-                                        elseif v2[5][2] == COLORPICKER then
-                                            if menu:MouseInMenu(v2[5][3][1], v2[5][3][2], 28, 14) then
-                                                v2[5][5] = true
-                                                menu.colorPickerOpen = v2[5]
-                                                menu.colorPickerOpen = v2[5]
-                                                if v2[5][1][4] ~= nil then
-                                                    menu:SetColorPicker(
-                                                        true,
-                                                        v2[5][1],
-                                                        v2[5],
-                                                        true,
-                                                        v2[5][6],
-                                                        LOCAL_MOUSE.x,
-                                                        LOCAL_MOUSE.y + 36
-                                                    )
-                                                else
-                                                    menu:SetColorPicker(
-                                                        true,
-                                                        v2[5][1],
-                                                        v2[5],
-                                                        false,
-                                                        v2[5][6],
-                                                        LOCAL_MOUSE.x,
-                                                        LOCAL_MOUSE.y + 36
-                                                    )
-                                                end
-                                            end
-                                        elseif v2[5][2] == DOUBLE_COLORPICKER then
-                                            for k3, v3 in pairs(v2[5][1]) do
-                                                if menu:MouseInMenu(v3[3][1], v3[3][2], 28, 14) then
-                                                    v3[5] = true
-                                                    menu.colorPickerOpen = v3
-                                                    menu.colorPickerOpen = v3
-                                                    if v3[1][4] ~= nil then
-                                                        menu:SetColorPicker(
-                                                            true,
-                                                            v3[1],
-                                                            v3,
-                                                            true,
-                                                            v3[6],
-                                                            LOCAL_MOUSE.x,
-                                                            LOCAL_MOUSE.y + 36
-                                                        )
-                                                    else
-                                                        menu:SetColorPicker(
-                                                            true,
-                                                            v3[1],
-                                                            v3,
-                                                            false,
-                                                            v3[6],
-                                                            LOCAL_MOUSE.x,
-                                                            LOCAL_MOUSE.y + 36
-                                                        )
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
-                                elseif v2[2] == SLIDER and not menu.dropbox_open then
-                                    if menu:MouseInMenu(v2[7][1], v2[7][2], 22, 13) then
-                                        local stepval = 1
-                                        if v2.stepsize then
-                                            stepval = v2.stepsize
-                                        end
-                                        if menu:modkeydown("shift", "left") then
-                                            stepval = v2.shift_stepsize or 0.1
-                                        end
-                                        if menu:MouseInMenu(v2[7][1], v2[7][2], 11, 13) then
-                                            v2[1] -= stepval
-                                        elseif menu:MouseInMenu(v2[7][1] + 11, v2[7][2], 11, 13) then
-                                            v2[1] += stepval
-                                        end
-
-                                        if v2[1] < v2[6][1] then
-                                            v2[1] = v2[6][1]
-                                        elseif v2[1] > v2[6][2] then
-                                            v2[1] = v2[6][2]
-                                        end
-                                        local decplaces = v2.decimal and string.rep("0", math.log(1 / v2.decimal) / math.log(10))
-                                        if decplaces and math.abs(v2[1]) < v2.decimal then
-                                            v2[1] = 0
-                                        end
-                                        v2[4][5].Text = v2.custom[v2[1]] or (v2[1] == math.floor(v2[1]) and v2.decimal) and tostring(v2[1]) .. "." .. decplaces .. v2[4][6] or tostring(v2[1]) .. v2[4][6]
-
-                                        for i = 1, 4 do
-                                            v2[4][i].Size = Vector2.new(
-                                                (v2[3][3] - 4) * ((v2[1] - v2[6][1]) / (v2[6][2] - v2[6][1])),
-                                                2
-                                            )
-                                        end
-                                    elseif menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 28) then
-                                        v2[5] = true
-                                    end
-                                elseif v2[2] == DROPBOX then
-                                    if menu.dropbox_open then
-                                        if v2 ~= menu.dropbox_open then
-                                            continue
-                                        end
-                                    end
-                                    if menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 36) then
-                                        if not v2[5] then
-                                            v2[5] = menu:SetDropBox(
-                                                true,
-                                                v2[3][1] + menu.x + 1,
-                                                v2[3][2] + menu.y + 13,
-                                                v2[3][3],
-                                                v2[1],
-                                                v2[6]
-                                            )
-                                            newdropbox_open = v2
-                                        else
-                                            menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-                                            v2[5] = false
-                                            newdropbox_open = nil
-                                        end
-                                    elseif menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 24 * (#v2[6] + 1) + 3) and v2[5]
-                                    then
-                                        for i = 1, #v2[6] do
-                                            if menu:MouseInMenu(
-                                                    v2[3][1],
-                                                    v2[3][2] + 36 + ((i - 1) * 21),
-                                                    v2[3][3],
-                                                    21
-                                                )
-                                            then
-                                                v2[4][1].Text = v2[6][i]
-                                                v2[1] = i
-                                                menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-                                                v2[5] = false
-                                                newdropbox_open = nil
-                                            end
-                                        end
-
-                                        if v2 == menu.options["Settings"]["Configuration"]["Configs"] then
-                                            local textbox = menu.options["Settings"]["Configuration"]["ConfigName"]
-                                            local relconfigs = GetConfigs()
-                                            textbox[1] = relconfigs[menu.options["Settings"]["Configuration"]["Configs"][1]]
-                                            textbox[4].Text = textbox[1]
-                                        end
-                                    end
-                                elseif v2[2] == COMBOBOX then
-                                    if menu.dropbox_open then
-                                        if v2 ~= menu.dropbox_open then
-                                            continue
-                                        end
-                                    end
-                                    if menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 36) then
-                                        if not v2[5] then
-                                           
-                                            v2[5] = set_comboboxthingy(
-                                                true,
-                                                v2[3][1] + menu.x + 1,
-                                                v2[3][2] + menu.y + 13,
-                                                v2[3][3],
-                                                v2[1],
-                                                v2[6]
-                                            )
-                                            newdropbox_open = v2
-                                        else
-                                            menu:SetDropBox(false, 400, 200, 160, 1, { "HI q", "HI q", "HI q" })
-                                            v2[5] = false
-                                            newdropbox_open = nil
-                                        end
-                                    elseif menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 24 * (#v2[1] + 1) + 3) and v2[5]
-                                    then
-                                        for i = 1, #v2[1] do
-                                            if menu:MouseInMenu(
-                                                    v2[3][1],
-                                                    v2[3][2] + 36 + ((i - 1) * 22),
-                                                    v2[3][3],
-                                                    23
-                                                )
-                                            then
-                                                v2[1][i][2] = not v2[1][i][2]
-                                                local textthing = ""
-                                                for k, v in pairs(v2[1]) do
-                                                    if v[2] then
-                                                        if textthing == "" then
-                                                            textthing = v[1]
-                                                        else
-                                                            textthing = textthing .. ", " .. v[1]
-                                                        end
-                                                    end
-                                                end
-                                                textthing = textthing ~= "" and textthing or "None"
-                                                textthing = string_cut(textthing, 25)
-                                                v2[4][1].Text = textthing
-                                                set_comboboxthingy(
-                                                    true,
-                                                    v2[3][1] + menu.x + 1,
-                                                    v2[3][2] + menu.y + 13,
-                                                    v2[3][3],
-                                                    v2[1],
-                                                    v2[6]
-                                                )
-                                            end
-                                        end
-                                    end
-                                elseif v2[2] == BUTTON and not menu.dropbox_open then
-                                    if menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 22) then
-                                        if not v2[1] then
-                                            buttonpressed(v2)
-                                            if k2 == "Unload Cheat" then
-                                                return
-                                            end
-                                            for i = 0, 8 do
-                                                v2[4][i + 1].Color = ColorRange(i, {
-                                                    [1] = { start = 0, color = RGB(35, 35, 35) },
-                                                    [2] = { start = 8, color = RGB(50, 50, 50) },
-                                                })
-                                            end
-                                            v2[1] = true
-                                        end
-                                    end
-                                elseif v2[2] == TEXTBOX and not menu.dropbox_open then
-                                    if menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 22) then
-                                        if not v2[5] then
-                                            menu.textboxopen = v2
-
-                                            v2[4].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                                            v2[5] = true
-                                        end
-                                    end
-                                elseif v2[2] == "list" then
-                                    --[[
-                                    menu.options[v.name][v1.name][v2.name] = {}
-                                    menu.options[v.name][v1.name][v2.name][4] = Draw:List(v2.name, v1.x + 8, v1.y + y_pos, v1.width - 16, v2.size, v2.columns, tabz[k])
-                                    menu.options[v.name][v1.name][v2.name][1] = nil
-                                    menu.options[v.name][v1.name][v2.name][2] = v2.type
-                                    menu.options[v.name][v1.name][v2.name][3] = 1
-                                    menu.options[v.name][v1.name][v2.name][5] = {}
-                                    menu.options[v.name][v1.name][v2.name][6] = v2.size
-                                    menu.options[v.name][v1.name][v2.name][7] = v2.columns
-                                    menu.options[v.name][v1.name][v2.name][8] = {v1.x + 8, v1.y + y_pos, v1.width - 16}
-                                    ]]
-                                    --
-                                    if #v2[5] > v2[6] then
-                                        for i = 1, v2[6] do
-                                            if menu:MouseInMenu(v2[8][1], v2[8][2] + (i * 22) - 5, v2[8][3], 22)
-                                            then
-                                                if v2[1] == tostring(v2[5][i + v2[3] - 1][1][1]) then
-                                                    v2[1] = nil
-                                                else
-                                                    v2[1] = tostring(v2[5][i + v2[3] - 1][1][1])
-                                                end
-                                            end
-                                        end
-                                    else
-                                        for i = 1, #v2[5] do
-                                            if menu:MouseInMenu(v2[8][1], v2[8][2] + (i * 22) - 5, v2[8][3], 22)
-                                            then
-                                                if v2[1] == tostring(v2[5][i + v2[3] - 1][1][1]) then
-                                                    v2[1] = nil
-                                                else
-                                                    v2[1] = tostring(v2[5][i + v2[3] - 1][1][1])
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-            menu.dropbox_open = newdropbox_open
-        end
-        for k, v in pairs(menu.options) do
-            for k1, v1 in pairs(v) do
-                for k2, v2 in pairs(v1) do
-                    if v2[2] == TOGGLE then
-                        if v2[6] then
-                            if not menu:GetVal("Settings", "Cheat Settings", "Allow Unsafe Features") then
-                                v2[1] = false
-                                for i = 0, 3 do
-                                    v2[4][i + 1].Color = ColorRange(i, {
-                                        [1] = { start = 0, color = RGB(50, 50, 50) },
-                                        [2] = { start = 3, color = RGB(30, 30, 30) },
-                                    })
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        menucolor()
-    end
-
-   
-
-    local function mousebutton1upfunc()
-        cp.dragging_m = false
-        cp.dragging_r = false
-        cp.dragging_b = false
-        for k, v in pairs(menu.options) do
-            if menu.tabnames[menu.activetab] == k then
-                for k1, v1 in pairs(v) do
-                    for k2, v2 in pairs(v1) do
-                        if v2[2] == SLIDER and v2[5] then
-                            v2[5] = false
-                        end
-                        if v2[2] == BUTTON and v2[1] then
-                            for i = 0, 8 do
-                                v2[4][i + 1].Color = ColorRange(i, {
-                                    [1] = { start = 0, color = RGB(50, 50, 50) },
-                                    [2] = { start = 8, color = RGB(35, 35, 35) },
-                                })
-                            end
-                            v2[1] = false
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    local clickspot_x, clickspot_y, original_menu_x, original_menu_y = 0, 0, 0, 0
-
-    menu.connections.mwf = LOCAL_MOUSE.WheelForward:Connect(function()
-        if menu.open then
-            for k, v in pairs(menu.options) do
-                if menu.tabnames[menu.activetab] == k then
-                    for k1, v1 in pairs(v) do
-                        for k2, v2 in pairs(v1) do
-                            if v2[2] == "list" then
-                                if v2[3] > 1 then
-                                    v2[3] -= 1
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end)
-
-    menu.connections.mwb = LOCAL_MOUSE.WheelBackward:Connect(function()
-        if menu.open then
-            for k, v in pairs(menu.options) do
-                if menu.tabnames[menu.activetab] == k then
-                    for k1, v1 in pairs(v) do
-                        for k2, v2 in pairs(v1) do
-                            if v2[2] == "list" then
-                                if v2[5][v2[3] + v2[6]] ~= nil then
-                                    v2[3] += 1
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end)
-
-    function menu:setMenuAlpha(transparency)
-        for k, v in pairs(bbmouse) do
-            v.Transparency = transparency
-        end
-        for k, v in pairs(bbmenu) do
-            v.Transparency = transparency
-        end
-        for k, v in pairs(tabz[menu.activetab]) do
-            v.Transparency = transparency
-        end
-    end
-
-    function menu:setMenuVisible(visible)
-        for k, v in pairs(bbmouse) do
-            v.Visible = visible
-        end
-        for k, v in pairs(bbmenu) do
-            v.Visible = visible
-        end
-        for k, v in pairs(tabz[menu.activetab]) do
-            v.Visible = visible
-        end
-
-        if visible then
-            for k, v in pairs(menu.multigroups) do
-                if menu.tabnames[menu.activetab] == k then
-                    for k1, v1 in pairs(v) do
-                        for k2, v2 in pairs(v1.vals) do
-                            for k3, v3 in pairs(menu.mgrouptabz[k][k2]) do
-                                v3.Visible = v2
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    menu:setMenuAlpha(0)
-    menu:setMenuVisible(false)
-    menu.lastActive = true
-    menu.open = false
-    menu.windowactive = true
-    menu.connections.mousemoved = MouseMoved:connect(function(b)
-        menu.windowactive = iswindowactive() or b
-    end)
-
-    local function renderSteppedMenu(fdt)
-        if cp.dragging_m or cp.dragging_r or cp.dragging_b then
-            menucolor()
-        end
-        menu.dt = fdt
-        if menu.unloaded then
-            return
-        end
-        SCREEN_SIZE = Camera.ViewportSize
-        if bbmouse[#bbmouse-1] then
-            if menu.inmenu and not menu.inmiddlemenu and not menu.intabs then
-                bbmouse[#bbmouse-1].Visible = true
-                bbmouse[#bbmouse-1].Transparency = 1
-            else
-                bbmouse[#bbmouse-1].Visible = false
-            end
-        end
-        -- i pasted the old menu working ingame shit from the old source nate pls fix ty
-        -- this is the really shitty alive check that we've been using since day one
-        -- removed it :DDD
-        -- im keepin all of our comments they're fun to look at
-        -- i wish it showed comment dates that would be cool
-        -- nah that would suck fk u (comment made on 3/4/2021 3:35 pm est by bitch)
-
-       
-        menu.lastActive = menu.windowactive
-        for button, time in next, buttonsInQue do
-            if time and tick() - time < doubleclickDelay then
-                button[4].text.Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                button[4].text.Text = "Confirm?"
-            else
-                button[4].text.Color = Color3.new(1, 1, 1)
-                button[4].text.Text = button.name
-            end
-        end
-        if menu.open then
-            if menu.backspaceheld then
-                local dt = tick() - menu.backspacetime
-                if dt > 0.4 then
-                    menu.backspaceflags += 1
-                    if menu.backspaceflags % 5 == 0 then
-                        local textbox = menu.textboxopen
-                        textbox[1] = string.sub(textbox[1], 0, #textbox[1] - 1)
-                        textbox[4].Text = textbox[1] .. "|"
-                    end
-                end
-            end
-        end
-        if menu.fading then
-            if menu.open then
-                menu.timesincefade = tick() - menu.fadestart
-                menu.fade_amount = 1 - (menu.timesincefade * 10)
-                menu:SetPlusMinus(0, 20, 20)
-                menu:setMenuAlpha(menu.fade_amount)
-                if menu.fade_amount <= 0 then
-                    menu.open = false
-                    menu.fading = false
-                    menu:setMenuAlpha(0)
-                    menu:setMenuVisible(false)
-                else
-                    menu:setMenuAlpha(menu.fade_amount)
-                end
-            else
-                menu:setMenuVisible(true)
-                setActiveTab(menu.activetab)
-                menu.timesincefade = tick() - menu.fadestart
-                menu.fade_amount = (menu.timesincefade * 10)
-                menu.fadeamount = menu.fade_amount
-                menu:setMenuAlpha(menu.fade_amount)
-                if menu.fade_amount >= 1 then
-                    menu.open = true
-                    menu.fading = false
-                    menu:setMenuAlpha(1)
-                else
-                    menu:setMenuAlpha(menu.fade_amount)
-                end
-            end
-        end
-        if menu.game == "uni" then
-            if menu.open then
-                INPUT_SERVICE.MouseBehavior = Enum.MouseBehavior.Default
-            else
-                if INPUT_SERVICE.MouseBehavior ~= menu.mousebehavior then
-                    INPUT_SERVICE.MouseBehavior = menu.mousebehavior
-                end
-            end
-        end
-        menu:SetMousePosition(LOCAL_MOUSE.x, LOCAL_MOUSE.y)
-        local settooltip = true
-        if menu.open or menu.fading then
-            menu:SetPlusMinus(0, 20, 20)
-            for k, v in pairs(menu.options) do
-                if menu.tabnames[menu.activetab] == k then
-                    for k1, v1 in pairs(v) do
-                        local pass = true
-                        for k3, v3 in pairs(menu.multigroups) do
-                            if k == k3 then
-                                for k4, v4 in pairs(v3) do
-                                    for k5, v5 in pairs(v4.vals) do
-                                        if k1 == k5 then
-                                            pass = v5
-                                        end
-                                    end
-                                end
-                            end
-                        end
-
-                        if pass then
-                            for k2, v2 in pairs(v1) do
-                                if v2[2] == TOGGLE then
-                                    if not menu.dropbox_open and not menu.colorPickerOpen then
-                                        if menu.open and menu:MouseInMenu(v2[3][1], v2[3][2], 30 + v2[4][5].TextBounds.x, 16)
-                                        then
-                                            if v2.tooltip and settooltip then
-                                                menu:SetToolTip(
-                                                    menu.x + v2[3][1],
-                                                    menu.y + v2[3][2] + 18,
-                                                    v2.tooltip,
-                                                    true,
-                                                    fdt--[[this is really fucking stupid]] -- this is no longer really fucking stupid
-                                                )
-                                                settooltip = false
-                                            end
-                                        end
-                                    end
-                                elseif v2[2] == SLIDER then
-                                    if v2[5] then
-                                        local new_val = (v2[6][2] - v2[6][1])  * (
-                                                (
-                                                    LOCAL_MOUSE.x
-                                                    - menu.x
-                                                    - v2[3][1]
-                                                ) / v2[3][3]
-                                            )
-                                        v2[1] = (
-                                                not v2.decimal and math.floor(new_val) or math.floor(new_val / v2.decimal) * v2.decimal
-                                            ) + v2[6][1]
-                                        if v2[1] < v2[6][1] then
-                                            v2[1] = v2[6][1]
-                                        elseif v2[1] > v2[6][2] then
-                                            v2[1] = v2[6][2]
-                                        end
-                                        local decplaces = v2.decimal and string.rep("0", math.log(1 / v2.decimal) / math.log(10))
-                                        if decplaces and math.abs(v2[1]) < v2.decimal then
-                                            v2[1] = 0
-                                        end
-
-                                        v2[4][5].Text = v2.custom[v2[1]] or (v2[1] == math.floor(v2[1]) and v2.decimal) and tostring(v2[1]) .. "." .. decplaces .. v2[4][6] or tostring(v2[1]) .. v2[4][6]
-                                        for i = 1, 4 do
-                                            v2[4][i].Size = Vector2.new(
-                                                (v2[3][3] - 4) * ((v2[1] - v2[6][1]) / (v2[6][2] - v2[6][1])),
-                                                2
-                                            )
-                                        end
-                                        menu:SetPlusMinus(1, v2[7][1], v2[7][2])
-                                    else
-                                        if not menu.dropbox_open then
-                                            if menu:MouseInMenu(v2[3][1], v2[3][2], v2[3][3], 28) then
-                                                if menu:MouseInMenu(v2[7][1], v2[7][2], 22, 13) then
-                                                    if menu:MouseInMenu(v2[7][1], v2[7][2], 11, 13) then
-                                                        menu:SetPlusMinus(2, v2[7][1], v2[7][2])
-                                                    elseif menu:MouseInMenu(v2[7][1] + 11, v2[7][2], 11, 13) then
-                                                        menu:SetPlusMinus(3, v2[7][1], v2[7][2])
-                                                    end
-                                                else
-                                                    menu:SetPlusMinus(1, v2[7][1], v2[7][2])
-                                                end
-                                            end
-                                        end
-                                    end
-                                elseif v2[2] == "list" then
-                                    for k3, v3 in pairs(v2[4].liststuff) do
-                                        for i, v4 in ipairs(v3) do
-                                            for i1, v5 in ipairs(v4) do
-                                                v5.Visible = false
-                                            end
-                                        end
-                                    end
-                                    for i = 1, v2[6] do
-                                        if v2[5][i + v2[3] - 1] ~= nil then
-                                            for i1 = 1, v2[7] do
-                                                v2[4].liststuff.words[i][i1].Text = v2[5][i + v2[3] - 1][i1][1]
-                                                v2[4].liststuff.words[i][i1].Visible = true
-
-                                                if v2[5][i + v2[3] - 1][i1][1] == v2[1] and i1 == 1 then
-                                                    if menu.options["Settings"]["Cheat Settings"]["Menu Accent"][1]
-                                                    then
-                                                        local clr = menu.options["Settings"]["Cheat Settings"]["Menu Accent"][5][1]
-                                                        v2[4].liststuff.words[i][i1].Color = RGB(clr[1], clr[2], clr[3])
-                                                    else
-                                                        v2[4].liststuff.words[i][i1].Color = RGB(menu.mc[1], menu.mc[2], menu.mc[3])
-                                                    end
-                                                else
-                                                    v2[4].liststuff.words[i][i1].Color = v2[5][i + v2[3] - 1][i1][2]
-                                                end
-                                            end
-                                            for k3, v3 in pairs(v2[4].liststuff.rows[i]) do
-                                                v3.Visible = true
-                                            end
-                                        elseif v2[3] > 1 then
-                                            v2[3] -= 1
-                                        end
-                                    end
-                                    if v2[3] == 1 then
-                                        for k3, v3 in pairs(v2[4].uparrow) do
-                                            if v3.Visible then
-                                                v3.Visible = false
-                                            end
-                                        end
-                                    else
-                                        for k3, v3 in pairs(v2[4].uparrow) do
-                                            if not v3.Visible then
-                                                v3.Visible = true
-                                                menu:SetMenuPos(menu.x, menu.y)
-                                            end
-                                        end
-                                    end
-                                    if v2[5][v2[3] + v2[6]] == nil then
-                                        for k3, v3 in pairs(v2[4].downarrow) do
-                                            if v3.Visible then
-                                                v3.Visible = false
-                                            end
-                                        end
-                                    else
-                                        for k3, v3 in pairs(v2[4].downarrow) do
-                                            if not v3.Visible then
-                                                v3.Visible = true
-                                                menu:SetMenuPos(menu.x, menu.y)
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-            menu.inmenu = LOCAL_MOUSE.x > menu.x and LOCAL_MOUSE.x < menu.x + menu.w and LOCAL_MOUSE.y > menu.y - 32 and LOCAL_MOUSE.y < menu.y + menu.h - 34
-            menu.intabs = LOCAL_MOUSE.x > menu.x + 9 and LOCAL_MOUSE.x < menu.x + menu.w - 9 and LOCAL_MOUSE.y > menu.y - 9 and LOCAL_MOUSE.y < menu.y + 24
-            menu.inmiddlemenu = LOCAL_MOUSE.x > menu.x + 18 and LOCAL_MOUSE.x < menu.x + menu.w - 18 and LOCAL_MOUSE.y > menu.y + 33 and LOCAL_MOUSE.y < menu.y + menu.h - 56
-            if (
-                    --[[(
-                        LOCAL_MOUSE.x > menu.x and LOCAL_MOUSE.x < menu.x + menu.w and LOCAL_MOUSE.y > menu.y - 32 and LOCAL_MOUSE.y < menu.y - 11
-                    )]]
-                    (
-                        menu.inmenu and
-                        not menu.intabs and
-                        not menu.inmiddlemenu
-                    ) or menu.dragging
-                ) and not menu.dontdrag
-            then
-                if menu.mousedown and not menu.colorPickerOpen and not dropbox_open then
-                    if not menu.dragging then
-                        clickspot_x = LOCAL_MOUSE.x
-                        clickspot_y = LOCAL_MOUSE.y - 36 original_menu_X = menu.x original_menu_y = menu.y
-                        menu.dragging = true
-                    end
-                    menu.x = (original_menu_X - clickspot_x) + LOCAL_MOUSE.x
-                    menu.y = (original_menu_y - clickspot_y) + LOCAL_MOUSE.y - 36
-                    if menu.y < 0 then
-                        menu.y = 0
-                    end
-                    if menu.x < -menu.w / 4 * 3 then
-                        menu.x = -menu.w / 4 * 3
-                    end
-                    if menu.x + menu.w / 4 > SCREEN_SIZE.x then
-                        menu.x = SCREEN_SIZE.x - menu.w / 4
-                    end
-                    if menu.y > SCREEN_SIZE.y - 20 then
-                        menu.y = SCREEN_SIZE.y - 20
-                    end
-                    menu:SetMenuPos(menu.x, menu.y)
-                else
-                    menu.dragging = false
-                end
-            elseif menu.mousedown then
-                menu.dontdrag = true
-            elseif not menu.mousedown then
-                menu.dontdrag = false
-            end
-            if menu.colorPickerOpen then
-                if cp.dragging_m then
-                    menu:SetDragBarM(
-                        clamp(LOCAL_MOUSE.x, cp.x + 12, cp.x + 167) - 2,
-                        clamp(LOCAL_MOUSE.y + 36, cp.y + 25, cp.y + 180) - 2
-                    )
-
-                    cp.hsv.s = (clamp(LOCAL_MOUSE.x, cp.x + 12, cp.x + 167) - cp.x - 12) / 155
-                    cp.hsv.v = 1 - ((clamp(LOCAL_MOUSE.y + 36, cp.y + 23, cp.y + 178) - cp.y - 23) / 155)
-                    newcolor.Color = Color3.fromHSV(cp.hsv.h, cp.hsv.s, cp.hsv.v)
-                    local tempclr = Color3.fromHSV(cp.hsv.h, cp.hsv.s, cp.hsv.v)
-                    menu.colorPickerOpen[4][1].Color = tempclr
-                    for i = 2, 3 do
-                        menu.colorPickerOpen[4][i].Color = RGB(
-                            math.floor(tempclr.R * 255) - 40,
-                            math.floor(tempclr.G * 255) - 40,
-                            math.floor(tempclr.B * 255) - 40
-                        )
-                    end
-                    if cp.alpha then
-                        menu.colorPickerOpen[1] = {
-                            math.floor(tempclr.R * 255),
-                            math.floor(tempclr.G * 255),
-                            math.floor(tempclr.B * 255),
-                            cp.hsv.a,
-                        }
-                    else
-                        menu.colorPickerOpen[1] = {
-                            math.floor(tempclr.R * 255),
-                            math.floor(tempclr.G * 255),
-                            math.floor(tempclr.B * 255),
-                        }
-                    end
-                elseif cp.dragging_r then
-                    menu:SetDragBarR(cp.x + 175, clamp(LOCAL_MOUSE.y + 36, cp.y + 23, cp.y + 178))
-
-                    maincolor.Color = Color3.fromHSV(
-                            1 - ((clamp(LOCAL_MOUSE.y + 36, cp.y + 23, cp.y + 178) - cp.y - 23) / 155),
-                            1,
-                            1
-                        )
-
-                    cp.hsv.h = 1 - ((clamp(LOCAL_MOUSE.y + 36, cp.y + 23, cp.y + 178) - cp.y - 23) / 155)
-                    newcolor.Color = Color3.fromHSV(cp.hsv.h, cp.hsv.s, cp.hsv.v)
-                    local tempclr = Color3.fromHSV(cp.hsv.h, cp.hsv.s, cp.hsv.v)
-                    menu.colorPickerOpen[4][1].Color = tempclr
-                    for i = 2, 3 do
-                        menu.colorPickerOpen[4][i].Color = RGB(
-                            math.floor(tempclr.R * 255) - 40,
-                            math.floor(tempclr.G * 255) - 40,
-                            math.floor(tempclr.B * 255) - 40
-                        )
-                    end
-                    if cp.alpha then
-                        menu.colorPickerOpen[1] = {
-                            math.floor(tempclr.R * 255),
-                            math.floor(tempclr.G * 255),
-                            math.floor(tempclr.B * 255),
-                            cp.hsv.a,
-                        }
-                    else
-                        menu.colorPickerOpen[1] = {
-                            math.floor(tempclr.R * 255),
-                            math.floor(tempclr.G * 255),
-                            math.floor(tempclr.B * 255),
-                        }
-                    end
-                elseif cp.dragging_b then
-                    local tempclr = Color3.fromHSV(cp.hsv.h, cp.hsv.s, cp.hsv.v)
-                    menu.colorPickerOpen[4][1].Color = tempclr
-                    for i = 2, 3 do
-                        menu.colorPickerOpen[4][i].Color = RGB(
-                            math.floor(tempclr.R * 255) - 40,
-                            math.floor(tempclr.G * 255) - 40,
-                            math.floor(tempclr.B * 255) - 40
-                        )
-                    end
-                    if cp.alpha then
-                        menu.colorPickerOpen[1] = {
-                            math.floor(tempclr.R * 255),
-                            math.floor(tempclr.G * 255),
-                            math.floor(tempclr.B * 255),
-                            cp.hsv.a,
-                        }
-                    else
-                        menu.colorPickerOpen[1] = {
-                            math.floor(tempclr.R * 255),
-                            math.floor(tempclr.G * 255),
-                            math.floor(tempclr.B * 255),
-                        }
-                    end
-                    menu:SetDragBarB(clamp(LOCAL_MOUSE.x, cp.x + 10, cp.x + 168), cp.y + 188)
-                    newcolor.Transparency = (clamp(LOCAL_MOUSE.x, cp.x + 10, cp.x + 168) - cp.x - 10) / 158
-                    cp.hsv.a = math.floor(((clamp(LOCAL_MOUSE.x, cp.x + 10, cp.x + 168) - cp.x - 10) / 158) * 255)
-                else
-                    local setvisnew = menu:MouseInColorPicker(197, 37, 75, 40)
-
-                    for i, v in ipairs(newcopy) do
-                        v.Visible = setvisnew
-                    end
-
-                    local setvisold = menu:MouseInColorPicker(197, 91, 75, 40)
-
-                    for i, v in ipairs(oldcopy) do
-                        v.Visible = setvisold
-                    end
-                end
-            end
-        else
-            menu.dragging = false
-        end
-        if settooltip then
-            menu:SetToolTip(nil, nil, nil, false, fdt)
-        end
-    end
-
-    menu.connections.inputstart = INPUT_SERVICE.InputBegan:Connect(function(input)
-        if menu then
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                menu.mousedown = true
-                if menu.open and not menu.fading then
-                    MouseButton1Event()
-                end
-            elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-                if menu.open and not menu.fading then
-                    MouseButton2Event()
-                end
-            end
-
-            if input.UserInputType == Enum.UserInputType.Keyboard then
-                if input.KeyCode.Name:match("Shift") then
-                    local kcn = input.KeyCode.Name
-                    local direction = kcn:split("Shift")[1]
-                    menu.modkeys.shift.direction = direction:lower()
-                end
-                if input.KeyCode.Name:match("Alt") then
-                    local kcn = input.KeyCode.Name
-                    local direction = kcn:split("Alt")[1]
-                    menu.modkeys.alt.direction = direction:lower()
-                end
-            end
-            if not menu then
-                return
-            end -- this fixed shit with unload
-            menu:InputBeganMenu(input)
-            menu:InputBeganKeybinds(input)
-            if menu.open then
-                if menu.tabnames[menu.activetab] == "Settings" then
-                    local menutext = menu:GetVal("Settings", "Cheat Settings", "Custom Menu Name") and menu:GetVal("Settings", "Cheat Settings", "MenuName") or "Bitch Bot"
-
-                    bbmenu[27].Text = menutext
-
-                    menu.watermark.text[1].Text = menutext.. menu.watermark.textString
-
-                    for i, v in ipairs(menu.watermark.rect) do
-                        local len = #menu.watermark.text[1].Text * 7 + 10
-                        if i == #menu.watermark.rect then
-                            len += 2
-                        end
-                        v.Size = Vector2.new(len, v.Size.y)
-                    end
-                end
-            end
-            if input.KeyCode == Enum.KeyCode.F2 then
-                menu.stat_menu = not menu.stat_menu
-
-                for k, v in pairs(graphs) do
-                    if k ~= "other" then
-                        for k1, v1 in pairs(v) do
-                            if k1 ~= "pos" then
-                                for k2, v2 in pairs(v1) do
-                                    v2.Visible = menu.stat_menu
-                                end
-                            end
-                        end
-                    end
-                end
-
-                for k, v in pairs(graphs.other) do
-                    v.Visible = menu.stat_menu
-                end
-            end
-        end
-    end)
-
-    menu.connections.inputended = INPUT_SERVICE.InputEnded:Connect(function(input)
-        menu:InputEndedKeybinds(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            menu.mousedown = false
-            if menu.open and not menu.fading then
-                mousebutton1upfunc()
-            end
-        end
-        if input.UserInputType == Enum.UserInputType.Keyboard then
-            if input.KeyCode.Name:match("Shift") then
-                menu.modkeys.shift.direction = nil
-            end
-            if input.KeyCode.Name:match("Alt") then
-                menu.modkeys.alt.direction = nil
-            end
-        end
-    end)
-
-    menu.connections.renderstepped = game:GetService("RunService").RenderStepped:Connect(renderSteppedMenu) -- fucking asshole 🖕🖕🖕
-
-    function menu:unload()
-        getgenv().v2 = nil
-        self.unloaded = true
-
-        for k, conn in next, self.connections do
-            if not getrawmetatable(conn) then
-                conn()
-            else
-                conn:Disconnect()
-            end
-            self.connections[k] = nil
-        end
-
-        game:service("ContextActionService"):UnbindAction("BB Keycheck")
-        if self.game == "pf" then
-            game:service("ContextActionService"):UnbindAction("BB PF check")
-        elseif self.game == "uni" then
-            game:service("ContextActionService"):UnbindAction("BB UNI check")
-        end
-
-        local mt = getrawmetatable(game)
-
-        setreadonly(mt, false)
-
-        local oldmt = menu.oldmt
-
-        if oldmt then
-            for k, v in next, mt do
-                if oldmt[k] then
-                    mt[k] = oldmt[k]
-                end
-            end
-        else
-            --TODO nate do this please
-            -- remember to store any "game" metatable hooks PLEASE PLEASE because this will ensure it replaces the meta so that it UNLOADS properly
-            -- rconsoleerr("fatal error: no old game meta found! (UNLOAD PROBABLY WON'T WORK AS EXPECTED)")
-        end
-
-        setreadonly(mt, true)
-
-        if menu.game == "pf" or menu.pfunload then
-            menu:pfunload()
-        end
-
-        Draw:UnRender()
-        CreateNotification = nil
-        allrender = nil
-        menu = nil
-        Draw = nil
-        self.unloaded = true
-    end
-end
-
-local avgfps = 100
-
--- I STOLE THE FPS COUNTER FROM https://devforum.roblox.com/t/get-client-fps-trough-a-script/282631/14 😿😿😿😢😭
--- fixed ur shitty fps counter
-local StatMenuRendered = event.new("StatMenuRendered")
-menu.connections.heartbeatmenu = game:GetService("RunService").Heartbeat:Connect(function() --ANCHOR MENU HEARTBEAT
-    if menu.open then
-        if menu.y < 0 then
-            menu.y = 0
-            menu:SetMenuPos(menu.x, 0)
-        end
-        if menu.x < -menu.w / 4 * 3 then
-            menu.x = -menu.w / 4 * 3
-            menu:SetMenuPos(-menu.w / 4 * 3, menu.y)
-        end
-        if menu.x + menu.w / 4 > SCREEN_SIZE.x then
-            menu.x = SCREEN_SIZE.x - menu.w / 4
-            menu:SetMenuPos(SCREEN_SIZE.x - menu.w / 4, menu.y)
-        end
-        if menu.y > SCREEN_SIZE.y - 20 then
-            menu.y = SCREEN_SIZE.y - 20
-            menu:SetMenuPos(menu.x, SCREEN_SIZE.y - 20)
-        end
-    end
-    if menu.stat_menu == false then
-        return
-    end
-    local fps = 1 / (menu.dt or 1)
-    avgfps = (fps + avgfps * 49) / 50
-    local CurrentFPS = math.floor(avgfps)
-
-    if tick() > lasttick + 0.25 then
-        table.remove(networkin.incoming, 1)
-        table.insert(networkin.incoming, stats.DataReceiveKbps)
-
-        table.remove(networkin.outgoing, 1)
-        table.insert(networkin.outgoing, stats.DataSendKbps)
-
-        --incoming
-        local biggestnum = 80
-        for i = 1, 21 do
-            if math.ceil(networkin.incoming[i]) > biggestnum - 10 then
-                biggestnum = (math.ceil(networkin.incoming[i] / 10) + 1) * 10
-                --graphs.incoming.pos.x - 21, graphs.incoming.pos.y - 7,
-            end
-        end
-
-        local numstr = tostring(biggestnum)
-        graphs.incoming.sides[2].Text = numstr
-        graphs.incoming.sides[2].Position = Vector2.new(graphs.incoming.pos.x - ((#numstr + 1) * 7), graphs.incoming.pos.y - 7)
-
-        for i = 1, 20 do
-            local line = graphs.incoming.graph[i]
-
-            line.From = Vector2.new(
-                ((i - 1) * 11) + graphs.incoming.pos.x,
-                graphs.incoming.pos.y + 80 - math.floor(networkin.incoming[i] / biggestnum * 80)
-            )
-
-            line.To = Vector2.new(
-                (i * 11) + graphs.incoming.pos.x,
-                graphs.incoming.pos.y + 80 - math.floor(networkin.incoming[i + 1] / biggestnum * 80)
-            )
-        end
-
-        local avgbar_h = average(networkin.incoming)
-
-        local avg_color = menu:GetVal("Settings", "Cheat Settings", "Menu Accent") and RGB(unpack(menu.mc)) or RGB(59, 214, 28)
-
-        graphs.incoming.graph[21].From = Vector2.new(
-            graphs.incoming.pos.x + 1,
-            graphs.incoming.pos.y + 80 - math.floor(avgbar_h / biggestnum * 80)
-        )
-        graphs.incoming.graph[21].To = Vector2.new(
-            graphs.incoming.pos.x + 220,
-            graphs.incoming.pos.y + 80 - math.floor(avgbar_h / biggestnum * 80)
-        )
-        graphs.incoming.graph[21].Color = avg_color
-        graphs.incoming.graph[21].Thickness = 2
-
-        graphs.incoming.graph[22].Position = Vector2.new(
-            graphs.incoming.pos.x + 222,
-            graphs.incoming.pos.y + 80 - math.floor(avgbar_h / biggestnum * 80) - 8
-        )
-        graphs.incoming.graph[22].Text = "avg: " .. tostring(round(avgbar_h, 2))
-        graphs.incoming.graph[22].Color = avg_color
-
-        graphs.incoming.sides[1].Text = "incoming kbps: " .. tostring(round(networkin.incoming[21], 2))
-
-        -- outgoing
-        local biggestnum = 10
-        for i = 1, 21 do
-            if math.ceil(networkin.outgoing[i]) > biggestnum - 5 then
-                biggestnum = (math.ceil(networkin.outgoing[i] / 5) + 1) * 5
-            end
-        end
-
-        local numstr = tostring(biggestnum)
-        graphs.outgoing.sides[2].Text = numstr
-        graphs.outgoing.sides[2].Position = Vector2.new(graphs.outgoing.pos.x - ((#numstr + 1) * 7), graphs.outgoing.pos.y - 7)
-
-        for i = 1, 20 do
-            local line = graphs.outgoing.graph[i]
-
-            line.From = Vector2.new(
-                ((i - 1) * 11) + graphs.outgoing.pos.x,
-                graphs.outgoing.pos.y + 80 - math.floor(networkin.outgoing[i] / biggestnum * 80)
-            )
-
-            line.To = Vector2.new(
-                (i * 11) + graphs.outgoing.pos.x,
-                graphs.outgoing.pos.y + 80 - math.floor(networkin.outgoing[i + 1] / biggestnum * 80)
-            )
-        end
-
-        local avgbar_h = average(networkin.outgoing)
-
-        graphs.outgoing.graph[21].From = Vector2.new(
-            graphs.outgoing.pos.x + 1,
-            graphs.outgoing.pos.y + 80 - math.floor(avgbar_h / biggestnum * 80)
-        )
-        graphs.outgoing.graph[21].To = Vector2.new(
-            graphs.outgoing.pos.x + 220,
-            graphs.outgoing.pos.y + 80 - math.floor(avgbar_h / biggestnum * 80)
-        )
-        graphs.outgoing.graph[21].Color = avg_color
-        graphs.outgoing.graph[21].Thickness = 2
-
-        graphs.outgoing.graph[22].Position = Vector2.new(
-            graphs.outgoing.pos.x + 222,
-            graphs.outgoing.pos.y + 80 - math.floor(avgbar_h / biggestnum * 80) - 8
-        )
-        graphs.outgoing.graph[22].Text = "avg: " .. tostring(round(avgbar_h, 2))
-        graphs.outgoing.graph[22].Color = avg_color
-
-        graphs.outgoing.sides[1].Text = "outgoing kbps: " .. tostring(round(networkin.outgoing[21], 2))
-
-        local drawnobjects = 0
-        for k, v in pairs(allrender) do
-            drawnobjects += #v
-        end
-
-        graphs.other[1].Text = string.format(
-            "initiation time: %d ms\ndrawn objects: %d\ntick: %d\nfps: %d\nlatency: %d",
-            menu.load_time,
-            drawnobjects,
-            tick(),
-            CurrentFPS,
-            math.ceil(GetLatency() * 1000)
-        )
-        lasttick = tick()
-        StatMenuRendered:fire(graphs.other[1])
-
-        local logsstr = "[DEBUG LOGS]\n"
-        for i, v in ipairs(reverse_table(NotifLogs)) do
-            logsstr = logsstr.. v.. "\n"
-            if i >= 13 then break end
-        end
-        graphs.other[2].Text = logsstr
-    end
-end)
-
-local function keycheck(actionName, inputState, inputObject)
-    if actionName == "BB Keycheck" then
-        if menu.open then
-            if menu.textboxopen then
-                if inputObject.KeyCode == Enum.KeyCode.Backspace then
-                    if menu.selectall then
-                        menu.textboxopen[1] = ""
-                        menu.textboxopen[4].Text = "|"
-                        menu.textboxopen[4].Color = RGB(unpack(menu.mc))
-                        menu.selectall = false
-                    end
-                    local on = inputState == Enum.UserInputState.Begin
-                    menu.backspaceheld = on
-                    menu.backspacetime = on and tick() or -1
-                    if not on then
-                        menu.backspaceflags = 0
-                    end
-                end
-
-                if inputObject.KeyCode ~= Enum.KeyCode.A and (not inputObject.KeyCode.Name:match("^Left") and not inputObject.KeyCode.Name:match("^Right")) and inputObject.KeyCode ~= Enum.KeyCode.Delete
-                then
-                    if menu.selectall then
-                        menu.textboxopen[4].Color = RGB(unpack(menu.mc))
-                        menu.selectall = false
-                    end
-                end
-
-                if inputObject.KeyCode == Enum.KeyCode.A then
-                    if inputState == Enum.UserInputState.Begin and INPUT_SERVICE:IsKeyDown(Enum.KeyCode.LeftControl)
-                    then
-                        menu.selectall = true
-                        local textbox = menu.textboxopen
-                        textbox[4].Color = RGB(menu.mc[3], menu.mc[2], menu.mc[1])
-                    end
-                end
-
-                return Enum.ContextActionResult.Sink
-            end
-        end
-
-        return Enum.ContextActionResult.Pass
-    end
-end
-
-game:service("ContextActionService"):BindAction("BB Keycheck", keycheck, false, Enum.UserInputType.Keyboard)
-
-if menu.game == "uni" then --SECTION UNIVERSAL
-    menu.activetab = 4
-
-    menu.mousebehavior = Enum.MouseBehavior.Default
-
-    local metatable = getrawmetatable(INPUT_SERVICE)
-    local old = metatable.__newindex
-
-    setreadonly(metatable, false)
-
-    metatable.__newindex = newcclosure(function(t, p, v)
-        if (not checkcaller()) then
-            if (p == "MouseBehavior") then
-                menu.mousebehavior = v
-                if menu.open then
-                    old(t, p, Enum.MouseBehavior.Default)
-                    return
-                end
-            end
-        end
-
-        return old(t, p, v)
-    end)
-
-    menu.oldmt = {
-        __newindex = old,
-    }
-
-    setreadonly(metatable, true)
-
-    local allesp = {
-        headdotoutline = {},
-        headdot = {},
-        name = {},
-        displayname = {},
-        outerbox = {},
-        box = {},
-        filledbox = {},
-        innerbox = {},
-        healthouter = {},
-        healthinner = {},
-        hptext = {},
-        distance = {},
-        team = {},
-    }
-
-    for i = 1, Players.MaxPlayers do
-        Draw:FilledRect(false, 20, 20, 20, 20, { 0, 0, 0, 220 }, allesp.filledbox)
-
-        Draw:Circle(false, 20, 20, 10, 3, 10, { 10, 10, 10, 215 }, allesp.headdotoutline)
-        Draw:Circle(false, 20, 20, 10, 1, 10, { 255, 255, 255, 255 }, allesp.headdot)
-
-        Draw:OutlinedRect(false, 20, 20, 20, 20, { 0, 0, 0, 220 }, allesp.innerbox)
-        Draw:OutlinedRect(false, 20, 20, 20, 20, { 0, 0, 0, 220 }, allesp.outerbox)
-        Draw:OutlinedRect(false, 20, 20, 20, 20, { 255, 255, 255, 255 }, allesp.box)
-
-        Draw:FilledRect(false, 20, 20, 4, 20, { 10, 10, 10, 215 }, allesp.healthouter)
-        Draw:FilledRect(false, 20, 20, 20, 20, { 255, 255, 255, 255 }, allesp.healthinner)
-
-        Draw:OutlinedText("", 1, false, 20, 20, 13, false, { 255, 255, 255, 255 }, { 0, 0, 0 }, allesp.hptext)
-        Draw:OutlinedText("", 2, false, 20, 20, 13, true, { 255, 255, 255, 255 }, { 0, 0, 0 }, allesp.distance)
-        Draw:OutlinedText("", 2, false, 20, 20, 13, true, { 255, 255, 255, 255 }, { 0, 0, 0 }, allesp.name)
-        Draw:OutlinedText("", 2, false, 20, 20, 13, true, { 255, 255, 255, 255 }, { 0, 0, 0 }, allesp.displayname)
-        Draw:OutlinedText("", 2, false, 20, 20, 13, true, { 255, 255, 255, 255 }, { 0, 0, 0 }, allesp.team)
-    end
-
-    menu.crosshair = { outline = {}, inner = {} }
-    for i, v in pairs(menu.crosshair) do
-        for i = 1, 2 do
-            Draw:FilledRect(false, 20, 20, 20, 20, { 10, 10, 10, 215 }, v)
-        end
-    end
-
-    menu.fovcircle = {}
-    Draw:Circle(false, 20, 20, 10, 3, 20, { 10, 10, 10, 215 }, menu.fovcircle)
-    Draw:Circle(false, 20, 20, 10, 1, 20, { 255, 255, 255, 255 }, menu.fovcircle)
-
-    menu.Initialize({
-        {
-            name = "Combat",
-            content = {
-                {
-                    name = "Aim Assist",
-                    autopos = "left",
-                    autofill = true,
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Enabled",
-                            value = false,
-                            extra = {
-                                type = KEYBIND,
-                                key = Enum.KeyCode.J,
-                                toggletype = 1,
-                            },
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Use Mouse Keys",
-                            value = 1,
-                            values = { "Off", "Mouse 1", "Mouse 2" },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Target Priority Only",
-                            value = false,
-                        },
-                        {
-                            type = COMBOBOX,
-                            name = "Checks",
-                            values = { { "Alive", true }, { "Same Team", false }, { "Distance", false } },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Max Distance",
-                            value = 100,
-                            minvalue = 30,
-                            maxvalue = 500,
-                            stradd = "m",
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "FOV Calculation",
-                            value = 1,
-                            values = { "Pixel", "Actual Fov", "Custom FOV" },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Custom FOV Value",
-                            value = 60,
-                            minvalue = 60,
-                            maxvalue = 120,
-                            stradd = "°",
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Aimbot FOV",
-                            value = 0,
-                            minvalue = 0,
-                            maxvalue = 360,
-                            stradd = "°",
-                            custom = {
-                                [0] = "Unlimited"
-                            }
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Hitbox",
-                            value = 1,
-                            values = { "Head", "Torso" },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Force Angles In First Person",
-                            unsafe = true,
-                            value = false,
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Smoothing",
-                            value = false,
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Smoothing Ammount",
-                            value = 0,
-                            minvalue = 0,
-                            maxvalue = 100,
-                            stradd = "%",
-                        },
-                        -- {
-                        --     type = TOGGLE,
-                        --     name = "Visibility Check",
-                        --     value = false,
-                        -- },
-                        -- {
-                        --     type = COMBOBOX,
-                        --     name = "Visibility Check Filters",
-                        --     values = { { "Transparent", true }, { "Force Feild", false }, { "Collisionless", false }, { "Thickness", false } },
-                        -- },
-                        -- {
-                        --     type = TOGGLE,
-                        --     name = "Auto Shoot",
-                        --     value = false,
-                        -- },
-                    },
-                },
-                {
-                    name = "Trigger Bot",
-                    autopos = "right",
-                    autofill = true,
-                    content = {
-                        {
-                            -- type = TOGGLE,
-                            -- name = "Enabled",
-                            -- value = false,
-                            -- extra = {
-                            --     type = KEYBIND,
-                            --     key = Enum.KeyCode.J,
-                            --     toggletype = 1,
-                            -- },
-                        },
-                    },
-                }
-            },
-        },
-        {
-            name = "Visuals",
-            content = {
-                {
-                    name = "Player ESP",
-                    autopos = "left",
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Name",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Name ESP",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Display Name",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Display Name ESP",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Head Dot",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Head Dot",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Box",
-                            value = false,
-                            extra = {
-                                type = DOUBLE_COLORPICKER,
-                                name = { "Box Fill", "Box ESP" },
-                                color = { { 255, 0, 0, 0 }, { 255, 0, 0, 150 } },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Health Bar",
-                            value = false,
-                            extra = {
-                                type = DOUBLE_COLORPICKER,
-                                name = { "Low Health", "Max Health" },
-                                color = { { 255, 0, 0 }, { 0, 255, 0 } },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Health Number",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Health Number ESP",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Team",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Team ESP",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Team Color Based",
-                            value = false,
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Distance",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Distance ESP",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                    },
-                },
-                {
-                    name = "ESP Settings",
-                    autopos = "left",
-                    autofill = true,
-                    content = {
-                        -- {
-                        --     type = DROPBOX,
-                        --     name = "ESP Sorting",
-                        --     value = 1,
-                        --     values = { "None", "Distance" },
-                        -- },
-                        {
-                            type = COMBOBOX,
-                            name = "Checks",
-                            values = { { "Alive", true }, { "Same Team", false }, { "Distance", false } },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Max Distance",
-                            value = 100,
-                            minvalue = 30,
-                            maxvalue = 500,
-                            stradd = "m",
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Max HP Visibility Cap",
-                            value = 90,
-                            minvalue = 50,
-                            maxvalue = 100,
-                            stradd = "% hp",
-                            custom = {
-                                [100] = "Always"
-                            }
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Text Case",
-                            value = 2,
-                            values = { "lowercase", "Normal", "UPPERCASE" },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Max Text Length",
-                            value = 0,
-                            minvalue = 0,
-                            maxvalue = 32,
-                            custom = { [0] = "Unlimited" },
-                            stradd = " letters",
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Highlight Target",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Aimbot Target",
-                                color = { 255, 0, 0, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Highlight Friends",
-                            value = true,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Friended Players",
-                                color = { 0, 255, 255, 255 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Highlight Priority",
-                            value = true,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Priority Players",
-                                color = { 255, 210, 0, 255 },
-                            },
-                        },
-                    },
-                },
-                {
-                    name = "Local Visuals",
-                    autopos = "right",
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Change FOV",
-                            value = false,
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Camera FOV",
-                            value = 60,
-                            minvalue = 60,
-                            maxvalue = 120,
-                            stradd = "°",
-                        },
-                    },
-                },
-                {
-                    name = "World Visuals",
-                    autopos = "right",
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Force Time",
-                            value = false,
-                            --tooltip = "Forces the time to the time set by your below.",
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Custom Time",
-                            value = 0,
-                            minvalue = 0,
-                            maxvalue = 24,
-                            decimal = 0.1,
-                            stradd = "hr",
-                        },
-                    }
-                },
-                {
-                    name = "Misc",
-                    autopos = "right",
-                    autofill = true,
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Custom Crosshair",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Crosshair Color",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-
-                        {
-                            type = DROPBOX,
-                            name = "Crosshair Position",
-                            value = 1,
-                            values = { "Center Of Screen", "Mouse" },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Crosshair Size",
-                            value = 10,
-                            minvalue = 5,
-                            maxvalue = 15,
-                            stradd = "px",
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Draw Aimbot FOV",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Aimbot FOV Circle Color",
-                                color = { 255, 255, 255, 255 },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        {
-            name = "Misc",
-            content = {
-                {
-                    name = "Movement",
-                    autopos = "left",
-                    autofill = true,
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Speed",
-                            value = false,
-                            extra = {
-                                type = KEYBIND,
-                                key = Enum.KeyCode.LeftShift,
-                                toggletype = 1,
-                            },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Speed Factor",
-                            value = 40,
-                            minvalue = 1,
-                            maxvalue = 200,
-                            stradd = " stud/s",
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Speed Method",
-                            value = 1,
-                            values = { "Velocity", "Walk Speed" },
-                        },
-                        -- {
-                        --     type = COMBOBOX,
-                        --     name = COMBOBOX,
-                        --     values = {{"Head", true}, {"Body", true}, {"Arms", false}, {"Legs", false}}
-                        -- },
-                        {
-                            type = TOGGLE,
-                            name = "Fly",
-                            value = false,
-                            extra = {
-                                type = KEYBIND,
-                                key = Enum.KeyCode.B,
-                            },
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Fly Method",
-                            value = 1,
-                            values = { "Velocity", "Noclip" },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Fly Speed",
-                            value = 40,
-                            minvalue = 1,
-                            maxvalue = 200,
-                            stradd = " stud/s",
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Mouse Teleport",
-                            value = false,
-                            extra = {
-                                type = KEYBIND,
-                                key = Enum.KeyCode.Q,
-                                toggletype = 0
-                            },
-                        },
-                    },
-                },
-                {
-                    name = "Exploits",
-                    autopos = "right",
-                    autofill = true,
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Enable Timer Exploits",
-                            unsafe = true,
-                            value = false,
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Timer",
-                            value = false,
-                            extra = {
-                                type = KEYBIND,
-                                key = Enum.KeyCode.E,
-                            },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Timer Factor",
-                            value = 20,
-                            minvalue = 1,
-                            maxvalue = 1000,
-                            stradd = "ms",
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Instant Tick Shift",
-                            value = false,
-                            extra = {
-                                type = KEYBIND,
-                                key = Enum.KeyCode.R,
-                                toggletype = 0,
-                            },
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Instant Tick Shift Delay",
-                            value = 0,
-                            minvalue = 0,
-                            maxvalue = 30,
-                            stradd = "s",
-                            custom = {
-                                [0] = "Off"
-                            }
-                        },
-                        {
-                            type = SLIDER,
-                            name = "Instant Tick Shift Factor",
-                            value = 5,
-                            minvalue = 1,
-                            maxvalue = 30,
-                            stradd = "s",
-                        },
-                    },
-                },
-            },
-        },
-        {
-            name = "Settings",
-            content = {
-                {
-                    name = "Player List",
-                    x = menu.columns.left,
-                    y = 66,
-                    width = menuWidth - 34, -- this does nothing?
-                    height = 328,
-                    content = {
-                        {
-                            type = "list",
-                            name = "Players",
-                            multiname = { "Name", "Team", "Status" },
-                            size = 9,
-                            columns = 3,
-                        },
-                        {
-                            type = IMAGE,
-                            name = "Player Info",
-                            text = "No Player Selected",
-                            size = 72,
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Player Status",
-                            x = 307,
-                            y = 314,
-                            w = 160,
-                            value = 1,
-                            values = { "None", "Friend", "Priority" },
-                        },
-                        {
-                            type = BUTTON,
-                            name = "Teleport",
-                            doubleclick = true,
-                            x = 307,
-                            y = 356,
-                            w = 160
-                        },
-                    },
-                },
-                {
-                    name = "Cheat Settings",
-                    x = menu.columns.left,
-                    y = 400,
-                    width = menu.columns.width,
-                    height = 182,
-                    content = {
-                        {
-                            type = TOGGLE,
-                            name = "Menu Accent",
-                            value = false,
-                            extra = {
-                                type = COLORPICKER,
-                                name = "Accent Color",
-                                color = { 127, 72, 163 },
-                            },
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Watermark",
-                            value = true,
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Custom Menu Name",
-                            value = MenuName and true or false,
-                        },
-                        {
-                            type = TEXTBOX,
-                            name = "MenuName",
-                            text = MenuName or "Bitch Bot",
-                        },
-                        {
-                            type = BUTTON,
-                            name = "Set Clipboard Game ID",
-                        },
-                        {
-                            type = BUTTON,
-                            name = "Unload Cheat",
-                            doubleclick = true,
-                        },
-                        {
-                            type = TOGGLE,
-                            name = "Allow Unsafe Features",
-                            value = false,
-                        },
-                    },
-                },
-                {
-                    name = "Configuration",
-                    x = menu.columns.right,
-                    y = 400,
-                    width = menu.columns.width,
-                    height = 182,
-                    content = {
-                        {
-                            type = TEXTBOX,
-                            name = "ConfigName",
-                            file = true,
-                            text = "",
-                        },
-                        {
-                            type = DROPBOX,
-                            name = "Configs",
-                            value = 1,
-                            values = GetConfigs(),
-                        },
-                        {
-                            type = BUTTON,
-                            name = "Load Config",
-                            doubleclick = true,
-                        },
-                        {
-                            type = BUTTON,
-                            name = "Save Config",
-                            doubleclick = true,
-                        },
-                        {
-                            type = BUTTON,
-                            name = "Delete Config",
-                            doubleclick = true,
-                        },
-                    },
-                },
-            },
-        },
-    })
-
-    local plistinfo = menu.options["Settings"]["Player List"]["Player Info"][1]
-    local plist = menu.options["Settings"]["Player List"]["Players"]
-    local function updateplist()
-        if menu == nil then
-            return
-        end
-        local playerlistval = menu:GetVal("Settings", "Player List", "Players")
-        local playerz = {}
-
-        for i, team in pairs(TEAMS:GetTeams()) do
-            local sorted_players = {}
-            for i1, player in pairs(team:GetPlayers()) do
-                table.insert(sorted_players, player.Name)
-            end
-            table.sort(sorted_players)
-            for i1, player_name in pairs(sorted_players) do
-                table.insert(playerz, Players:FindFirstChild(player_name))
-            end
-        end
-
-        local sorted_players = {}
-        for i, player in pairs(Players:GetPlayers()) do
-            if player.Team == nil then
-                table.insert(sorted_players, player.Name)
-            end
-        end
-        table.sort(sorted_players)
-        for i, player_name in pairs(sorted_players) do
-            table.insert(playerz, Players:FindFirstChild(player_name))
-        end
-        sorted_players = nil
-
-        local templist = {}
-        for k, v in pairs(playerz) do
-            local playername = { v.Name, RGB(255, 255, 255) }
-            local teamtext = { "None", RGB(255, 255, 255) }
-            local playerstatus = { "None", RGB(255, 255, 255) }
-            if v.Team ~= nil then
-                teamtext[1] = v.Team.Name
-                teamtext[2] = v.TeamColor.Color
-            end
-            if v == LOCAL_PLAYER then
-                playerstatus[1] = "Local Player"
-                playerstatus[2] = RGB(66, 135, 245)
-            elseif table.find(menu.friends, v.Name) then
-                playerstatus[1] = "Friend"
-                playerstatus[2] = RGB(0, 255, 0)
-            elseif table.find(menu.priority, v.Name) then
-                playerstatus[1] = "Priority"
-                playerstatus[2] = RGB(255, 210, 0)
-            end
-
-            table.insert(templist, { playername, teamtext, playerstatus })
-        end
-        plist[5] = templist
-        if playerlistval ~= nil then
-            for i, v in ipairs(playerz) do
-                if v.Name == playerlistval then
-                    selectedPlayer = v
-                    break
-                end
-                if i == #playerz then
-                    selectedPlayer = nil
-                    menu.list.setval(plist, nil)
-                end
-            end
-        end
-        menu:SetMenuPos(menu.x, menu.y)
-    end
-
-    local function setplistinfo(player, textonly)
-        if not menu then
-            return
-        end
-        if player ~= nil then
-            local playerteam = "None"
-            if player.Team ~= nil then
-                playerteam = player.Team.Name
-            end
-            local playerhealth = "?"
-
-            if player.Character ~= nil then
-                local humanoid = player.Character:FindFirstChild("Humanoid")
-                if humanoid ~= nil then
-                    if humanoid.Health ~= nil then
-                        playerhealth = tostring(humanoid.Health) .. "/" .. tostring(humanoid.MaxHealth)
-                    else
-                        playerhealth = "No health found"
-                    end
-                else
-                    playerhealth = "Humanoid not found"
-                end
-            end
-
-            plistinfo[1].Text = "Display Name: " .. player.DisplayName .. "\nName: ".. player.Name .. "\nTeam: " .. playerteam .. "\nHealth: " .. playerhealth
-
-            if textonly == nil then
-                plistinfo[2].Data = BBOT_IMAGES[5]
-                plistinfo[2].Data = game:HttpGet(string.format(
-                    "https://www.roblox.com/headshot-thumbnail/image?userId=%s&width=100&height=100&format=png",
-                    player.UserId
-                ))
-            end
-        else
-            plistinfo[2].Data = BBOT_IMAGES[5]
-            plistinfo[1].Text = "No Player Selected"
-        end
-    end
-
-    menu.list.removeall(menu.options["Settings"]["Player List"]["Players"])
-    updateplist()
-    setplistinfo(nil)
-
-    menu.tickbase_manip_added = false
-    menu.tickbaseadd = 0
-end
-
-do
-    local wm = menu.watermark
-    wm.textString = " | " .. BBOT.username .. " | " .. os.date("%b. %d, %Y")
-    wm.pos = Vector2.new(50, 9)
-    wm.text = {}
-    local fulltext = menu.options["Settings"]["Cheat Settings"]["MenuName"][1] .. wm.textString
-    wm.width = #fulltext * 7 + 10
-    wm.height = 19
-    wm.rect = {}
-
-    Draw:FilledRect(
-        false,
-        wm.pos.x,
-        wm.pos.y + 1,
-        wm.width,
-        2,
-        { menu.mc[1] - 40, menu.mc[2] - 40, menu.mc[3] - 40, 255 },
-        wm.rect
-    )
-    Draw:FilledRect(false, wm.pos.x, wm.pos.y, wm.width, 2, { menu.mc[1], menu.mc[2], menu.mc[3], 255 }, wm.rect)
-    Draw:FilledRect(false, wm.pos.x, wm.pos.y + 3, wm.width, wm.height - 5, { 50, 50, 50, 255 }, wm.rect)
-    for i = 0, wm.height - 4 do
-        Draw:FilledRect(
-            false,
-            wm.pos.x,
-            wm.pos.y + 3 + i,
-            wm.width,
-            1,
-            { 50 - i * 1.7, 50 - i * 1.7, 50 - i * 1.7, 255 },
-            wm.rect
-        )
-    end
-    Draw:OutlinedRect(false, wm.pos.x, wm.pos.y, wm.width, wm.height, { 0, 0, 0, 255 }, wm.rect)
-    Draw:OutlinedRect(false, wm.pos.x - 1, wm.pos.y - 1, wm.width + 2, wm.height + 2, { 0, 0, 0, 255 * 0.4 }, wm.rect)
-    Draw:OutlinedText(
-        fulltext,
-        2,
-        false,
-        wm.pos.x + 5,
-        wm.pos.y + 3,
-        13,
-        false,
-        { 255, 255, 255, 255 },
-        { 0, 0, 0, 255 },
-        wm.text
-    )
-end
-
---ANCHOR watermak
-for k, v in pairs(menu.watermark.rect) do
-    v.Visible = true
-end
-
-menu.watermark.text[1].Visible = true
-
-local textbox = menu.options["Settings"]["Configuration"]["ConfigName"]
-local relconfigs = GetConfigs()
-textbox[1] = relconfigs[menu.options["Settings"]["Configuration"]["Configs"][1]]
-textbox[4].Text = textbox[1]
-
-menu.load_time = math.floor((tick() - loadstart) * 1000)
-
-CreateNotification(string.format("Done loading the " .. menu.game .. " cheat. (%d ms)", menu.load_time))
-CreateNotification("Press DELETE to open and close the menu!")
-
-CreateThread(function()
-    local x = loadingthing.Position.x
-
-    for i = 1, 20 do
-        loadingthing.Transparency = 1-i/20
-        loadingthing.Position -= Vector2.new(x/10, 0)
-        wait()
-    end
-
-    loadingthing.Visible = false -- i do it this way because otherwise it would fuck up the Draw:UnRender function, it doesnt cause any lag sooooo
-end)
-if not menu.open then
-    menu.fading = true
-    menu.fadestart = tick()
-end
-
-menu.Initialize = nil -- let me freeeeee
-_G.CreateNotification = CreateNotification
+--[[ 
+Lithium 
+------------------------------------------- 
+🟢 Fully Operational 
+🟡 Coming Very Soon 
+🔴 Not Yet Available 
+🟣 Supported by Lithium's Native Universal Handler 
+
+Copy Support (25) 
+
+🟢 Da Hood 
+🟢 Da Strike 
+🟢 Da Fights 
+🟢 Da Uphill 
+🟢 Da Customs 
+🟢 Da Downhill 
+🟢 Dah Hood 1 
+🟢 Dah Hood 2 
+🟢 Hood Modded 
+🟢 Custom Lock 
+🟢 Custom FFA 
+🟢 OG Da Hood 
+🟢 Flame Hood 
+🟢 Yeno Hood 
+🟢 Bell Hood 
+🟢 New Hood 
+🟢 1v1 Hood 
+🟢 Del Hood 
+🟢 Dee Hood 
+🟡 Der Hood 
+🟢 Ar Hood 
+🟢 Hood Z 
+🟢 Hood Spirit FFA 
+🟡 Dah Aim Trainer 
+🟢 The Hood Customs 
+
+
+Universal Support (7) 
+
+🟡 Phantom Forces 
+🟣 Counter Blox 
+🟣 Criminality 
+🟣 Chaos Town 
+🟣 Fortblox 
+🟣 Jailbird 
+🟣 Operations Siege 
+🟣 Any Non Custom Model Game 
+]] 
+
+getgenv().Script = { 
+['Core'] = { 
+['Key'] = '', 
+['Intro'] = true, 
+['Version'] = 'v0.4', 
+['Script Core'] = { 
+['Refresh Rates'] = { 
+['Aimbot'] = 5, 
+['Other'] = 20 
+}, 
+['Multithreading'] = { 
+["Enabled"] = false, 
+}, 
+['Connection Flags'] = { 
+['Main'] = {'Thread'}, 
+['Other'] = {'Thread'}, 
+}, 
+['Thread Cache'] = { 
+['Enabled'] = false, 
+['Max Threads'] = 10, 
+['Cache Time'] = 30, 
+['Multithreaded'] = false 
+} 
+}, 
+['Script Safety'] = { 
+['Unload'] = { 
+['Enabled'] = false, 
+}, 
+['Soft Panic'] = { 
+['Enabled'] = false, 
+['Disables'] = {'Visuals'} 
+}, 
+}, 
+['Script Logic'] = { 
+['FFA Mode'] = true, --[[ Keep on for hood games ]] 
+['Global Wall Check'] = false, --[[ Checks if a player is behind a wall before locking on ]] 
+} 
+}, 
+['Binds'] = { 
+['Macro'] = 'X', 
+['NoClip'] = '-', 
+['Unlock'] = 'Z', --[[ Only works with double bind ]] 
+['AntiAim'] = 'Y', 
+['AimAssist'] = 'T', 
+['Soft Panic'] = 'L', 
+['Triggerbot'] = 'C', 
+['Specific ESP'] = 'T', 
+['Unload Cheat'] = 'R', 
+['Silent Toggle'] = 'P', 
+['InventorySorter'] = 'H', 
+['AimAssist Toggle'] = 'B' -- [[ This is to completely disable the aim assist till the button is clicked again ]] 
+}, 
+['Universal'] = { 
+['Enabled'] = true, --[[ Does not work for solara ]] 
+['Predict'] = false, 
+['Prediction'] = 0.112, 
+['Method'] = 'Raycast', --[[ Raycast, FindPartOnRayWithIgnoreList, FindPartOnRayWithWhitelist, FindPartOnRay ]] 
+['WallCheck Origin'] = 'Head', --[[ Head, Torso, Camera ]] 
+['HitParts'] = {'Head'}, 
+['HitPart'] = 'Head' 
+}, 
+['Silent'] = { 
+['Enabled'] = true, 
+['Mode'] = 'Regular', --[[ Target / Regular ]]-- 
+['HitScan'] = 'Automatic', --[[ On Shot / Automatic, Automatic is very performance heavy ]]-- 
+['FOVType'] = 'CircleFOV', --[[ BoxFOV / CircleFOV ]]-- 
+['Default FOV'] = 100, --[[ Applies to universal too ]] 
+['OverrideYAxis'] = 'None', 
+['HitChance'] = { 
+['HitChance'] = 100, 
+['Miss Chance'] = 0, -- [[ Counts by decimals, eg: 0.1 = 10% ]] 
+}, 
+['Prediction'] = 0.12972152, 
+['Draw Hit'] = false, 
+['Prediction Adjustment'] = 1, 
+['3D Adjustment'] = { false, Vector3.new(1, 0, 1) }, 
+['Hit Location'] = { 
+['Hit Target'] = 'Nearest Point', --[[ Nearest Point / Center Point /, Nearest Part, R15 ]]-- 
+['Point Scale'] = 'Dynamic', --[[ Legacy, Dynamic, Static, Scalar, Full ]] 
+['Max Nearest Point'] = 0, 
+['Ignore Blank Points'] = true, 
+['R15'] = {'Head'} 
+}, 
+['Prediction Points'] = { --[[ Will set your prediction depending on the part you're aiming nearest to ]]-- 
+['Enabled'] = false, 
+['Hit Points'] = { 
+['Head'] = 0.011, 
+['UpperTorso'] = 0.135, 
+['LowerTorso'] = 0.127, 
+['HumanoidRootPart'] = 0.127, 
+['LeftUpperArm'] = 0.127, 
+['LeftLowerArm'] = 0.127, 
+['LeftHand'] = 0.127, 
+['RightUpperArm'] = 0.127, 
+['RightLowerArm'] = 0.127, 
+['RightHand'] = 0.127, 
+['LeftUpperLeg'] = 0.127, 
+['LeftLowerLeg'] = 0.127, 
+['LeftFoot'] = 0.127, 
+['RightUpperLeg'] = 0.127, 
+['RightLowerLeg'] = 0.127, 
+['RightFoot'] = 0.127, 
+} 
+}, 
+['Ping Prediction'] = { 
+['Enabled'] = false, 
+['30 40'] = 0.11, 
+['40 50'] = 0.115, 
+['50 60'] = 0.120, 
+['60 70'] = 0.123, 
+['70 80'] = 0.129, 
+['80 90'] = 0.130, 
+['90 100'] = 0.134, 
+['100 110'] = 0.139, 
+['110 120'] = 0.144, 
+['120 130'] = 0.149, 
+['130 140'] = 0.1274, 
+['140 150'] = 0.1575 
+} 
+}, 
+['Aiming'] = { 
+['Enabled'] = true, 
+['Mode'] = 'Target', --[[ Target / Regular ]]-- 
+['Radius'] = 100, 
+['Stickiness'] = 1, 
+['Prediction'] = 0, 
+['Double Bind'] = false, 
+['Readjustment'] = false, 
+['OverrideYAxis'] = 'None', 
+['3D Adjustment'] = { true, Vector3.new(1, 1, 1) }, 
+['Legacy Smoothing'] = false, --[[ Whole number smoothing (30, 50 etc), Disable to use decimals ]]-- 
+['Hit Location'] = { 
+['Hit Target'] = 'R15', --[[ Nearest Point / Center Point /, Nearest Part, R15 ]]-- 
+['Point Scale'] = 'Dynamic', --[[ Legacy, Dynamic, Static, Scalar, Full ]] 
+['Max Nearest Point'] = 5, 
+['Ignore Blank Points'] = true, 
+['R15'] = {'Head'} 
+}, 
+['HitChance'] = { 
+['HitChance'] = 100, 
+['Miss Chance'] = 0, -- [[ Counts by decimals, eg: 0.1 = 10% ]] 
+}, 
+['Prediction Points'] = { --[[ Will set your prediction depending on the part your aiming nearest to ]]-- 
+['Enabled'] = false, 
+['Hit Points'] = { 
+['Head'] = 0.127, 
+['UpperTorso'] = 0.06, 
+['LowerTorso'] = 0.06, 
+['HumanoidRootPart'] = 0.127, 
+['LeftUpperArm'] = 0.06, 
+['LeftLowerArm'] = 0.06, 
+['LeftHand'] = 0.06, 
+['RightUpperArm'] = 0.06, 
+['RightLowerArm'] = 0.06, 
+['RightHand'] = 0.06, 
+['LeftUpperLeg'] = 0.06, 
+['LeftLowerLeg'] = 0.06, 
+['LeftFoot'] = 0.06, 
+['RightUpperLeg'] = 0.06, 
+['RightLowerLeg'] = 0.06, 
+['RightFoot'] = 0.06, 
+} 
+}, 
+['Smoothing'] = { 
+['Smoothing'] = 1, 
+['Easing'] = { 
+['Style'] = 'Expo', 
+['Formula'] = function(d, s) 
+local UseCustom = false 
+return (UseCustom and (d / s^s) - tick()) or Enum.EasingDirection.InOut 
+end, 
+}, 
+}, 
+['Randomization'] = { 
+['Enabled'] = false, 
+['X'] = { 
+['X'] = 3, 
+['Y'] = 3, 
+['Z'] = 3, 
+}, 
+['Y'] = { 
+['X'] = 3, 
+['Y'] = 3, 
+['Z'] = 3, 
+} 
+}, 
+['Conditions'] = { 
+['Shift Lock'] = false, 
+['Third Person'] = false, 
+['Chat Focused'] = false, 
+['Tool Equipped'] = false, 
+['Wall Check'] = false, 
+['FOV Check'] = false, 
+['Visible'] = false, 
+}, 
+}, 
+['Triggerbot'] = { 
+['Enabled'] = false, 
+['Default FOV'] = 23, 
+['Interval'] = 1, 
+['Tolerance'] = 1, 
+['Cooldown 1'] = 0.1275, 
+['Cooldown 2'] = 0.12, 
+['Prediction'] = 0.132, 
+['FOVType'] = 'CircleFOV', 
+['Activation'] = { 
+['Mode'] = 'Keybind', --[[ Mouse / Keybind ]]-- 
+['Type'] = 'Toggle', --[[ Toggle / Hold ]]-- 
+}, 
+['Silent Link'] = false, --[[ Adjusts the triggerbot depending on Silent Aim ]]-- 
+}, 
+['Helpers'] = { 
+['DisableYAxis'] = false, 
+['Bullet Curvation'] = { 
+['Enabled'] = false, 
+['Formula'] = '3D', --[[ 3D, 2D ]]-- 
+['2D'] = { 
+['X'] = 300, 
+['Y'] = 360, 
+}, 
+['3D'] = { 
+['Angle'] = 4.6, 
+}, 
+['Logger'] = false --[[ Print information ]]-- 
+}, 
+['Location Assist'] = { 
+['Visible'] = false, 
+['Thickness'] = 1, 
+['Color'] = Color3.fromRGB(199, 166, 163), 
+['Unsafe Color'] = Color3.fromRGB(255, 0, 0), 
+['Transparency'] = 1, 
+['Center'] = false, 
+['Position'] = { 
+['X'] = workspace.CurrentCamera.ViewportSize.X / 2 - 5, 
+['Y'] = workspace.CurrentCamera.ViewportSize.Y / 2 - 300 
+}, 
+['Min Scan'] = 3, 
+['Max Scan Radius'] = 150 
+} 
+}, 
+['Visuals'] = { 
+['Load Check'] = false, --[[ Hide visuals on start ]]-- 
+['Global ESP'] = { 
+['Enabled'] = true, 
+['Team Check'] = true, 
+['Max Draw Distance'] = math.huge, 
+['Text Size'] = 10, 
+['Text Font'] = 'Smallest Pixel', --[[ Smallest Pixel, Upheaval, ProggyClean ]] 
+['Fade Effect'] = { 
+['On Distance'] = true, 
+}, 
+['Drawing'] = { 
+['Names'] = { 
+['Enabled'] = true, 
+['Color'] = Color3.fromRGB(227, 180, 206), 
+}, 
+['Distance'] = { 
+['Enabled'] = true, 
+['Docked'] = false, 
+['Color'] = Color3.fromRGB(175, 194, 223), 
+}, 
+['Health'] = { 
+['Enabled'] = true, 
+['Text'] = true, 
+['Position'] = 'Left', --[[ Left, Right ]] 
+['Health Based'] = false, 
+['Text Color'] = Color3.fromRGB(195, 193, 239), 
+['Width'] = 1.5, 
+['Gradient'] = true, 
+['Alpha Color'] = Color3.fromRGB(189, 185, 235), 
+['Depth Color'] = Color3.fromRGB(239, 193, 193), 
+['Color Keypoint'] = Color3.fromRGB(202, 219, 247), 
+}, 
+['Boxes'] = { 
+['Enabled'] = false, 
+['Box Type'] = 'Bounding Box', -- Corner, Bounding Box 
+['Bounding Box'] = { 
+['Animate'] = true, 
+['Animate Speed'] = 360, 
+['Gradient'] = true, 
+['Alpha Color'] = Color3.fromRGB(205, 160, 227), 
+['Depth Color'] = Color3.fromRGB(204, 177, 188), 
+['Filled Color Scheme'] = true, 
+['Fill Color'] = Color3.fromRGB(204, 244, 215), 
+['Fill Glow'] = Color3.fromRGB(226, 191, 188), 
+['Filled'] = { 
+['Enabled'] = true, 
+['Transparency'] = 0.75, 
+['Color'] = Color3.fromRGB(193, 177, 214), 
+}, 
+}, 
+['Corner'] = { 
+['Color'] = Color3.fromRGB(226, 181, 181), 
+}, 
+}, 
+}, 
+}, 
+['Specific ESP'] = { --[[ Raid Awareness ]] 
+['Visible'] = false, 
+['EnemyColor'] = Color3.fromRGB(202, 219, 247), 
+['AllyColor'] = Color3.fromRGB(32, 209, 29), 
+['Thickness'] = 1, 
+['Transparency'] = 0.7, 
+['Modules'] = { 
+['Name'] = { 
+['Visible'] = true, 
+['Size'] = 9, 
+['Outline'] = true, 
+['OutlineColor'] = Color3.fromRGB(0, 0, 0), 
+['Transparency'] = 1, 
+}, 
+['Distance'] = { 
+['Visible'] = true, 
+['Size'] = 9, 
+['Outline'] = true, 
+['OutlineColor'] = Color3.fromRGB(0, 0, 0), 
+['Transparency'] = 1, 
+}, 
+}, 
+}, 
+['Panel'] = { 
+['Visible'] = false, --[[ Information helper / panel ]]-- 
+['Thickness'] = 1, 
+['Color'] = Color3.fromRGB(255, 255, 255), 
+['Transparency'] = 0.7, 
+['Center'] = false, 
+['Position'] = { 
+['X'] = workspace.CurrentCamera.ViewportSize.X / 2 - 700, 
+['Y'] = workspace.CurrentCamera.ViewportSize.Y / 2 - 30 
+} 
+}, 
+['Tracer'] = { 
+['Visible'] = false, 
+['Thickness'] = 1, 
+['Color'] = Color3.fromRGB(255, 255, 255), 
+['Transparency'] = 1, 
+}, 
+['Crosshair'] = { --[[ Some text positions are currently messed up ]] 
+['Visible'] = false, 
+['Stutter'] = 0, 
+['Docked'] = false, 
+['Width'] = 1.5, 
+['Length'] = 15, 
+['Radius'] = 5, 
+['Color'] = Color3.fromRGB(180, 207, 227), 
+['Rotate'] = true, 
+['Rotate Speed'] = 150, 
+['Max Angle'] = 360, 
+['Lerp Style'] = Enum.EasingStyle.Linear, 
+['Fluctuate'] = false, 
+['Fluctuate Speed'] = 150, 
+['Fluctuate Min'] = 5, 
+['Fluctuate Max'] = 22, 
+['Labels'] = { 
+['Name'] = { 
+['Visible'] = true, 
+['Text'] = 'Lithium', 
+['Color'] = Color3.fromRGB(180, 207, 227) 
+}, 
+['Extension'] = { 
+['Visible'] = true, 
+['Text'] = '.space', 
+['Color'] = Color3.fromRGB(180, 207, 227) 
+}, 
+['Current Target'] = { 
+['Visible'] = false, 
+['Color'] = Color3.fromRGB(255, 255, 255), 
+}, 
+['Current Target Health'] = { 
+['Visible'] = false, 
+['Color'] = Color3.fromRGB(165, 255, 191), 
+} 
+} 
+}, 
+['Visualization'] = { 
+['Assist'] = { 
+['Visible'] = false, 
+['Filled'] = false, 
+['Transparency'] = 0.4, 
+['Color'] = Color3.fromRGB(221, 130, 240), 
+}, 
+['Silent'] = { 
+['BoxFOV'] = { 
+['Visible'] = false, 
+['Thickness'] = 1, 
+['TargetColor'] = Color3.fromRGB(255, 0, 0), 
+['Color'] = Color3.fromRGB(180, 207, 227), 
+['Transparency'] = 1, 
+}, 
+['CircleFOV'] = { 
+['Visible'] = false, 
+['Filled'] = true, 
+['Transparency'] = 1, 
+['Color'] = Color3.fromRGB(221, 130, 240), 
+}, 
+}, 
+['Triggerbot'] = { 
+['BoxFOV'] = { 
+['Visible'] = false, 
+['Thickness'] = 3, 
+['TargetColor'] = Color3.fromRGB(231, 126, 222), 
+['Transparency'] = 1, 
+}, 
+['CircleFOV'] = { 
+['Visible'] = false, 
+['Filled'] = true, 
+['Transparency'] = 0.3, 
+['Color'] = Color3.fromRGB(67, 39, 68), 
+}, 
+}, 
+}, 
+}, 
+['Misc'] = { 
+['RemoveSeats'] = false, 
+['AntiFling'] = false, 
+['AntiAim'] = { 
+['Enabled'] = false, 
+['Type'] = 'Prediction Disabler', --[[ Sides, Prediction Disabler ]]-- 
+}, 
+['Macro'] = { 
+['Enabled'] = false, 
+['Gun Macro'] = { 
+['Mode'] = 'Hold', 
+['Type'] = 'ThirdPerson', --[[ ThirdPerson, FirstPerson ]]-- 
+}, 
+['NoClip Macro'] = { 
+['Enabled'] = false, 
+['Delay'] = 0.03 
+} 
+}, 
+['InventorySorter'] = { 
+['Enabled'] = false, 
+['Priorities'] = { -- [[ Case Sensitive ]]-- 
+'[Double-Barrel SG]', 
+'[Revolver]', 
+'[TacticalShotgun]', 
+'[Knife]' 
+}, 
+}, 
+}, 
+['Range Index'] = { --[[ Distances ]]-- 
+['Short'] = 15, 
+['Medium'] = 30, 
+['Long'] = math.huge, 
+}, 
+['FOVs'] = { 
+['GunFOV'] = false, 
+['Silent'] = { 
+['BoxFOV'] = { 
+['Bind To Silent'] = false, --[[ Make your box move with your silent ]]-- 
+['Height'] = 2, 
+['Width'] = 1.2, 
+}, 
+['CircleFOV'] = { --[[ Short, Medium, Long ]]-- 
+['Revolver'] = { 100, 100, 100 }, 
+['DoubleBarrel'] = { 75, 75, 75 }, 
+['Shotgun'] = { 75, 75, 75 }, 
+['TacticalShotgun'] = { 75, 75, 75 }, 
+['SMG'] = { 75, 75, 75 }, 
+['Silencer'] = { 75, 75, 75 }, 
+['AssaultRifle'] = { 75, 75, 75 }, 
+['Others'] = { 75, 75, 75 }, 
+}, 
+}, 
+['Triggerbot'] = { 
+['BoxFOV'] = { 
+['Height'] = 2, 
+['Width'] = 1.2, 
+}, 
+['CircleFOV'] = { --[[ Short, Medium, Long ]]-- 
+['Revolver'] = { 75, 50, 25 }, 
+['DoubleBarrel'] = { 75, 50, 25 }, 
+['Shotgun'] = { 75, 50, 25 }, 
+['TacticalShotgun'] = { 75, 50, 25 }, 
+['SMG'] = { 75, 50, 25 }, 
+['Silencer'] = { 75, 50, 25 }, 
+['AssaultRifle'] = { 75, 50, 25 }, 
+['Others'] = { 75, 50, 25 }, 
+}, 
+}, 
+}, 
+} 
+-- 
+if not LPH_OBFUSCATED then 
+LPH_JIT_MAX = function(...) 
+return (...) 
+end 
+LPH_NO_VIRTUALIZE = function(...) 
+return (...) 
+end 
+end 
+--[[ 
+Nemesis.Softworks - 2022-2024 ALL RIGHTS RESERVED 
+
+Sadly had to discontinue this project, was amazing while it lasted. was getting to a point tho, since i had created at least 7 rewrites, this being the final & last. 
+All rights of this source go to hook (alex), the original creator and developer of Nemesis 
+The source below is entirely mine, coded by me, and made by me alex. 
+Some code is messy, some is unfinished due to me shutting down nemesis, apart from that everything works. 
+]] 
+--[[ 
+--// filtered out cus this doesnt work for solara (missing getconnections) 
+for Index, Connection in next, getconnections(workspace.CurrentCamera.Changed) do 
+Connection:Disable() 
+end]] 
+-- 
+local function SanityCheck() --// Had to add this due to idiots always saying the script doesnt work when theyre using an older script version :/ 
+local UserVersion = getgenv().Script.Core['Version'] 
+local URL = 'https://github.com/hookmeta/Lithium/blob/main/Loader.lua' 
+local CurrentVersion = 'v0.4' 
+local KickMessages = { 
+['Outdated'] = 'Outdated table - Please get the latest Lithium table, our github was copied to your clipboard.', 
+['Version'] = 'Outdated table - Please get the latest Lithium table, our github was copied to your clipboard. Your version: ' .. UserVersion .. ', Current Version: ' .. CurrentVersion, 
+['Unsupported'] = 'Unsupported executor: ' .. identifyexecutor() 
+} 
+-- 
+local function Kick(Reason) 
+local message = KickMessages[Reason] 
+if message then 
+game.Players.LocalPlayer:Kick(message) 
+else 
+game.Players.LocalPlayer:Kick('Unknown error occurred.') 
+end 
+end 
+-- 
+if not getgenv().Script.Core['Script Logic'] then 
+setclipboard(URL) 
+Kick('Outdated') 
+end 
+-- 
+if not getgenv().Script.Silent['Default FOV'] then 
+setclipboard(URL) 
+Kick('Outdated') 
+end 
+-- 
+if not getgenv().Script.Universal then 
+setclipboard(URL) 
+Kick('Outdated') 
+end 
+-- 
+if not getgenv().Script.Aiming['3D Adjustment'] then 
+setclipboard(URL) 
+Kick('Outdated') 
+end 
+-- 
+if not getgenv().Script.Universal.Method then 
+setclipboard(URL) 
+Kick('Version') 
+end 
+-- 
+if not getgenv().Script.Core['Version'] then 
+setclipboard(URL) 
+Kick('Outdated') 
+end 
+-- 
+if getgenv().Script.Silent['Prediction Points'].Enabled and getgenv().Script.Silent['Ping Prediction'].Enabled then 
+Kick('Script Error') 
+end 
+-- 
+if CurrentVersion ~= UserVersion then 
+setclipboard(URL) 
+Kick('Version') 
+end 
+end 
+-- 
+SanityCheck() 
+-- 
+local RobloxReplicatedStorage = cloneref(game:GetService('RobloxReplicatedStorage')) 
+local ReplicatedStorage = cloneref(game:GetService('ReplicatedStorage')) 
+local UserInputService = cloneref(game:GetService('UserInputService')) 
+local ReplicatedFirst = cloneref(game:GetService('ReplicatedFirst')) 
+local TweenService = cloneref(game:GetService('TweenService')) 
+local HttpService = cloneref(game:GetService('HttpService')) 
+local RunService = cloneref(game:GetService('RunService')) 
+local GuiService = cloneref(game:GetService('GuiService')) 
+local Workspace = cloneref(game:GetService('Workspace')) 
+local CoreGui = cloneref(game:GetService('CoreGui')) 
+local Players = cloneref(game:GetService('Players')) 
+local Teams = cloneref(game:GetService('Teams')) 
+local Stats = cloneref(game:GetService('Stats')) 
+local Network = cloneref(settings():GetService('NetworkSettings')) 
+local Client = Players.LocalPlayer 
+local Mouse = Client:GetMouse() 
+local Ping = Stats.PerformanceStats.Ping:GetValue() 
+local Camera = Workspace.CurrentCamera 
+local MRandom = math.random 
+local Floor = math.floor 
+local Round = math.round 
+local Clamp = math.clamp 
+local Acos = math.acos 
+local Atan2 = math.atan2 
+local Huge = math.huge 
+local Sqrt = math.sqrt 
+local Ceil = math.ceil 
+local Cos = math.cos 
+local Abs = math.abs 
+local Sin = math.sin 
+local Rad = math.rad 
+local Max = math.max 
+local Min = math.min 
+local Deg = math.deg 
+local Pi = math.pi 
+local Remove = table.remove 
+local Find = table.find 
+local Lower = string.lower 
+local Split = string.split 
+local Create = coroutine.create 
+local Resume = coroutine.resume 
+local Delay = task.delay 
+local Spawn = task.spawn 
+local Wait = task.wait 
+local Vector2new = Vector2.new 
+local Vector3new = Vector3.new 
+local Offset = GuiService:GetGuiInset().Y 
+-- 
+local Decode = crypt.base64.decode; 
+local UtilityUI = Instance.new('ScreenGui'); UtilityUI.Parent = gethui(); UtilityUI.IgnoreGuiInset = true; 
+local PriorityRelationSilent, PriorityRelationAssist, PriorityRelationTrigger 
+local Fonts = { ['Smallest Pixel'] = nil, ['ProggyClean'] = nil, ['Upheaval'] = nil } 
+local Shared = {}; 
+local CurrentGame, Supported; 
+local AimbotTick, VisualTick, OtherTick = tick(), tick(), tick() 
+-- 
+local Supported = { 
+[1008451066] = { 
+Name = 'Da Hood', 
+Updater = 'UpdateMousePosI', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+if (Player) and Player.Character:FindFirstChild('BodyEffects') then 
+return Player.Character.BodyEffects['K.O'].Value 
+end 
+-- 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+if Player and Player.Character then 
+if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') ~= nil then 
+return true 
+else 
+return false 
+end 
+else 
+return false 
+end 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[1958807588] = { 
+Name = 'Hood Modded', 
+Updater = 'MousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['Bullets'] 
+end 
+} 
+}, 
+[6134176644] = { 
+Name = 'OG Da Hood', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+if (Player) and Player.Character:FindFirstChild('BodyEffects') then 
+return Player.Character.BodyEffects['K.O'].Value 
+end 
+-- 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+if Player and Player.Character then 
+if Player.Character:FindFirstChild('GRABBING_CONSTRAINT') ~= nil then 
+return true 
+else 
+return false 
+end 
+else 
+return false 
+end 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[3634139746] = { 
+Name = 'Hood Customs', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+if (Player) and Player.Character:FindFirstChild('BodyEffects') then 
+return Player.Character.BodyEffects['K.O'].Value 
+end 
+-- 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6070070353] = { 
+Name = 'The Hood Customs', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[5990512246] = { 
+Name = 'Ar Hood', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6133438581] = { 
+Name = 'Hood Spirit FFA', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6173397248] = { 
+Name = '1v1 Hood 2', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+if (Player) and Player.Character:FindFirstChild('BodyEffects') then 
+return Player.Character.BodyEffects['K.O'].Value 
+end 
+-- 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[5403249584] = { 
+Name = 'Flame Hood', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['.gg/flamehood'] 
+end 
+} 
+}, 
+[5235037897] = { 
+Name = 'Da Strike', 
+Updater = 'MOUSE', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage.MAINEVENT 
+end 
+} 
+}, 
+[5955726556] = { 
+Name = 'Da Downhill', 
+Updater = 'MOUSE', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage.MAINEVENT 
+end 
+} 
+}, 
+[6139677386] = { 
+Name = 'Da Uphill', 
+Updater = 'MOUSE', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage.MAINEVENT 
+end 
+} 
+}, 
+[6144889736] = { 
+Name = 'Da Hills', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return game:GetService('ReplicatedStorage'):FindFirstChild('assets'):FindFirstChild('dh'):FindFirstChild('MainEvent') 
+end 
+} 
+}, 
+[6070798844] = { 
+Name = 'Dee Hood', 
+Updater = 'UpdateMousePosI', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6256403293] = { 
+Name = 'Der Hood', 
+Updater = 'FIRETHISIFYOUREASKID', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6101464687] = { 
+Name = 'New Hood', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6069154695] = { 
+Name = 'Bell Hood', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[5934929789] = { 
+Name = 'Yeno Hood', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[5793036557] = { 
+Name = 'Hood Z', 
+Updater = 'UpdateMousePos', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+} 
+}, 
+[6035872082] = { 
+Name = 'Rivals', 
+Mouse = true, 
+Updater = 'N/A', 
+HoodGame = true, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return 'N/A' 
+end 
+} 
+}, 
+[595270616] = { 
+Name = 'State Of Anarchy', 
+Mouse = true, 
+Updater = 'N/A', 
+HoodGame = false, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return 'N/A' 
+end 
+} 
+}, 
+[115797356] = { 
+Name = 'Counter Blox', 
+Mouse = true, 
+Updater = 'N/A', 
+HoodGame = false, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return 'N/A' 
+end 
+} 
+}, 
+['Universal'] = { 
+Name = 'Universal', 
+Updater = 'None', 
+HoodGame = false, 
+Functions = { 
+KnockedFunction = function(Player) 
+return false 
+end, 
+GrabbedFunction = function(Player) 
+return false 
+end, 
+RemotePath = function() 
+return ReplicatedStorage['MainEvent'] 
+end 
+}, 
+} 
+} 
+-- 
+local Visuals = {} 
+local Utility = {} 
+local Signal = {} 
+local Math = {} 
+local State = { 
+Connections = {}, 
+ToolConnections = {}, 
+Tracked = {}, 
+Previous = {}, 
+Current = nil, 
+Tick = tick() 
+} 
+local Lithium = { 
+Locals = { 
+LastStutter = tick(), 
+TriggerTick = tick(), 
+CrossTick = tick(), 
+VisualTick = tick(), 
+SilentAim = true, 
+Triggerbot = true, 
+NoClipMacro = false, 
+AntiAiming = false, 
+Bounding = false, 
+Pressed = false, 
+Aimbot = true, 
+Macro = false, 
+Visuals = not getgenv().Script.Visuals['Load Check'], 
+Mode = 'Camera' 
+}, 
+Universal = { 
+FindPartOnRayWithIgnoreList = { 
+ArgCountRequired = 3, 
+Args = { 
+'Instance', 'Ray', 'table', 'boolean', 'boolean' 
+} 
+}, 
+FindPartOnRayWithWhitelist = { 
+ArgCountRequired = 3, 
+Args = { 
+'Instance', 'Ray', 'table', 'boolean' 
+} 
+}, 
+FindPartOnRay = { 
+ArgCountRequired = 2, 
+Args = { 
+'Instance', 'Ray', 'Instance', 'boolean', 'boolean' 
+} 
+}, 
+Raycast = { 
+ArgCountRequired = 3, 
+Args = { 
+'Instance', 'Vector3', 'Vector3', 'RaycastParams' 
+} 
+} 
+}, 
+Safe = true 
+} 
+local Raid = { 
+Players = {}, 
+Visuals = { 
+Lines = {}, 
+Texts = {}, 
+Squares = {}, 
+Distance = {}, 
+Corners = {}, 
+Outlines = {} 
+} 
+} 
+local Renderer = { 
+Connections = {}, 
+Drawings = {} 
+}; 
+local Threads, Cache = {}, {}; 
+-- 
+local Overlay = {}; 
+-- 
+do --// Setup 
+if Supported[game.GameId] then 
+CurrentGame = Supported[game.GameId]; 
+else 
+CurrentGame = Supported['Universal']; 
+-- 
+Shared.Camera = workspace.CurrentCamera; 
+Shared.Players = game:GetService('Players'); 
+Shared.RunService = game:GetService('RunService'); 
+Shared.GuiService = game:GetService('GuiService'); 
+Shared.UserInputService = game:GetService('UserInputService'); 
+Shared.GetChildren = game.GetChildren; 
+Shared.GetPlayers = Shared.Players.GetPlayers; 
+Shared.WorldToScreen = Shared.Camera.WorldToScreenPoint; 
+Shared.WorldToViewportPoint = Shared.Camera.WorldToViewportPoint; 
+Shared.GetPartsObscuringTarget = Shared.Camera.GetPartsObscuringTarget; 
+Shared.FindFirstChild = game.FindFirstChild; 
+Shared.GetMouseLocation = Shared.UserInputService.GetMouseLocation; 
+-- 
+Shared.GetDirection = function(Origin, Position) 
+return (Position - Origin).Unit * 1000 
+end; 
+-- 
+Shared.ValidateArguments = function(Arguments, RayMethod) 
+local Matches = 0 
+if #Arguments < RayMethod.ArgCountRequired then 
+return false 
+end 
+for Pos, Argument in next, Arguments do 
+if typeof(Argument) == RayMethod.Args[Pos] then 
+Matches = Matches + 1 
+end 
+end 
+return Matches >= RayMethod.ArgCountRequired 
+end; 
+-- 
+Shared.GetPosition = function(Vector) 
+local Vec3, OnScreen = Shared.WorldToScreen(Camera, Vector) 
+return Vector2.new(Vec3.X, Vec3.Y), OnScreen 
+end; 
+-- 
+Shared.GetMousePosition = function() 
+return Shared.UserInputService.GetMouseLocation(Shared.UserInputService) 
+end; 
+-- 
+Shared.GetNearestPlayer = function() 
+local Closest 
+local DistanceToMouse = math.huge 
+for _, Player in next, Shared.GetPlayers(Players) do 
+if (Player ~= Client) and Player and Player.Character then 
+local Object, Humanoid, RootPart = Player.Character, Shared.FindFirstChild(Player.Character, 'Humanoid'), Shared.FindFirstChild(Player.Character, getgenv().Script.Universal['WallCheck Origin']) 
+if (Object and Humanoid and RootPart) then 
+local Vector = RootPart.Position 
+local Position, Visible = Shared.GetPosition(Vector) 
+local Magnitude = (Vector2new(Position.X, Position.Y) - Shared.GetMousePosition()).Magnitude 
+local WallCheck = getgenv().Script.Core['Script Logic']['Global Wall Check'] 
+local TeamCheck = not getgenv().Script.Core['Script Logic']['FFA Mode'] 
+if (TeamCheck and Player.Team ~= Client.Team or not TeamCheck) and (WallCheck and Lithium:RayCast(RootPart, Lithium:GetOrigin('Camera'), {Lithium:GetCharacter(Client)}) or not WallCheck) and not (CurrentGame.Functions.KnockedFunction(Player)) and Lithium:ClientAlive(Humanoid) then 
+if Magnitude < DistanceToMouse and (Visuals.SilentCircle.Radius) > Magnitude and Visible then 
+Closest = Player 
+DistanceToMouse = Magnitude 
+end 
+end 
+end 
+end 
+end 
+return Closest 
+end; 
+-- 
+Shared.GetClosestPart = function(Player, Table) 
+Table = Table or {'Head'} 
+if Player then 
+local SelectedPart = nil 
+local Distance = math.huge 
+for _, Part in pairs(Table) do 
+local Box = Shared.FindFirstChild(Player.Character, Part) 
+if Box then 
+local World = Shared.GetPosition(Box.Position) 
+local Difference = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(World.X, World.Y)).Magnitude 
+if Difference < Distance then 
+SelectedPart = Box 
+Distance = Difference 
+end 
+end 
+end 
+return SelectedPart 
+end 
+end; 
+end; 
+-- 
+CurrentGame.Mouse = CurrentGame.Mouse or false 
+end 
+-- 
+do --// Renderer 
+function Renderer.Connect(Callback) 
+local Connection = RunService.RenderStepped:Connect(Callback) 
+table.insert(Renderer.Connections, Connection) 
+return Connection 
+end 
+-- 
+function Renderer.new(Name, Class, Properties) 
+if not Renderer.Drawings[Name] then 
+Renderer.Drawings[Name] = Overlay.new(Class) 
+end 
+-- 
+for Property, Value in pairs(Properties) do 
+Renderer.Drawings[Name][Property] = Value 
+end 
+-- 
+return Renderer.Drawings[Name] 
+end 
+-- 
+function Renderer.Disconnect() 
+for _, Connection in pairs(Renderer.Connections) do 
+Connection:Disconnect() 
+end 
+-- 
+for _, Drawing in pairs(Renderer.Drawings) do 
+Drawing:Remove() 
+end 
+end 
+end 
+-- 
+do --// Drawing 
+local Drawings = 0; 
+local BaseObject = setmetatable({ 
+Visible = true, 
+ZIndex = 0, 
+Transparency = 1, 
+Color = Color3.new(), 
+Remove = function(self) 
+setmetatable(self, nil) 
+end, 
+Destroy = function(self) 
+setmetatable(self, nil) 
+end 
+}, { 
+__add = function(t1, t2) 
+local result = table.clone(t1) 
+
+for index, value in t2 do 
+result[index] = value 
+end 
+return result 
+end 
+}); 
+-- 
+local function SetTransparency(number) 
+return Clamp(1 - number, 0, 1) 
+end; 
+-- 
+function Overlay.new(Class) 
+Drawings += 1 
+if Class == 'Line' then 
+local LineObject = ({ 
+From = Vector2.zero, 
+To = Vector2.zero, 
+Thickness = 1 
+} + BaseObject) 
+-- 
+local Line = Instance.new('Frame') 
+-- 
+Line.Name = Drawings 
+Line.AnchorPoint = (Vector2.one * 0.5) 
+Line.BorderSizePixel = 0 
+Line.BackgroundColor3 = LineObject.Color 
+Line.Visible = LineObject.Visible 
+Line.ZIndex = LineObject.ZIndex 
+Line.BackgroundTransparency = SetTransparency(LineObject.Transparency) 
+Line.Size = UDim2.new() 
+Line.Parent = UtilityUI 
+-- 
+return setmetatable(table.create(0), { 
+__newindex = function(_, Property, Value) 
+if Property == 'From' then 
+local Direction = (LineObject.To - Value) 
+local Center = (LineObject.To + Value) / 2 
+local Magnitude = Direction.Magnitude 
+local Theta = Deg(Atan2(Direction.Y, Direction.X)) 
+-- 
+Line.Position = UDim2.fromOffset(Center.X, Center.Y) 
+Line.Rotation = Theta 
+Line.Size = UDim2.fromOffset(Magnitude, LineObject.Thickness) 
+elseif Property == 'To' then 
+local Direction = (Value - LineObject.From) 
+local Center = (Value + LineObject.From) / 2 
+local Magnitude = Direction.Magnitude 
+local Theta = Deg(Atan2(Direction.Y, Direction.X)) 
+-- 
+Line.Position = UDim2.fromOffset(Center.X, Center.Y) 
+Line.Rotation = Theta 
+Line.Size = UDim2.fromOffset(Magnitude, LineObject.Thickness) 
+elseif Property == 'Thickness' then 
+local Thickness = (LineObject.To - LineObject.From).Magnitude 
+Line.Size = UDim2.fromOffset(Thickness, Value) 
+elseif Property == 'Visible' then 
+Line.Visible = Value 
+elseif Property == 'ZIndex' then 
+Line.ZIndex = Value 
+elseif Property == 'Transparency' then 
+Line.BackgroundTransparency = SetTransparency(Value) 
+elseif Property == 'Color' then 
+Line.BackgroundColor3 = Value 
+end 
+LineObject[Property] = Value 
+end, 
+__index = function(self, index) 
+if index == 'Remove' or index == 'Destroy' then 
+return function() 
+Line:Destroy() 
+LineObject.Remove(self) 
+return LineObject:Remove() 
+end 
+end 
+return LineObject[index] 
+end, 
+__tostring = function() return 'CustomLib' end 
+}); 
+elseif Class == 'Circle' then 
+local CircleObject = ({ 
+Radius = 150, 
+Position = Vector2.zero, 
+Thickness = .7, 
+Filled = false 
+} + BaseObject) 
+-- 
+local Frame, Corner, Stroke = Instance.new('Frame'), Instance.new('UICorner'), Instance.new('UIStroke'); 
+-- 
+Frame.Name = Drawings 
+Frame.AnchorPoint = (Vector2.one * .5) 
+Frame.BorderSizePixel = 0 
+Frame.BackgroundTransparency = (CircleObject.Filled and SetTransparency(CircleObject.Transparency) or 1) 
+Frame.BackgroundColor3 = CircleObject.Color 
+Frame.Visible = CircleObject.Visible 
+Frame.ZIndex = CircleObject.ZIndex 
+Frame.Size = UDim2.fromOffset(CircleObject.Radius, CircleObject.Radius) 
+-- 
+Stroke.Thickness = CircleObject.Thickness 
+Stroke.Enabled = not CircleObject.Filled 
+Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border 
+Corner.CornerRadius = UDim.new(1, 0) 
+-- 
+Frame.Parent, Corner.Parent, Stroke.Parent = UtilityUI, Frame, Frame; 
+return setmetatable(table.create(0), { 
+__newindex = function(_, Property, Value) 
+if Property == 'Radius' then 
+local Radius = Value * 2 
+Frame.Size = UDim2.fromOffset(Radius, Radius) 
+elseif Property == 'Position' then 
+Frame.Position = UDim2.fromOffset(Value.X, Value.Y) 
+elseif Property == 'Thickness' then 
+Value = Clamp(Value, 0.6, 0x7fffffff) 
+Stroke.Thickness = Value 
+elseif Property == 'Filled' then 
+Frame.BackgroundTransparency = (CircleObject.Filled and SetTransparency(CircleObject.Transparency) or 1) 
+Stroke.Enabled = not Value 
+elseif Property == 'Visible' then 
+Frame.Visible = Value 
+elseif Property == 'ZIndex' then 
+Frame.ZIndex = Value 
+elseif Property == 'Transparency' then 
+local Transparency = SetTransparency(Value) 
+-- 
+Frame.BackgroundTransparency = (CircleObject.Filled and Transparency or 1) 
+Stroke.Transparency = Transparency 
+elseif Property == 'Color' then 
+Frame.BackgroundColor3 = Value 
+Stroke.Color = Value 
+end 
+-- 
+CircleObject[Property] = Value 
+end, 
+__index = function(self, index) 
+if index == 'Remove' or index == 'Destroy' then 
+return function() 
+Frame:Destroy() 
+CircleObject.Remove(self) 
+return CircleObject:Remove() 
+end 
+end 
+return CircleObject[index] 
+end, 
+__tostring = function() return 'CustomLib' end 
+}) 
+elseif Class == 'Square' then 
+local squareObj = ({ 
+Size = Vector2.zero, 
+Position = Vector2.zero, 
+Thickness = .7, 
+Filled = false, 
+Drag = false, 
+} + BaseObject) 
+
+local squareFrame, Stroke = Instance.new('Frame'), Instance.new('UIStroke') 
+squareFrame.Name = Drawings 
+squareFrame.BorderSizePixel = 0 
+local transparency 
+if squareObj.Filled then 
+transparency = SetTransparency(squareObj.Transparency) 
+else 
+transparency = 1 
+end 
+squareFrame.BackgroundTransparency = transparency 
+squareFrame.ZIndex = squareObj.ZIndex 
+squareFrame.BackgroundColor3 = squareObj.Color 
+squareFrame.Visible = squareObj.Visible 
+Stroke.Thickness = squareObj.Thickness 
+Stroke.Enabled = not squareObj.Filled 
+Stroke.LineJoinMode = Enum.LineJoinMode.Miter 
+squareFrame.Parent, Stroke.Parent = UtilityUI, squareFrame 
+
+local dragging = false 
+local dragStart = nil 
+local startPos = nil 
+
+squareFrame.MouseEnter:Connect(function() 
+if squareObj.Drag then 
+local inputConnection 
+inputConnection = UserInputService.InputBegan:Connect(function(input) 
+if input.UserInputType == Enum.UserInputType.MouseButton1 then 
+dragging = true 
+dragStart = input.Position 
+startPos = squareFrame.Position 
+end 
+end) 
+
+local leaveConnection 
+leaveConnection = squareFrame.MouseLeave:Connect(function() 
+inputConnection:Disconnect() 
+leaveConnection:Disconnect() 
+end) 
+end 
+end) 
+
+UserInputService.InputChanged:Connect(function(input) 
+if squareObj.Drag then 
+if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then 
+local delta = input.Position - dragStart 
+local newX = startPos.X.Offset + delta.X 
+local newY = startPos.Y.Offset + delta.Y 
+squareFrame.Position = UDim2.new(startPos.X.Scale, newX, startPos.Y.Scale, newY) 
+end 
+end 
+end) 
+
+UserInputService.InputEnded:Connect(function(input) 
+if squareObj.Drag then 
+if input.UserInputType == Enum.UserInputType.MouseButton1 then 
+dragging = false 
+end 
+end 
+end) 
+
+return setmetatable(table.create(0), { 
+__newindex = function(_, index, value) 
+if typeof(squareObj[index]) == 'nil' then return end 
+
+if index == 'Size' then 
+squareFrame.Size = UDim2.fromOffset(value.X, value.Y) 
+elseif index == 'Position' then 
+squareFrame.Position = UDim2.fromOffset(value.X, value.Y) 
+elseif index == 'Thickness' then 
+value = Clamp(value, 0.6, 0x7fffffff) 
+Stroke.Thickness = value 
+elseif index == 'Filled' then 
+squareFrame.BackgroundTransparency = 1 
+Stroke.Enabled = not value 
+elseif index == 'Visible' then 
+squareFrame.Visible = value 
+elseif index == 'ZIndex' then 
+squareFrame.ZIndex = value 
+elseif index == 'Transparency' then 
+local transparency = SetTransparency(value) 
+
+squareFrame.BackgroundTransparency = 1 
+Stroke.Transparency = transparency 
+elseif index == 'Color' then 
+Stroke.Color = value 
+squareFrame.BackgroundColor3 = value 
+end 
+squareObj[index] = value 
+end, 
+__index = function(self, index) 
+if index == 'Remove' or index == 'Destroy' then 
+return function() 
+squareFrame:Destroy() 
+squareObj.Remove(self) 
+return squareObj:Remove() 
+end 
+end 
+return squareObj[index] 
+end, 
+__tostring = function() return 'CustomLib' end 
+}) 
+elseif Class == 'Text' then 
+local textObj = ({ 
+Text = '', 
+FontFace = Fonts['Smallest Pixel'], 
+Size = 0, 
+Position = Vector2.zero, 
+Center = false, 
+Outline = false, 
+OutlineColor = Color3.new() 
+} + BaseObject) 
+
+local textLabel, Stroke = Instance.new('TextLabel'), Instance.new('UIStroke') 
+textLabel.Name = Drawings 
+textLabel.AnchorPoint = (Vector2.one * .5) 
+textLabel.BorderSizePixel = 0 
+textLabel.BackgroundTransparency = 1 
+
+textLabel.Visible = textObj.Visible 
+textLabel.TextColor3 = textObj.Color 
+textLabel.TextTransparency = SetTransparency(textObj.Transparency) 
+textLabel.ZIndex = textObj.ZIndex 
+
+textLabel.FontFace = Fonts['Smallest Pixel'] 
+textLabel.TextSize = textObj.Size 
+
+textLabel:GetPropertyChangedSignal('TextBounds'):Connect(function() 
+local textBounds = textLabel.TextBounds 
+local offset = textBounds / 2 
+
+local offsetX 
+if not textObj.Center then 
+offsetX = offset.X 
+else 
+offsetX = 0 
+end 
+
+textLabel.Position = UDim2.fromOffset(textObj.Position.X + offsetX, textObj.Position.Y + offset.Y) 
+end) 
+
+Stroke.Thickness = 1 
+Stroke.Enabled = textObj.Outline 
+Stroke.Color = textObj.Color 
+
+textLabel.Parent, Stroke.Parent = UtilityUI, textLabel 
+return setmetatable(table.create(0), { 
+__newindex = function(_, index, value) 
+if typeof(textObj[index]) == 'nil' then return end 
+
+if index == 'Text' then 
+textLabel.Text = value 
+elseif index == 'Font' then 
+textLabel.FontFace = Fonts[value] 
+elseif index == 'Size' then 
+textLabel.TextSize = value 
+elseif index == 'Position' then 
+local offset = textLabel.TextBounds / 2 
+
+local offsetX 
+if not textObj.Center then 
+offsetX = offset.X 
+else 
+offsetX = 0 
+end 
+
+textLabel.Position = UDim2.fromOffset(textObj.Position.X + offsetX, textObj.Position.Y + offset.Y) 
+elseif index == 'Center' then 
+local position 
+if value then 
+position = Camera.ViewportSize / 2 
+else 
+position = textObj.Position 
+end 
+textLabel.Position = UDim2.fromOffset(position.X, position.Y) 
+elseif index == 'Outline' then 
+Stroke.Enabled = value 
+elseif index == 'OutlineColor' then 
+Stroke.Color = value 
+elseif index == 'Visible' then 
+textLabel.Visible = value 
+elseif index == 'ZIndex' then 
+textLabel.ZIndex = value 
+elseif index == 'Transparency' then 
+local transparency = SetTransparency(value) 
+
+textLabel.TextTransparency = transparency 
+Stroke.Transparency = transparency 
+elseif index == 'Color' then 
+textLabel.TextColor3 = value 
+end 
+textObj[index] = value 
+end, 
+__index = function(self, index) 
+if index == 'Remove' or index == 'Destroy' then 
+return function() 
+textLabel:Destroy() 
+textObj.Remove(self) 
+return textObj:Remove() 
+end 
+elseif index == 'TextBounds' then 
+return textLabel.TextBounds 
+end 
+return textObj[index] 
+end, 
+__tostring = function() return 'CustomLib' end 
+}) 
+elseif Class == 'Image' then 
+local imageObj = ({ 
+Data = '', 
+DataURL = 'rbxassetid:/', 
+Size = Vector2.zero, 
+Position = Vector2.zero 
+} + BaseObject) 
+
+local imageFrame = Instance.new('ImageLabel') 
+imageFrame.Name = Drawings 
+imageFrame.BorderSizePixel = 0 
+imageFrame.ScaleType = Enum.ScaleType.Stretch 
+imageFrame.BackgroundTransparency = 1 
+
+imageFrame.Visible = imageObj.Visible 
+imageFrame.ZIndex = imageObj.ZIndex 
+imageFrame.ImageTransparency = SetTransparency(imageObj.Transparency) 
+imageFrame.ImageColor3 = imageObj.Color 
+
+imageFrame.Parent = UtilityUI 
+return setmetatable(table.create(0), { 
+__newindex = function(_, index, value) 
+if typeof(imageObj[index]) == 'nil' then return end 
+
+if index == 'Data' then 
+-- later 
+elseif index == 'DataURL' then -- temporary property 
+imageFrame.Image = value 
+elseif index == 'Size' then 
+imageFrame.Size = UDim2.fromOffset(value.X, value.Y) 
+elseif index == 'Position' then 
+imageFrame.Position = UDim2.fromOffset(value.X, value.Y) 
+elseif index == 'Visible' then 
+imageFrame.Visible = value 
+elseif index == 'ZIndex' then 
+imageFrame.ZIndex = value 
+elseif index == 'Transparency' then 
+imageFrame.ImageTransparency = SetTransparency(value) 
+elseif index == 'Color' then 
+imageFrame.ImageColor3 = value 
+end 
+imageObj[index] = value 
+end, 
+__index = function(self, index) 
+if index == 'Remove' or index == 'Destroy' then 
+return function() 
+imageFrame:Destroy() 
+imageObj.Remove(self) 
+return imageObj:Remove() 
+end 
+elseif index == 'Data' then 
+return nil 
+end 
+return imageObj[index] 
+end, 
+__tostring = function() return 'CustomLib' end 
+}) 
+end 
+end 
+-- 
+function Overlay.NewFont(Name, Weight, Style, Asset) 
+if not isfile(Asset.Id) then writefile(Asset.Id, Asset.Font) end 
+if isfile(Name .. '.font') then delfile(Name .. '.font') end 
+local Data = { 
+name = Name, 
+faces = { 
+{ 
+name = 'Regular', 
+weight = Weight, 
+style = Style, 
+assetId = getcustomasset(Asset.Id), 
+}, 
+}, 
+} 
+writefile(Name .. '.font', HttpService:JSONEncode(Data)) 
+return getcustomasset(Name .. '.font'); 
+end 
+end 
+-- 
+do -- // Utility 
+function Utility:Connection(Table) 
+if not Table.Signal or not Table.Callback or not Table.Name then 
+Utility:UnsafeAction(print, 'Missing necessary fields in Table: Signal, Callback, or Name') 
+end 
+-- 
+Table.Flags = Table.Flags or {} 
+-- 
+local Connection 
+-- 
+if table.find(Table.Flags, 'Thread') then 
+Connection = coroutine.wrap(function() 
+Table.Signal:Connect(Table.Callback) 
+end)() 
+elseif table.find(Table.Flags, 'Multithread') then 
+Connection = coroutine.create(function() 
+Table.Signal:Connect(Table.Callback) 
+end) 
+coroutine.resume(Connection) 
+else 
+Connection = Table.Signal:Connect(Table.Callback) 
+end 
+-- 
+State.Connections[Table.Name] = Connection 
+return Connection 
+end 
+-- 
+function Utility:Thread(Function, ...) 
+local Thread = coroutine.create(Function) 
+coroutine.resume(Thread, ...) 
+return Thread 
+end 
+-- 
+function Utility:GetThreads(obj, ...) 
+local ThreadCount = #obj 
+if ThreadCount > 0 then 
+for ThreadIndex = 1, ThreadCount do 
+local Index = obj[ThreadIndex] 
+if type(Index) == 'table' then 
+local Check = #Index 
+assert(Check ~= 0, 'table inserted was not an array or was empty') 
+assert(Check < 3, ('invalid number of arguments (%d)'):format(Check)) 
+Utility:Thread(Index[1], unpack(Index[2])) 
+else 
+Utility:Thread(Index, ...) 
+end 
+end 
+else 
+for i, v in pairs(obj) do 
+Utility:Thread(v, ...) 
+end 
+end 
+end 
+-- 
+function Utility:UnsafeAction(Action, ...) 
+if not Lithium.Safe then 
+Action(...) 
+end 
+end 
+-- 
+function Utility:LerpColor(color1, color2, t) 
+return color1:Lerp(color2, t) 
+end 
+-- 
+function Utility:Create(Class, Properties) 
+local Instance = typeof(Class) == 'string' and Instance.new(Class) or Class 
+for Property, Value in pairs(Properties) do 
+Instance[Property] = Value 
+end 
+return Instance; 
+end 
+-- 
+function Utility:LerpTransparency(Element, Distance, Alpha) 
+Alpha = Alpha or getgenv().Script.Visuals['Global ESP']['Max Draw Distance'] 
+local Transparency = Max(0.1, 1 - (Distance / Alpha)) 
+if Element:IsA('TextLabel') then 
+Element.TextTransparency = 1 - Transparency 
+elseif Element:IsA('ImageLabel') then 
+Element.ImageTransparency = 1 - Transparency 
+elseif Element:IsA('UIStroke') then 
+Element.Transparency = 1 - Transparency 
+elseif Element:IsA('Frame') then 
+Element.BackgroundTransparency = 1 - Transparency 
+elseif Element:IsA('Frame') then 
+Element.BackgroundTransparency = 1 - Transparency 
+elseif Element:IsA('Highlight') then 
+Element.FillTransparency = 1 - Transparency 
+Element.OutlineTransparency = 1 - Transparency 
+end 
+end 
+end 
+-- 
+do --// Math 
+function Math:FlatComparison(Position, BoxRotation, BoxSize) 
+return Position.X >= BoxRotation.X and 
+Position.X <= BoxRotation.X + BoxSize.X and 
+Position.Y >= BoxRotation.Y and 
+Position.Y <= BoxRotation.Y + BoxSize.Y 
+end 
+-- 
+function Math:SolveAngle(Angle, Curve) 
+return Vector2new( 
+Sin(Rad(Angle)) * Curve, 
+Cos(Rad(Angle)) * Curve 
+) 
+end 
+-- 
+function Math:XZPlane(pos, vel, time, angle) --// Was planning on using this but i didnt 
+local Position = pos + vel * time 
+local Radians = math.rad(angle) 
+local Cosine = math.cos(Radians) 
+local Sin = math.sin(Radians) 
+local XZPlane = Vector3new(Position.X * Cosine - Position.Z * Sin, Position.Y, Position.X * Sin + Position.Z * Cosine); 
+-- 
+return XZPlane 
+end 
+end 
+-- 
+do -- // Preload 
+if not Visuals.Crosshair then 
+Visuals.Crosshair = {} 
+end 
+-- 
+if not Visuals.BoundingBoxes then 
+Visuals.BoundingBoxes = { 
+[1] = {}, 
+[2] = {} 
+} 
+end 
+-- 
+Fonts['Upheaval'] = Font.new(Overlay.NewFont('Upheaval', 100, 'normal', { --// Upheavel 
+Id = 'Upheaval.ttf', 
+Font = Decode('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BwMGBQgEBgQDCAYEBgQEAwYFAwMCBAYHBwcGBgYGBgYGBwYGBgYGBgYGBgcGBgYGBgYFBgYGBgYHBgYGBgYGBgYHBgYGBgYGBgYGBwYGBgYGBgUGBgYGBgcGBwAFAAAACwoIBAMEBwcHBwIEBAYHAgcCBwcDBwcHBwcHBwcCAgUHBQcIBwcHBwcHBwcGBwcHCAcHBwcHBwYHBwgHBwcEBwQGBwIHBwcHBwcHBwYHBwcIBwcHBwcHBgcHCAcHBwUDBQgHBwcCBQQFBwcECgcDCAcHBwcDAwYGBAMHBAgHAwgHBwcEAwcHBgcDBwUIBAYEAwgHBAcEBAMHBQMDAgQGBwcHBwcHBwcHBwgHBwcHBwYGBgYHBwcHBwcHBQcHBwcHBwcHBwcHBwcHCAcHBwcHBgYGBgcHBwcHBwcGBwcHBwcHBwcABgAAAAwLCQQDBQcHCAcCBQUGBwIHAggHAwcHBwcHBwcHAgIFBwUHCAcHBwcHBwcHBwcIBwgHBwcHBwcHBwcIBwgHBQgFBgcCBwcHBwcHBwcHBwgHCAcHBwcHBwcHBwgHCAcFAwUJBwcHAgUFBQcHBQsHBAgHBwcHAwMGBgUDBwUJBwQIBwcIBAMHCAcIAwcFCQQHBQMJBwUHBAQDBwUDAwIEBwgICAcHBwcHBwcIBwcHBwcHBwcHCAcHBwcHBwUHBwcHBwgHBwcHBwcHBwgHBwcHBwcHBwcIBwcHBwcHBgcHBwcHCAcIAAYAAAANDAoFAwUICAgIAwUFBwgDCAMICAMICAgICAgICAMDBggGCAkICAgICAgICAcICAgJCAgICAgIBwgICQgICAUIBQcIAwgICAgICAgIBwgICAkICAgICAgHCAgJCAgIBgMGCggICAMGBQYICAUMCAQJCAgICAMDBwcFAwgFCggECQgICAUDCAgHCAMIBgoFBwUDCggFCAUFAwgGAwMCBQcICAgICAgICAgICQgICAgIBwcHBwgICAgICAgGCAgICAgICAgICAgICAgJCAgICAgHBwcHCAgICAgICAcICAgICAgICAAHAAAADw4LBQQGCQkKCQMGBggJAwkDCgkECQkJCQkJCQkDAwcJBwkLCQkJCQkJCQkICQoJCwkJCQkJCQgJCQsJCgkGCgYICQMJCQkJCQkJCQgJCgkLCQkJCQkJCAkJCwkKCQcEBwsJCQkDBwYHCQkGDgkFCwkJCQkEBAgIBgQJBgsJBQsJCQoFBAkKCAoECQcLBQgGBAsJBgkFBQQJBwQEAgUICgoKCQkJCQkJCQsJCQkJCQgICAgKCQkJCQkJBwkJCQkJCgkJCQkJCQkJCwkJCQkJCAgICAoJCQkJCQkICQkJCQkKCQoACAAAABAPDAYEBgoKCgoDBgYICgMKAwoKBAoKCgoKCgoKAwMHCgcKCwoKCgoKCgoKCQoKCgsKCgoKCgoJCgoLCgoKBgoGCAoDCgoKCgoKCgoJCgoKCwoKCgoKCgkKCgsKCgoHBAcMCgoKAwcGBwoKBg8KBQsKCgoKBAQICAYECgYMCgULCgoKBgQKCgkKBAoHDAYJBgQMCgYKBgYECgcEBAIGCQoKCgoKCgoKCgoLCgoKCgoJCQkJCgoKCgoKCgcKCgoKCgoKCgoKCgoKCgsKCgoKCgkJCQkKCgoKCgoKCAoKCgoKCgoKAAgAAAAREA0GBAcKCgsKAwcHCQoDCgMLCgQKCgoKCgoKCgMDCAoICgwKCgoKCgoKCgkKCwoMCgoKCgoKCQoKDAoLCgcLBwkKAwoKCgoKCgoKCQoLCgwKCgoKCgoJCgoMCgsKCAQIDQoKCgMIBwgKCgcQCgUMCgoKCgQECQkHBAoHDQoFDAoKCwYECgsJCwQKCA0GCQcEDQoHCgYGBAoIBAQDBgkLCwsKCgoKCgoKDAoKCgoKCQkJCQsKCgoKCgoICgoKCgoLCgoKCgoKCgoMCgoKCgoJCQkJCwoKCgoKCgkKCgoKCgsKCwAJAAAAExIOBwUICwsMCwQICAoLBAsEDAsFCwsLCwsLCwsEBAkLCQsNCwsLCwsLCwsKCwwLDQsLCwsLCwoLCw0LDAsIDAgKCwQLCwsLCwsLCwoLDAsNCwsLCwsLCgsLDQsMCwkFCQ4LCwsECQgJCwsIEgsGDQsLCwsFBQoKCAULCA4LBg0LCwwHBQsMCgwFCwkOBwoIBQ4LCAsHBwULCQUFAwcKDAwMCwsLCwsLCw0LCwsLCwoKCgoMCwsLCwsLCQsLCwsLDAsLCwsLCwsLDQsLCwsLCgoKCgwLCwsLCwsKCwsLCwsMCwwACgAAABUUDwcFCA0NDg0ECAgLDQQNBA4NBQ0NDQ0NDQ0NBAQJDQkNDw0NDQ0NDQ0NDA0ODQ8NDQ0NDQ0MDQ0PDQ4NCA4ICw0EDQ0NDQ0NDQ0MDQ4NDw0NDQ0NDQwNDQ8NDg0JBQkQDQ0NBAkICQ0NCBQNBg8NDQ0NBQULCwgFDQgQDQYPDQ0OBwUNDgwOBQ0JEAcMCAUQDQgNBwcFDQkFBQMHDA4ODg0NDQ0NDQ0PDQ0NDQ0MDAwMDg0NDQ0NDQkNDQ0NDQ4NDQ0NDQ0NDQ8NDQ0NDQwMDAwODQ0NDQ0NCw0NDQ0NDg0OAAsAAAAYFxIIBgoODhAOBQoKDA4FDgUQDgYODg4ODg4ODgUFCw4LDhEODg4ODg4ODg0OEA4RDg4ODg4ODQ4OEQ4QDgoQCgwOBQ4ODg4ODg4ODQ4QDhEODg4ODg4NDg4RDhAOCwYLEg4ODgULCgsODgoXDgcRDg4ODgYGDAwKBg4KEg4HEQ4OEAgGDhANEAYOCxIIDQoGEg4KDggIBg4LBgYECA0QEBAODg4ODg4OEQ4ODg4ODQ0NDRAODg4ODg4LDg4ODg4QDg4ODg4ODg4RDg4ODg4NDQ0NEA4ODg4ODgwODg4ODhAOEAAMAAAAGxoUCQcLEBASEAULCw4QBRAFEhAHEBAQEBAQEBAFBQwQDBATEBAQEBAQEBAPEBIQExAQEBAQEA8QEBMQEhALEgsOEAUQEBAQEBAQEA8QEhATEBAQEBAQDxAQExASEAwHDBQQEBAFDAsMEBALGhAIExAQEBAHBw4OCwcQCxQQCBMQEBIJBxASDxIHEAwUCQ8LBxQQCxAJCQcQDAcHBAkPEhISEBAQEBAQEBMQEBAQEA8PDw8SEBAQEBAQDBAQEBAQEhAQEBAQEBAQExAQEBAQDw8PDxIQEBAQEBAOEBAQEBASEBIADgAAAB0cFQoHDBERExEGDAwPEQYRBhMRBxERERERERERBgYNEQ0RFBEREREREREREBETERQREREREREQEREUERMRDBMMDxEGEREREREREREQERMRFBERERERERARERQRExENBw0WERERBg0MDRERDBwRCRQRERERBwcPDwwHEQwWEQkUERETCgcRExATBxENFgoQDAcWEQwRCgoHEQ0HBwQKEBMTExEREREREREUEREREREQEBAQExEREREREQ0RERERERMRERERERERERQRERERERAQEBATERERERERDxERERERExETAA8AAAAgHhgLCA0TExUTBg0NEBMGEwYVEwgTExMTExMTEwYGDhMOExYTExMTExMTExITFRMWExMTExMTEhMTFhMVEw0VDRATBhMTExMTExMTEhMVExYTExMTExMSExMWExUTDggOGBMTEwYODQ4TEw0eEwoWExMTEwgIEBANCBMNGBMKFhMTFQsIExUSFQgTDhgLEg0IGBMNEwsLCBMOCAgFCxIVFRUTExMTExMTFhMTExMTEhISEhUTExMTExMOExMTExMVExMTExMTExMWExMTExMSEhISFRMTExMTExATExMTExUTFQAQAAAAIR8YDAgNFBQVFAcNDREUBxQHFRQIFBQUFBQUFBQHBw8UDxQXFBQUFBQUFBQSFBUUFxQUFBQUFBIUFBcUFRQNFQ0RFAcUFBQUFBQUFBIUFRQXFBQUFBQUEhQUFxQVFA8IDxkUFBQHDw0PFBQNHxQKFxQUFBQICBERDQgUDRkUChcUFBUMCBQVEhUIFA8ZDBINCBkUDRQMDAgUDwgIBQwSFRUVFBQUFBQUFBcUFBQUFBISEhIVFBQUFBQUDxQUFBQUFRQUFBQUFBQUFxQUFBQUEhISEhUUFBQUFBQRFBQUFBQVFBUAEQAAACUjGw0JDxYWGBYHDw8TFgcWBxgWCRYWFhYWFhYWBwcRFhEWGhYWFhYWFhYWFBYYFhoWFhYWFhYUFhYaFhgWDxgPExYHFhYWFhYWFhYUFhgWGhYWFhYWFhQWFhoWGBYRCREcFhYWBxEPERYWDyMWCxoWFhYWCQkTEw8JFg8cFgsaFhYYDQkWGBQYCRYRHA0UDwkcFg8WDQ0JFhEJCQYNFBgYGBYWFhYWFhYaFhYWFhYUFBQUGBYWFhYWFhEWFhYWFhgWFhYWFhYWFhoWFhYWFhQUFBQYFhYWFhYWExYWFhYWGBYYABMAAAAqKB8PCxEZGRsZCBERFRkIGQgbGQsZGRkZGRkZGQgIExkTGR0ZGRkZGRkZGRcZGxkdGRkZGRkZFxkZHRkbGREbERUZCBkZGRkZGRkZFxkbGR0ZGRkZGRkXGRkdGRsZEwsTIBkZGQgTERMZGREoGQ0dGRkZGQsLFRURCxkRIBkNHRkZGw8LGRsXGwsZEyAPFxELIBkRGQ8PCxkTCwsGDxcbGxsZGRkZGRkZHRkZGRkZFxcXFxsZGRkZGRkTGRkZGRkbGRkZGRkZGRkdGRkZGRkXFxcXGxkZGRkZGRUZGRkZGRsZGwAVAAAALiwiEAwSHBweHAkSEhccCRwJHhwMHBwcHBwcHBwJCRUcFRwgHBwcHBwcHBwZHB4cIBwcHBwcHBkcHCAcHhwSHhIXHAkcHBwcHBwcHBkcHhwgHBwcHBwcGRwcIBweHBUMFSMcHBwJFRIVHBwSLBwOIBwcHBwMDBcXEgwcEiMcDiAcHB4QDBweGR4MHBUjEBkSDCMcEhwQEAwcFQwMBxAZHh4eHBwcHBwcHCAcHBwcHBkZGRkeHBwcHBwcFRwcHBwcHhwcHBwcHBwcIBwcHBwcGRkZGR4cHBwcHBwXHBwcHBweHB4AFwAAADIwJRINFB4eIR4KFBQZHgoeCiEeDR4eHh4eHh4eCgoXHhceIx4eHh4eHh4eHB4hHiMeHh4eHh4cHh4jHiEeFCEUGR4KHh4eHh4eHh4cHiEeIx4eHh4eHhweHiMeIR4XDRcmHh4eChcUFx4eFDAeDyMeHh4eDQ0ZGRQNHhQmHg8jHh4hEg0eIRwhDR4XJhIcFA0mHhQeEhINHhcNDQgSHCEhIR4eHh4eHh4jHh4eHh4cHBwcIR4eHh4eHhceHh4eHiEeHh4eHh4eHiMeHh4eHhwcHBwhHh4eHh4eGR4eHh4eIR4hABkAAAA2MygTDhYgICMgCxYWGyALIAsjIA4gICAgICAgIAsLGCAYICYgICAgICAgIB4gIyAmICAgICAgHiAgJiAjIBYjFhsgCyAgICAgICAgHiAjICYgICAgICAeICAmICMgGA4YKSAgIAsYFhggIBYzIBAmICAgIA4OGxsWDiAWKSAQJiAgIxMOICMeIw4gGCkTHhYOKSAWIBMTDiAYDg4IEx4jIyMgICAgICAgJiAgICAgHh4eHiMgICAgICAYICAgICAjICAgICAgICAmICAgICAeHh4eIyAgICAgIBsgICAgICMgIwAbAAAAOjcrFA8XIyMmIwwXFx0jDCMMJiMPIyMjIyMjIyMMDBojGiMpIyMjIyMjIyMgIyYjKSMjIyMjIyAjIykjJiMXJhcdIwwjIyMjIyMjIyAjJiMpIyMjIyMjICMjKSMmIxoPGiwjIyMMGhcaIyMXNyMRKSMjIyMPDx0dFw8jFywjESkjIyYUDyMmICYPIxosFCAXDywjFyMUFA8jGg8PCRQgJiYmIyMjIyMjIykjIyMjIyAgICAmIyMjIyMjGiMjIyMjJiMjIyMjIyMjKSMjIyMjICAgICYjIyMjIyMdIyMjIyMmIyYA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Jf8mESYqJjwmWicjJ7goZykJKVUplinXKk8quSsNK1krmSvpLCIsYizQLRwtVC2MLgAuPC6ALvgvNS9yL+YwSzCcMRoxYjGYMc4yOzKBMsoy9jM3M3gzuTQxNJs07zU7NXs1yzYENkQ2sjb+NzY3bjfiOB44YjjaORc5VDnIOi06fjqnOu87JTtbO8g8DjxXPIM82zzbPNsAAQAAAOMCAAAFAAAAAAACAAAAAAAUAAACAAKmAAAAAQAAAA4ArgABAAAAAAAAACsAAAABAAAAAAABABEAKwABAAAAAAACAAcAPAABAAAAAAADABIAQwABAAAAAAAEABEAVQABAAAAAAAFAAwAZgABAAAAAAAGAA8AcgADAAEECQAAAFYAgQADAAEECQABACIA1wADAAEECQACAA4A+QADAAEECQADACQBBwADAAEECQAEACIBKwADAAEECQAFABgBTQADAAEECQAGAB4BZcZOSUdNQSBGT05UUyAgIFtlLW1haWxdICBrZW50cHdAbm9yd2ljaC5uZXRVcGhlYXZhbCBUVCAoQlJLKVJlZ3VsYXJGT05UTEFCMzA6VFRFWFBPUlRVcGhlYXZhbCBUVCAtQlJLLVZlcnNpb24gMi4wOVVwaGVhdmFsVFQtQlJLLQDGAE4ASQBHAE0AQQAgAEYATwBOAFQAUwAgACAAIABbAGUALQBtAGEAaQBsAF0AIAAgAGsAZQBuAHQAcAB3AEAAbgBvAHIAdwBpAGMAaAAuAG4AZQB0AFUAcABoAGUAYQB2AGEAbAAgAFQAVAAgACgAQgBSAEsAKQBSAGUAZwB1AGwAYQByAEYATwBOAFQATABBAEIAMwAwADoAVABUAEUAWABQAE8AUgBUAFUAcABoAGUAYQB2AGEAbAAgAFQAVAAgAC0AQgBSAEsALQBWAGUAcgBzAGkAbwBuACAAMgAuADAAOQBVAHAAaABlAGEAdgBhAGwAVABUAC0AQgBSAEsALQAAAAACAAAAAAAA/5wAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAOMAAAADAAQABQAGAAcACAAJAAoACwAMAA0ADgAPAO8AEQASABMAFAAVABYAFwAYABkAGgAbABwAHQAeAB8AIAAhACIAIwAkACUAJgAnACgAKQAqACsALAAtAC4ALwAwADEAMgAzADQANQA2ADcAOAA5ADoAOwA8AD0APgA/AEAAQQBCAEMARABFAEYARwBIAEkASgBLAEwATQBOAE8AUABRAFIAUwBUAFUAVgBXAFgAWQBaAFsAXABdAF4AXwBgAGEBAgEDAQQAxACmAMUAqwCCAMIA2ADGAOQAvgCwAQUBBgEHAQgAtgC3ALQAtQCHALIAswDZAIwA5QC/ALEBCQEKALsBCwCjAIQAhQC9AJYA6ACGAI4AiwCdAKkApAAQAIoBDACDAJMA8gDzAI0AlwCIAQ0A3gDxAJ4AqgD1APQA9gCiAK0AyQDHAK4AYgBjAJAAZADLAGUAyADKAM8AzADNAM4A6QBmANMA0ADRAK8AZwDwAJEA1gDUANUAaADrAO0AiQBqAGkAawBtAGwAbgCgAG8AcQBwAHIAcwB1AHQAdgB3AOoAeAB6AHkAewB9AHwAuAChAH8AfgCAAIEA7ADuALoBDgACBS4wMTI3BS4wMTI4BS4wMTI5BS4wMTQxBS4wMTQyBS4wMTQzBS4wMTQ0BS4wMTU3BS4wMTU4BS4wMTYwBm1hY3Jvbg5wZXJpb2RjZW50ZXJlZAUubnVsbLgAACu6AAAABAAHKw=='), 
+})) 
+-- 
+Fonts['Smallest Pixel'] = Font.new(Overlay.NewFont('Pixel', 100, 'normal', { --// Smallest Pixel 
+Id = 'Pixel.ttf', 
+Font = Decode('AAEAAAAMAIAAAwBAT1MvMmSz/H0AAAFIAAAAYFZETVhoYG/3AAAGmAAABeBjbWFwel+AIwAADHgAAAUwZ2FzcP//AAEAAGP4AAAACGdseWa90hIhAAARqAAARRRoZWFk/hqSzwAAAMwAAAA2aGhlYQegBbsAAAEEAAAAJGhtdHhmdgAAAAABqAAABPBsb2Nh73HeDAAAVrwAAAJ6bWF4cAFBADMAAAEoAAAAIG5hbWX/R4pVAABZOAAABC1wb3N0fPqooAAAXWgAAAaOAAEAAAABAAArGZw2Xw889QAJA+gAAAAAzSamLgAAAADNJqljAAD/OASwAyAAAAAJAAIAAAAAAAAAAQAAAu7/BgAABRQAAABkBLAAAQAAAAAAAAAAAAAAAAAAATwAAQAAATwAMgAEAAAAAAABAAAAAAAAAAAAAAAAAAAAAAADAfMBkAAFAAACvAKKAAD/nAK8AooAAAD6ADIA+gAAAgAAAAAAAAAAAIAAAi8AAAAKAAAAAAAAAABQWVJTAEAAICEiAu7/BgAAAyAAyAAAAAUAAAAAAPoB9AAAACAAAAH0AAAAAAAAAfQAAAH0AAACWAAAAlgAAAJYAAAAyAAAAS0AAAEtAAABkAAAAZAAAAEsAAABkAAAAMgAAAJYAAAB9AAAAZAAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAMgAAAEsAAABkAAAAZAAAAGQAAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAZAAAAH0AAAB9AAAAfQAAAJYAAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAABkAAAAfQAAAGQAAACWAAAAfQAAAGQAAAB9AAAASwAAAJYAAABLAAAAlgAAAH0AAABLAAAAfQAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAABkAAAAfQAAAH0AAAB9AAAAlgAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAfQAAAGQAAAB9AAAAZAAAAJYAAAB9AAAAZAAAAH0AAABkAAAAMgAAAGQAAAB9AAAAlgAAAH0AAABLAAAAfQAAAJYAAACWAAAAZAAAAGQAAACWAAAAyAAAAJYAAABkAAAAlgAAAH0AAACWAAAAZAAAAJYAAABLAAAASwAAAJYAAACWAAAASwAAAGQAAAB9AAAA4QAAAJYAAABkAAAAlgAAAH0AAACWAAAAZAAAAGQAAABkAAAAfQAAAH0AAAB9AAAAMgAAAH0AAAB9AAAAyAAAAH0AAACvAAAAfQAAAEsAAADIAAAAZAAAAGQAAABkAAAAZAAAAGQAAAB9AAAAlgAAAJYAAAAyAAAAfQAAAK8AAAB9AAAArwAAAH0AAAB9AAAAfQAAAGQAAAB9AAAAfQAAAH0AAAB9AAAAlgAAAH0AAACWAAAAfQAAAH0AAAB9AAAAfQAAAH0AAACWAAAAfQAAAH0AAAB9AAAAfQAAAH0AAABkAAAAfQAAAJYAAAB9AAAAlgAAAH0AAACWAAAArwAAAJYAAACvAAAAfQAAAH0AAACWAAAAfQAAAH0AAAB9AAAAfQAAAH0AAACWAAAAfQAAAJYAAAB9AAAAfQAAAH0AAAB9AAAAfQAAAJYAAAB9AAAAfQAAAH0AAAB9AAAAfQAAAGQAAAB9AAAAlgAAAH0AAACWAAAAfQAAAJYAAACvAAAAlgAAAK8AAAB9AAAAfQAAAJYAAAB9AAAAfQAAAH0AAAAyAAAAlgAAAH0AAABkAAAAZAAAAH0AAAB9AAAAfQAAAEsAAABkAAAAZAAAAH0AAAFFAAABRQAAAUUAAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAlgAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAZAAAAGQAAABkAAAAZAAAAJYAAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAABkAAAAlgAAAH0AAAB9AAAAfQAAAH0AAABkAAAAfQAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAfQAAAH0AAACWAAAAfQAAAH0AAAB9AAAAfQAAAH0AAABkAAAAZAAAAGQAAABkAAAAlgAAAH0AAAB9AAAAfQAAAH0AAAB9AAAAfQAAAGQAAACWAAAAfQAAAH0AAAB9AAAAfQAAAGQAAAB9AAAAZAAAAJYAAACWAAAAfQAAAH0AAABkAAAAfQAAAH0AAAB9AAAAZAAAAH0AAACWAAAAMgAAAGQAAAAAAABAAEBAQEBAAwA+Aj/AAgAB//+AAkACP/+AAoACP/+AAsACf/9AAwACv/9AA0AC//9AA4ADP/9AA8ADP/9ABAADf/8ABEADv/8ABIAD//8ABMAEP/8ABQAEP/8ABUAEf/7ABYAEv/7ABcAE//7ABgAFP/7ABkAFP/7ABoAFf/6ABsAFv/6ABwAF//6AB0AGP/6AB4AGP/6AB8AGf/5ACAAGv/5ACEAG//5ACIAHP/5ACMAHP/5ACQAHf/4ACUAHv/4ACYAH//4ACcAIP/4ACgAIP/4ACkAIf/3ACoAIv/3ACsAI//3ACwAJP/3AC0AJP/3AC4AJf/2AC8AJv/2ADAAJ//2ADEAKP/2ADIAKP/2ADMAKf/1ADQAKv/1ADUAK//1ADYALP/1ADcALP/1ADgALf/0ADkALv/0ADoAL//0ADsAMP/0ADwAMP/0AD0AMf/zAD4AMv/zAD8AM//zAEAANP/zAEEANP/zAEIANf/yAEMANv/yAEQAN//yAEUAOP/yAEYAOP/yAEcAOf/xAEgAOv/xAEkAO//xAEoAPP/xAEsAPP/xAEwAPf/wAE0APv/wAE4AP//wAE8AQP/wAFAAQP/wAFEAQf/vAFIAQv/vAFMAQ//vAFQARP/vAFUARP/vAFYARf/uAFcARv/uAFgAR//uAFkASP/uAFoASP/uAFsASf/tAFwASv/tAF0AS//tAF4ATP/tAF8ATP/tAGAATf/sAGEATv/sAGIAT//sAGMAUP/sAGQAUP/sAGUAUf/rAGYAUv/rAGcAU//rAGgAVP/rAGkAVP/rAGoAVf/qAGsAVv/qAGwAV//qAG0AWP/qAG4AWP/qAG8AWf/pAHAAWv/pAHEAW//pAHIAXP/pAHMAXP/pAHQAXf/oAHUAXv/oAHYAX//oAHcAYP/oAHgAYP/oAHkAYf/nAHoAYv/nAHsAY//nAHwAZP/nAH0AZP/nAH4AZf/mAH8AZv/mAIAAZ//mAIEAaP/mAIIAaP/mAIMAaf/lAIQAav/lAIUAa//lAIYAbP/lAIcAbP/lAIgAbf/kAIkAbv/kAIoAb//kAIsAcP/kAIwAcP/kAI0Acf/jAI4Acv/jAI8Ac//jAJAAdP/jAJEAdP/jAJIAdf/iAJMAdv/iAJQAd//iAJUAeP/iAJYAeP/iAJcAef/hAJgAev/hAJkAe//hAJoAfP/hAJsAfP/hAJwAff/gAJ0Afv/gAJ4Af//gAJ8AgP/gAKAAgP/gAKEAgf/fAKIAgv/fAKMAg//fAKQAhP/fAKUAhP/fAKYAhf/eAKcAhv/eAKgAh//eAKkAiP/eAKoAiP/eAKsAif/dAKwAiv/dAK0Ai//d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ATkBOgE7ATwBPQE+AT8BQAFBAUIBQwFEAUUBRgFHAUgBSQFKAUsBTAFNAU4BTwFQAVEBUgFTAVQBVQFWAVcBWAFZAVoBWwFcAV0BXgFfAWABYQFiAWMBZAFlAWYAowCEAIUAlgCOAJ0A8gDzAI0A3gDxAJ4A9QD0APYAogCtAMkAxwCuAGIAYwCQAGQAywBlAMgAygDPAMwAzQDOAOkAZgDTANAA0QCvAGcA8ACRANYA1ADVAGgA6wDtAIkAagBpAGsAbQBsAG4AoABvAHEAcAByAHMAdQB0AHYAdwDqAHgAegB5AHsAfQB8ALgAoQB/AH4AgACBAOwA7gC6ALAAsQDkAOUAuwDmAOcApgDYANkABgAEAAUFLm51bGwJYWZpaTEwMDUxCWFmaWkxMDA1MglhZmlpMTAxMDAERXVybwlhZmlpMTAwNTgJYWZpaTEwMDU5CWFmaWkxMDA2MQlhZmlpMTAwNjAJYWZpaTEwMTQ1CWFmaWkxMDA5OQlhZmlpMTAxMDYJYWZpaTEwMTA3CWFmaWkxMDEwOQlhZmlpMTAxMDgJYWZpaTEwMTkzCWFmaWkxMDA2MglhZmlpMTAxMTAJYWZpaTEwMDU3CWFmaWkxMDA1MAlhZmlpMTAwMjMJYWZpaTEwMDUzB3VuaTAwQUQJYWZpaTEwMDU2CWFmaWkxMDA1NQlhZmlpMTAxMDMJYWZpaTEwMDk4DnBlcmlvZGNlbnRlcmVkCWFmaWkxMDA3MQlhZmlpNjEzNTIJYWZpaTEwMTAxCWFmaWkxMDEwNQlhZmlpMTAwNTQJYWZpaTEwMTAyCWFmaWkxMDEwNAlhZmlpMTAwMTcJYWZpaTEwMDE4CWFmaWkxMDAxOQlhZmlpMTAwMjAJYWZpaTEwMDIxCWFmaWkxMDAyMglhZmlpMTAwMjQJYWZpaTEwMDI1CWFmaWkxMDAyNglhZmlpMTAwMjcJYWZpaTEwMDI4CWFmaWkxMDAyOQlhZmlpMTAwMzAJYWZpaTEwMDMxCWFmaWkxMDAzMglhZmlpMTAwMzMJYWZpaTEwMDM0CWFmaWkxMDAzNQlhZmlpMTAwMzYJYWZpaTEwMDM3CWFmaWkxMDAzOAlhZmlpMTAwMzkJYWZpaTEwMDQwCWFmaWkxMDA0MQlhZmlpMTAwNDIJYWZpaTEwMDQzCWFmaWkxMDA0NAlhZmlpMTAwNDUJYWZpaTEwMDQ2CWFmaWkxMDA0NwlhZmlpMTAwNDgJYWZpaTEwMDQ5CWFmaWkxMDA2NQlhZmlpMTAwNjYJYWZpaTEwMDY3CWFmaWkxMDA2OAlhZmlpMTAwNjkJYWZpaTEwMDcwCWFmaWkxMDA3MglhZmlpMTAwNzMJYWZpaTEwMDc0CWFmaWkxMDA3NQlhZmlpMTAwNzYJYWZpaTEwMDc3CWFmaWkxMDA3OAlhZmlpMTAwNzkJYWZpaTEwMDgwCWFmaWkxMDA4MQlhZmlpMTAwODIJYWZpaTEwMDgzCWFmaWkxMDA4NAlhZmlpMTAwODUJYWZpaTEwMDg2CWFmaWkxMDA4NwlhZmlpMTAwODgJYWZpaTEwMDg5CWFmaWkxMDA5MAlhZmlpMTAwOTEJYWZpaTEwMDkyCWFmaWkxMDA5MwlhZmlpMTAwOTQJYWZpaTEwMDk1CWFmaWkxMDA5NglhZmlpMTAwOTcNYWZpaTEwMDQ1LjAwMQ1hZmlpMTAwNDcuMDAxAAAAAAAB//8AAA=='), 
+})) 
+-- 
+Fonts['ProggyClean'] = Font.new(Overlay.NewFont('ProggyClean', 100, 'normal', { --// ProggyClean 
+Id = 'ProggyClean.ttf', 
+Font = Decode('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/oADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAWwBfAGMAZwBrAG8AcwB3AHsAfwCDAIcAiwCPAAARNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxWAgICAgICA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAAoCA/ICAgICAgICABICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAABwGAAAACAAQAAAMABwALAA8AEwAXABsAAAE1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQM1MxUBgICAgICAgICAgICAgIADgICAgICAgICAgICAgICAgICA/wCAgAAGAQADAAKABIAAAwAHAAsADwATABcAAAE1MxUzNTMVBTUzFTM1MxUFNTMVMzUzFQEAgICA/oCAgID+gICAgAQAgICAgICAgICAgICAgIAAABgAAAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwBXAFsAXwAAATUzFTM1MxUFNTMVMzUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVMzUzFQU1MxUzNTMVAYCAgID+gICAgP2AgICAgICA/YCAgID+gICAgP2AgICAgICA/YCAgID+gICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAFQCA/4ADAAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAAABNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVMTUzFTE1MxUFNTMVMzUzFQU1MxUzNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUBgID/AICAgID9gICAgP6AgICA/wCAgID/AICAgP6AgICA/YCAgICA/wCAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAUAAAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAATNTMVITUzFQU1MxUzNTMVMzUzFQU1MxUzNTMVMzUzFQU1MxUzNTMVBzUzFTM1MxUFNTMVMzUzFTM1MxUFNTMVMzUzFTM1MxUFNTMVITUzFYCAAYCA/QCAgICAgP2AgICAgID+AICAgICAgID+AICAgICA/YCAgICAgP0AgAGAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAFACAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAATUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUhNTMVBTUzFSE1MxUzNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTM1MxUBAICA/oCAAQCA/gCAAQCA/oCAgAEAgP0AgAEAgICA/QCAAYCA/YCAAYCA/gCAgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAMBgAMAAgAEgAADAAcACwAAATUzFQc1MxUHNTMVAYCAgICAgAQAgICAgICAgIAAAAsBAP8AAoAEgAADAAcACwAPABMAFwAbAB8AIwAnACsAAAE1MxUFNTMVBzUzFQU1MxUHNTMVBzUzFQc1MxUHNTMdATUzFQc1Mx0BNTMVAgCA/wCAgID/AICAgICAgICAgICAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAALAQD/AAKABIAAAwAHAAsADwATABcAGwAfACMAJwArAAABNTMdATUzFQc1Mx0BNTMVBzUzFQc1MxUHNTMVBzUzFQU1MxUHNTMVBTUzFQEAgICAgICAgICAgICAgP8AgICA/wCABACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAACwCAAIADAAMAAAMABwALAA8AEwAXABsAHwAjACcAKwAAATUzFQU1MxUzNTMVMzUzFQU1MxUxNTMVMTUzFQU1MxUzNTMVMzUzFQU1MxUBgID+gICAgICA/gCAgID+AICAgICA/oCAAoCAgICAgICAgICAgICAgICAgICAgICAgICAgAAACQCAAIADAAMAAAMABwALAA8AEwAXABsAHwAjAAABNTMVBzUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUBgICAgP6AgICAgID+gICAgAKAgICAgICAgICAgICAgICAgICAgICAgAAABACA/wABgAEAAAMABwALAA8AACU1MxUHNTMVBzUzFQU1MxUBAICAgICA/wCAgICAgICAgICAgICAAAAABQCAAYADAAIAAAMABwALAA8AEwAAEzUzFTE1MxUxNTMVMTUzFTE1MxWAgICAgIABgICAgICAgICAgIAAAgEAAAABgAEAAAMABwAAJTUzFQc1MxUBAICAgICAgICAgAAACgCA/4ADAASAAAMABwALAA8AEwAXABsAHwAjACcAAAE1MxUHNTMVBTUzFQc1MxUFNTMVBzUzFQU1MxUHNTMVBTUzFQc1MxUCgICAgP8AgICA/wCAgID/AICAgP8AgICABACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAUAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAABNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTM1MxUzNTMVBTUzFTM1MxUzNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQEAgICA/gCAAYCA/YCAAYCA/YCAgICAgP2AgICAgID9gIABgID9gIABgID+AICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAADgCAAAADAAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwAAATUzFQU1MxUxNTMVBTUzFTM1MxUHNTMVBzUzFQc1MxUHNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUBgID/AICA/oCAgICAgICAgICAgP6AgICAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAA8AgAAAAwAEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwAAATUzFTE1MxUxNTMVBTUzFSE1MxUHNTMVBTUzFQU1MxUFNTMVBTUzFQc1MxUxNTMVMTUzFTE1MxUxNTMVAQCAgID+AIABgICAgP8AgP8AgP8AgP8AgICAgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAPAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAAAE1MxUxNTMVMTUzFQU1MxUhNTMVBzUzFQU1MxUxNTMdATUzFQc1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQEAgICA/gCAAYCAgID+gICAgICA/YCAAYCA/gCAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAEQCAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwAAATUzFQU1MxUxNTMVBTUzFTM1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUCgID/AICA/oCAgID+AIABAID9gIABgID9gICAgICAgP8AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABIAgAAAAwAEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAEzUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUxNTMVMTUzFTE1Mx0BNTMVBzUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVgICAgICA/YCAgICAgICAgICAgP2AgAGAgP4AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAARAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAAABNTMVMTUzFQU1MxUFNTMVBzUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQGAgID+gID/AICAgICAgP4AgAGAgP2AgAGAgP2AgAGAgP4AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAADACAAAADAAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvAAATNTMVMTUzFTE1MxUxNTMVMTUzFQc1MxUFNTMVBzUzFQU1MxUHNTMVBTUzFQc1MxWAgICAgICAgP8AgICA/wCAgID/AICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAATAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwAAATUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQEAgICA/gCAAYCA/YCAAYCA/gCAgID+AIABgID9gIABgID9gIABgID+AICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAEQCAAAADAAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwAAATUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQc1MxUFNTMVBTUzFTE1MxUBAICAgP4AgAGAgP2AgAGAgP2AgAGAgP4AgICAgICA/wCA/oCAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAQBgAAAAgADAAADAAcACwAPAAABNTMVBzUzFQM1MxUHNTMVAYCAgICAgICAAoCAgICAgP6AgICAgIAAAAYAgP8AAYADAAADAAcACwAPABMAFwAAATUzFQc1MxUDNTMVBzUzFQc1MxUFNTMVAQCAgICAgICAgID/AIACgICAgICA/oCAgICAgICAgICAgAAAAAoAAACAAwADAAADAAcACwAPABMAFwAbAB8AIwAnAAABNTMVMTUzFQU1MxUxNTMVBTUzFTE1Mx0BNTMVMTUzHQE1MxUxNTMVAgCAgP4AgID+AICAgICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAAAAADACAAQADgAKAAAMABwALAA8AEwAXABsAHwAjACcAKwAvAAATNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxUBNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxWAgICAgICA/QCAgICAgIACAICAgICAgICAgICAgP8AgICAgICAgICAgICAAAAKAIAAgAOAAwAAAwAHAAsADwATABcAGwAfACMAJwAAEzUzFTE1Mx0BNTMVMTUzHQE1MxUxNTMVBTUzFTE1MxUFNTMVMTUzFYCAgICAgID+AICA/gCAgAKAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAoAgAAAAwAEAAADAAcACwAPABMAFwAbAB8AIwAnAAABNTMVMTUzFTE1MxUFNTMVITUzFQc1MxUFNTMVBTUzFQc1MxUDNTMVAQCAgID+AIABgICAgP8AgP8AgICAgIADgICAgICAgICAgICAgICAgICAgICAgICA/wCAgAAaAAAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwBbAF8AYwBnAAABNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVMTUzFTM1MxUFNTMVMzUzFTM1MxUzNTMVBTUzFTM1MxUzNTMVMzUzFQU1MxUhNTMVMTUzFTE1MxUFNTMdATUzFTE1MxUxNTMVMTUzFQEAgICA/gCAAYCA/QCAAQCAgICA/ICAgICAgICA/ICAgICAgICA/ICAAQCAgID9gICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABIAgAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzFTE1MxUFNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVAYCAgP8AgID+gIABAID+AIABAID+AICAgID9gIACAID9AIACAID9AIACAIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAGACAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAWwBfAAATNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxWAgICAgP4AgAGAgP2AgAGAgP2AgICAgID9gIACAID9AIACAID9AIACAID9AICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAADgCAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwAAATUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVBzUzFQc1MxUHNTMdATUzFSE1MxUFNTMVMTUzFTE1MxUBgICAgP4AgAGAgP0AgICAgICAgIABgID+AICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAUAIAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAATNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFYCAgICA/gCAAYCA/YCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAYCA/YCAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAATAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwAAEzUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVMTUzFYCAgICAgP2AgICAgICAgID+AICAgICAgICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAPAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAABM1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVBzUzFYCAgICAgP2AgICAgICAgID+AICAgICAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAASAIAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcAAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFQc1MxUHNTMVITUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQGAgICA/gCAAYCA/QCAgICAgAEAgICA/QCAAgCA/YCAAYCA/gCAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAFACAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAEzUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxWAgAIAgP0AgAIAgP0AgAIAgP0AgICAgICA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAgCAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAwBAAAAAoAEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAAATUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBTUzFTE1MxUxNTMVAQCAgID/AICAgICAgICAgICA/wCAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAADACAAAACgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvAAABNTMVMTUzFTE1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUFNTMVMTUzFTE1MxUBAICAgICAgICAgICAgICAgP4AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAARAIAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAAATNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMzUzFQU1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFYCAAgCA/QCAAYCA/YCAAQCA/gCAgID+gICAgP6AgAEAgP4AgAGAgP2AgAIAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAMAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AABM1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVMTUzFYCAgICAgICAgICAgICAgICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABoAAAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwBXAFsAXwBjAGcAABE1MxUxNTMVITUzFTE1MxUFNTMVMTUzFSE1MxUxNTMVBTUzFTM1MxUzNTMVMzUzFQU1MxUzNTMVMzUzFTM1MxUFNTMVITUzFSE1MxUFNTMVITUzFSE1MxUFNTMVITUzFQU1MxUhNTMVgIABgICA/ICAgAGAgID8gICAgICAgID8gICAgICAgID8gIABAIABAID8gIABAIABAID8gIACgID8gIACgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAYAIAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwBbAF8AABM1MxUxNTMVITUzFQU1MxUxNTMVITUzFQU1MxUzNTMVITUzFQU1MxUzNTMVITUzFQU1MxUhNTMVMzUzFQU1MxUhNTMVMzUzFQU1MxUhNTMVMTUzFQU1MxUhNTMVMTUzFYCAgAGAgP0AgIABgID9AICAgAEAgP0AgICAAQCA/QCAAQCAgID9AIABAICAgP0AgAGAgID9AIABgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABAAgAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AAABNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVAYCAgP6AgAEAgP2AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP2AgAEAgP6AgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAARAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAAATNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFYCAgICA/gCAAYCA/YCAAYCA/YCAAYCA/YCAgICA/gCAgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAEgCA/4ADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMzUzFQc1MxUBgICA/oCAAQCA/YCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/YCAAQCA/oCAgICAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAFACAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAEzUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxWAgICAgP4AgAGAgP2AgAGAgP2AgAGAgP2AgICAgP4AgAEAgP4AgAGAgP2AgAIAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAEgCAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMdATUzFTE1Mx0BNTMVMTUzHQE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUBAICAgID9gIACAID9AICAgICAgP0AgAIAgP2AgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAOAAAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3AAARNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFYCAgICAgID+AICAgICAgICAgICAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAASAIAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcAABM1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFYCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/YCAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAA4AAAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAABE1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTM1MxUFNTMVMzUzFQU1MxUHNTMVgAKAgPyAgAKAgP0AgAGAgP2AgAGAgP4AgICA/oCAgID/AICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAYAAAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwBbAF8AABE1MxUhNTMVBTUzFSE1MxUhNTMVBTUzFSE1MxUhNTMVBTUzFTM1MxUzNTMVMzUzFQU1MxUzNTMVMzUzFTM1MxUFNTMVMTUzFTM1MxUxNTMVBTUzFSE1MxUFNTMVITUzFYACgID8gIABAIABAID8gIABAIABAID8gICAgICAgID8gICAgICAgID9AICAgICA/YCAAYCA/YCAAYCAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABAAgAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AAATNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFQU1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVgIACAID9AIACAID9gIABAID+gICA/wCAgP6AgAEAgP2AgAIAgP0AgAIAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAwAAAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAAETUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTM1MxUFNTMVBzUzFQc1MxUHNTMVgAKAgPyAgAKAgP0AgAGAgP4AgICA/wCAgICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAASAIAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcAABM1MxUxNTMVMTUzFTE1MxUxNTMVMTUzFQc1MxUFNTMVBTUzFQU1MxUFNTMVBTUzFQc1MxUxNTMVMTUzFTE1MxUxNTMVMTUzFYCAgICAgICAgP8AgP8AgP8AgP8AgP8AgICAgICAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAADwEA/wACgASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AAABNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVMTUzFTE1MxUBAICAgP6AgICAgICAgICAgICAgICAgICAgICABACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAoAgP+AAwAEgAADAAcACwAPABMAFwAbAB8AIwAnAAATNTMVBzUzHQE1MxUHNTMdATUzFQc1Mx0BNTMVBzUzHQE1MxUHNTMVgICAgICAgICAgICAgICAgAQAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAA8BAP8AAoAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwAAATUzFTE1MxUxNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBTUzFTE1MxUxNTMVAQCAgICAgICAgICAgICAgICAgICAgID+gICAgAQAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAKAIABgAMABIAAAwAHAAsADwATABcAGwAfACMAJwAAATUzFQc1MxUFNTMVMzUzFQU1MxUzNTMVBTUzFSE1MxUFNTMVITUzFQGAgICA/wCAgID+gICAgP4AgAGAgP2AgAGAgAQAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAcAAP+AA4AAAAADAAcACwAPABMAFwAbAAAVNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVgICAgICAgICAgICAgICAgICAgICAgAACAQADgAIABIAAAwAHAAABNTMdATUzFQEAgIAEAICAgICAAAAQAIAAAAMAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFTE1MxUxNTMdATUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQEAgICAgP4AgICAgP2AgAGAgP2AgAGAgP4AgICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAATAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwAAEzUzFQc1MxUHNTMVBzUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFYCAgICAgICAgICA/gCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/YCAgICABACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAMAIAAAAMAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFQc1MxUHNTMVITUzFQU1MxUxNTMVMTUzFQEAgICA/gCAAYCA/YCAgICAgAGAgP4AgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAATAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwAAATUzFQc1MxUHNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQKAgICAgID+AICAgID9gIABgID9gIABgID9gIABgID9gIABgID+AICAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAEACAAAADAAMAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFSE1MxUFNTMVMTUzFTE1MxUBAICAgP4AgAGAgP2AgICAgID9gICAgAGAgP4AgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAADgCAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwAAATUzFTE1MxUxNTMVBTUzFQc1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVBzUzFQc1MxUBgICAgP4AgICA/wCAgICA/oCAgICAgICAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAVAID+gAMAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAAAE1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUHNTMVBzUzFQU1MxUxNTMVMTUzFQEAgICAgP2AgAGAgP2AgAGAgP2AgAGAgP2AgAGAgP4AgICAgICAgID+AICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAABEAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMAABM1MxUHNTMVBzUzFQc1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVgICAgICAgICAgID+AIABgID9gIABgID9gIABgID9gIABgID9gIABgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAACAEAAAACAASAAAMABwALAA8AEwAXABsAHwAAATUzFQE1MxUxNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUBgID/AICAgICAgICAgICAgAQAgID+gICAgICAgICAgICAgICAgICAgIAAAAAMAID/AAKABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AAAE1MxUBNTMVMTUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQU1MxUxNTMVMTUzFQIAgP8AgICAgICAgICAgICAgID+AICAgAQAgID+gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAQAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAEzUzFQc1MxUHNTMVBzUzFSE1MxUFNTMVITUzFQU1MxUzNTMVBTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFYCAgICAgICAAYCA/YCAAQCA/gCAgID+gICAgP6AgAEAgP4AgAGAgAQAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAKAQAAAAIABIAAAwAHAAsADwATABcAGwAfACMAJwAAATUzFTE1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQEAgICAgICAgICAgICAgICAgICABACAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAFAAAAAADgAMAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAETUzFTE1MxUxNTMVMzUzFTE1MxUFNTMVITUzFSE1MxUFNTMVITUzFSE1MxUFNTMVITUzFSE1MxUFNTMVITUzFSE1MxUFNTMVITUzFSE1MxWAgICAgID9AIABAIABAID8gIABAIABAID8gIABAIABAID8gIABAIABAID8gIABAIABAIACgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAA4AgAAAAwADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAABM1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVgICAgID+AIABgID9gIABgID9gIABgID9gIABgID9gIABgIACgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAA4AgAAAAwADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVAQCAgID+AIABgID9gIABgID9gIABgID9gIABgID+AICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABMAgP6AAwADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAAATNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVgICAgID+AIABgID9gIABgID9gIABgID9gIABgID9gICAgID+AICAgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABMAgP6AAwADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAAABNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVBzUzFQc1MxUHNTMVAQCAgICA/YCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/gCAgICAgICAgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAoAgAAAAwADAAADAAcACwAPABMAFwAbAB8AIwAnAAATNTMVMzUzFTE1MxUFNTMVMTUzFSE1MxUFNTMVBzUzFQc1MxUHNTMVgICAgID+AICAAQCA/YCAgICAgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAAA0AgAAAAwADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzAAABNTMVMTUzFTE1MxUxNTMVBTUzHQE1MxUxNTMdATUzHQE1MxUFNTMVMTUzFTE1MxUxNTMVAQCAgICA/YCAgICAgP2AgICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAA0BAAAAAwAEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzAAABNTMVBzUzFQc1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUHNTMdATUzFTE1MxUxNTMVAQCAgICAgICAgP4AgICAgICAgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAOAIAAAAMAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3AAATNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFYCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/gCAgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAKAIAAAAMAAwAAAwAHAAsADwATABcAGwAfACMAJwAAEzUzFSE1MxUFNTMVITUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVBzUzFYCAAYCA/YCAAYCA/gCAgID+gICAgP8AgICAAoCAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABIAAAAAA4ADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAETUzFSE1MxUFNTMVITUzFSE1MxUFNTMVITUzFSE1MxUFNTMVMzUzFTM1MxUzNTMVBTUzFTE1MxUzNTMVMTUzFQU1MxUhNTMVgAKAgPyAgAEAgAEAgPyAgAEAgAEAgPyAgICAgICAgP0AgICAgID9gIABgIACgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAKAIAAAAMAAwAAAwAHAAsADwATABcAGwAfACMAJwAAEzUzFSE1MxUFNTMVMzUzFQU1MxUHNTMVBTUzFTM1MxUFNTMVITUzFYCAAYCA/gCAgID/AICAgP8AgICA/gCAAYCAAoCAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABMAgP6AAwADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAAATNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQc1MxUHNTMVBTUzFTE1MxUxNTMVgIABgID9gIABgID9gIABgID9gIABgID9gIABgID+AICAgICAgICA/gCAgIACgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAOAIAAAAMAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3AAATNTMVMTUzFTE1MxUxNTMVMTUzFQc1MxUFNTMVBTUzFQU1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFYCAgICAgICA/wCA/wCA/wCA/wCAgICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAOAID/AAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3AAABNTMVMTUzFQU1MxUHNTMVBzUzFQc1MxUFNTMVMTUzHQE1MxUHNTMVBzUzFQc1Mx0BNTMVMTUzFQIAgID+gICAgICAgID+gICAgICAgICAgICABACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAsBgP8AAgAEgAADAAcACwAPABMAFwAbAB8AIwAnACsAAAE1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVAYCAgICAgICAgICAgICAgICAgICAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAOAID/AAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3AAATNTMVMTUzHQE1MxUHNTMVBzUzFQc1Mx0BNTMVMTUzFQU1MxUHNTMVBzUzFQc1MxUFNTMVMTUzFYCAgICAgICAgICAgP6AgICAgICAgP6AgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAgAAAGAA4ACgAADAAcACwAPABMAFwAbAB8AABM1MxUxNTMVMTUzFSE1MxUFNTMVITUzFTE1MxUxNTMVgICAgAEAgPyAgAEAgICAAgCAgICAgICAgICAgICAgICAgAAAABMAgAAAA4ADgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAAABNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVAYCAgID+AIABgID9AICAgID+gID/AICAgID+gIABgID+AICAgAMAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAABAEA/wACAAEAAAMABwALAA8AACU1MxUHNTMVBzUzFQU1MxUBgICAgICA/wCAgICAgICAgICAgICAAAAAEACA/wADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AAAE1MxUxNTMVBTUzFQc1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVBTUzFTE1MxUCAICA/oCAgID/AICAgID+gICAgICAgICAgICA/oCAgAQAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAYBAP+AAoABAAADAAcACwAPABMAFwAAJTUzFTM1MxUFNTMVMzUzFQU1MxUzNTMVAQCAgID+gICAgP6AgICAgICAgICAgICAgICAgICAAAAAAwCAAAADAACAAAMABwALAAAzNTMVMzUzFTM1MxWAgICAgICAgICAgIAAAAANAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwAAATUzFQc1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQGAgICA/oCAgICAgP6AgICAgICAgICAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAABEAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMAAAE1MxUHNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUHNTMVAYCAgID+gICAgICA/oCA/oCAgICAgP6AgICAgICAgAQAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAUAgAMAAwAEgAADAAcACwAPABMAAAE1MxUFNTMVMzUzFQU1MxUhNTMVAYCA/wCAgID+AIABgIAEAICAgICAgICAgICAgAAAAA4AgAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAAAE1MxUFNTMVITUzFQU1MxUzNTMVBzUzFQU1MxUHNTMVMzUzFTM1MxUFNTMVITUzFTM1MxUFNTMVAgCA/gCAAQCA/gCAgICAgP8AgICAgICAgP0AgAEAgICA/QCAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAVAIAAAAOABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAAAE1MxUzNTMVBTUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1Mx0BNTMVMTUzHQE1MxUxNTMdATUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQEAgICA/wCA/wCAgICA/YCAAgCA/QCAgICAgID9AIACAID9gICAgIAEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAABQCAAIACAAMAAAMABwALAA8AEwAAATUzFQU1MxUFNTMdATUzHQE1MxUBgID/AID/AICAgAKAgICAgICAgICAgICAgIAAAAAAGAAAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAWwBfAAATNTMVMTUzFTM1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUzNTMVMTUzFTE1MxWAgICAgICA/ICAAQCA/gCAAQCA/gCAAQCAgID9AIABAID+AIABAID+AIABAID+gICAgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABUAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwAAATUzFTM1MxUFNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVBzUzFQU1MxUFNTMVBTUzFQU1MxUFNTMVBzUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVAQCAgID/AID+gICAgICAgICA/wCA/wCA/wCA/wCA/wCAgICAgICAgASAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAADAYADAAKABIAAAwAHAAsAAAE1MxUHNTMdATUzFQGAgICAgAQAgICAgICAgIAAAAADAQADAAIABIAAAwAHAAsAAAE1MxUHNTMVBTUzFQGAgICA/wCABACAgICAgICAgAAGAQADAAMABIAAAwAHAAsADwATABcAAAE1MxUzNTMVBTUzFTM1MxUFNTMVMzUzFQEAgICA/oCAgID/AICAgAQAgICAgICAgICAgICAgIAAAAYAgAMAAoAEgAADAAcACwAPABMAFwAAATUzFTM1MxUFNTMVMzUzFQU1MxUzNTMVAQCAgID+gICAgP4AgICABACAgICAgICAgICAgICAgAAADQCAAIADAAMAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMAAAE1MxUFNTMVMTUzFTE1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUxNTMVMTUzFQU1MxUBgID/AICAgP4AgICAgID+AICAgP8AgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAUAgAGAAwACAAADAAcACwAPABMAABM1MxUxNTMVMTUzFTE1MxUxNTMVgICAgICAAYCAgICAgICAgICAAAcAAAGAA4ACAAADAAcACwAPABMAFwAbAAARNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVgICAgICAgAGAgICAgICAgICAgICAgIAAAAAABACAAwACgAQAAAMABwALAA8AAAE1MxUzNTMVBTUzFTM1MxUBAICAgP4AgICAA4CAgICAgICAgIAAAAAAEAAAAgADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AABE1MxUxNTMVMTUzFTM1MxUxNTMVMTUzFQU1MxUhNTMVMTUzFTE1MxUFNTMVITUzFTM1MxUFNTMVITUzFTM1MxWAgICAgICA/QCAAQCAgID9AIABAICAgP0AgAEAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAQAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFTM1MxUFNTMVATUzFTE1MxUxNTMVMTUzFQU1Mx0BNTMVMTUzHQE1Mx0BNTMVBTUzFTE1MxUxNTMVMTUzFQEAgICA/wCA/wCAgICA/YCAgICAgP2AgICAgAQAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAFAIAAgAIAAwAAAwAHAAsADwATAAATNTMdATUzHQE1MxUFNTMVBTUzFYCAgID/AID/AIACgICAgICAgICAgICAgICAABUAAAAAA4ADAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwAAEzUzFTE1MxUzNTMVMTUzFQU1MxUhNTMVITUzFQU1MxUhNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFSE1MxUFNTMVMTUzFTM1MxUxNTMVgICAgICA/QCAAQCAAQCA/ICAAQCAgICA/ICAAQCA/gCAAQCAAQCA/QCAgICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAEQCAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwAAATUzFTM1MxUFNTMVATUzFTE1MxUxNTMVMTUzFTE1MxUHNTMVBTUzFQU1MxUFNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUBAICAgP8AgP6AgICAgICAgP8AgP8AgP8AgP8AgICAgIAEAICAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAADQAAAAADgASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMAAAE1MxUzNTMVATUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTM1MxUFNTMVBzUzFQc1MxUBAICAgP2AgAKAgPyAgAKAgP0AgAGAgP4AgICA/wCAgICAgAQAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAHAYAAAAIABAAAAwAHAAsADwATABcAGwAAATUzFQM1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQGAgICAgICAgICAgICAgAOAgID/AICAgICAgICAgICAgICAgICAABIAgP+AAwADgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzFQU1MxUxNTMVMTUzFQU1MxUzNTMVMzUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVMzUzFTM1MxUFNTMVMTUzFTE1MxUFNTMVAYCA/wCAgID+AICAgICA/YCAgID+gICAgP6AgICAgID+AICAgP8AgAMAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAQAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFTE1MxUFNTMVBzUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQU1MxUHNTMVMTUzFTE1MxUxNTMVMTUzFQGAgID+gICAgP8AgICAgP6AgICA/wCAgICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAUAAAAAAOAA4AAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAARNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVITUzFYACgID9AICAgICA/YCAAYCA/YCAAYCA/YCAAYCA/YCAgICAgP0AgAKAgAMAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABAAAAAAA4AEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AAARNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMzUzFQU1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVgAKAgPyAgAKAgP0AgAGAgP4AgICA/wCA/oCAgICAgP6AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAACgGA/wACAASAAAMABwALAA8AEwAXABsAHwAjACcAAAE1MxUHNTMVBzUzFQc1MxUHNTMVAzUzFQc1MxUHNTMVBzUzFQc1MxUBgICAgICAgICAgICAgICAgICAgIAEAICAgICAgICAgICAgICA/wCAgICAgICAgICAgICAgAAAAAASAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcAAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzHQE1MxUxNTMVBTUzFTM1MxUFNTMVMTUzHQE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQEAgICA/gCAAYCA/YCAgID/AICAgP8AgICA/YCAAYCA/gCAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAACAQAEAAKABIAAAwAHAAABNTMVMzUzFQEAgICABACAgICAAAAcAAAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwBbAF8AYwBnAGsAbwAAEzUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVMTUzFTM1MxUFNTMVMzUzFSE1MxUFNTMVMzUzFSE1MxUFNTMVITUzFTE1MxUzNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFYCAgICAgP0AgAKAgPyAgAEAgICAgPyAgICAAYCA/ICAgIABgID8gIABAICAgID8gIACgID9AICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAACwCAAYACgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAAATUzFTE1Mx0BNTMVBTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUBAICAgP6AgICA/gCAAQCA/oCAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAKAIAAgAMAAwAAAwAHAAsADwATABcAGwAfACMAJwAAATUzFTM1MxUFNTMVMzUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVMzUzFQGAgICA/gCAgID+AICAgP8AgICA/wCAgIACgICAgICAgICAgICAgICAgICAgICAgICAgAAABwCAAAACgAIAAAMABwALAA8AEwAXABsAABM1MxUxNTMVMTUzFTE1MxUHNTMVBzUzFQc1MxWAgICAgICAgICAgAGAgICAgICAgICAgICAgICAgIAAHgAAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAWwBfAGMAZwBrAG8AcwB3AAATNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFTM1MxUxNTMVITUzFQU1MxUzNTMVMzUzFTM1MxUFNTMVMzUzFTE1MxUhNTMVBTUzFTM1MxUzNTMVMzUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxWAgICAgID9AIACgID8gICAgIABAID8gICAgICAgID8gICAgIABAID8gICAgICAgID8gIACgID9AICAgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAABwAABIADgAUAAAMABwALAA8AEwAXABsAABE1MxUxNTMVMTUzFTE1MxUxNTMVMTUzFTE1MxWAgICAgICABICAgICAgICAgICAgICAgAAAAAAIAIACgAKABIAAAwAHAAsADwATABcAGwAfAAABNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFQEAgID+gIABAID+AIABAID+gICABACAgICAgICAgICAgICAgICAgICAAAAAAA4AgAAAAwADgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAAAE1MxUHNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFQE1MxUxNTMVMTUzFTE1MxUxNTMVAYCAgID+gICAgICA/oCAgID+gICAgICAAwCAgICAgICAgICAgICAgICAgICAgICA/wCAgICAgICAgICAAAoAgAIAAoAEgAADAAcACwAPABMAFwAbAB8AIwAnAAATNTMVMTUzFTE1Mx0BNTMVBTUzFQU1MxUFNTMVMTUzFTE1MxUxNTMVgICAgID/AID/AID/AICAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgAAACgCAAgACgASAAAMABwALAA8AEwAXABsAHwAjACcAABM1MxUxNTMVMTUzHQE1MxUFNTMVMTUzHQE1MxUFNTMVMTUzFTE1MxWAgICAgP6AgICA/gCAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgAAAAAACAYADgAKABIAAAwAHAAABNTMVBTUzFQIAgP8AgAQAgICAgIAAAAAAEQAA/wADgAMAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwAAEzUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFSE1MxUFNTMVMzUzFTE1MxUzNTMVBTUzFQU1MxWAgAGAgP2AgAGAgP2AgAGAgP2AgAGAgP2AgIABAID9gICAgICAgP0AgP8AgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAGgCA/4ADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAWwBfAGMAZwAAATUzFTE1MxUxNTMVMTUzFTE1MxUFNTMVMTUzFTE1MxUzNTMVBTUzFTE1MxUxNTMVMzUzFQU1MxUxNTMVMzUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVMzUzFQU1MxUzNTMVBTUzFTM1MxUBAICAgICA/QCAgICAgP2AgICAgID+AICAgID+gICAgP6AgICA/oCAgID+gICAgP6AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAJAQABAAKAAoAAAwAHAAsADwATABcAGwAfACMAAAE1MxUxNTMVMTUzFQU1MxUxNTMVMTUzFQU1MxUxNTMVMTUzFQEAgICA/oCAgID+gICAgAIAgICAgICAgICAgICAgICAgICAgIAAAAQBgP6AAoAAAAADAAcACwAPAAAFNTMVMTUzFQc1MxUFNTMVAYCAgICA/wCAgICAgICAgICAgIAACACAAgACAASAAAMABwALAA8AEwAXABsAHwAAATUzFQU1MxUxNTMVBzUzFQc1MxUFNTMVMTUzFTE1MxUBAID/AICAgICAgP8AgICABACAgICAgICAgICAgICAgICAgICAgAAAAAoAgAIAAoAEgAADAAcACwAPABMAFwAbAB8AIwAnAAABNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVAQCAgP6AgAEAgP4AgAEAgP4AgAEAgP6AgIAEAICAgICAgICAgICAgICAgICAgICAgICAgAAKAIAAgAMAAwAAAwAHAAsADwATABcAGwAfACMAJwAAEzUzFTM1MxUFNTMVMzUzFQU1MxUzNTMVBTUzFTM1MxUFNTMVMzUzFYCAgID/AICAgP8AgICA/gCAgID+AICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAAAAAFgCAAAADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAAAE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMzUzFQc1MxUFNTMVITUzFQU1MxUzNTMVMTUzFQU1MxUzNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUCgID9gIABgID9gIABAID+AIABAID+AICAgICA/wCAAQCA/gCAgICA/YCAgICAgID9AIABgIAEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABYAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwBXAAABNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTM1MxUHNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFTE1MxUxNTMVAoCA/YCAAYCA/YCAAQCA/gCAAQCA/gCAgICAgICA/gCAAYCA/YCAAQCA/YCAAQCA/gCAAQCAgIAEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAaAAAAAAOABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwBbAF8AYwBnAAABNTMVBTUzFTE1MxUhNTMVBTUzFTM1MxUFNTMVMTUzFTM1MxUFNTMVMTUzFQU1MxUxNTMVMzUzFQU1MxUhNTMVBTUzFTM1MxUxNTMVBTUzFTM1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQKAgP0AgIABgID+AICAgP4AgICAgP6AgID+AICAgID/AIABAID+AICAgID9gICAgICAgP0AgAGAgASAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAKAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwAAATUzFQM1MxUHNTMVBTUzFQU1MxUHNTMVITUzFQU1MxUxNTMVMTUzFQGAgICAgID/AID/AICAgAGAgP4AgICAA4CAgP8AgICAgICAgICAgICAgICAgICAgICAgIAAEgCAAAADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMdATUzFQE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUBgICA/wCAgP6AgAEAgP4AgAEAgP4AgICAgP2AgAIAgP0AgAIAgP0AgAIAgASAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAASAIAAAAOABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcAAAE1MxUFNTMVAzUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQIAgP8AgICAgP6AgAEAgP4AgAEAgP4AgICAgP2AgAIAgP0AgAIAgP0AgAIAgASAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABQAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AAAE1MxUxNTMVBTUzFSE1MxUBNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVAYCAgP6AgAEAgP6AgID+gIABAID+AIABAID+AICAgID9gIACAID9AIACAID9AIACAIAEgICAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAFACAAAADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAATUzFTM1MxUFNTMVMzUzFQE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUBgICAgP4AgICA/wCAgP6AgAEAgP4AgAEAgP4AgICAgP2AgAIAgP0AgAIAgP0AgAIAgASAgICAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAASAIAAAAOABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcAAAE1MxUhNTMVATUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQEAgAEAgP6AgID+gIABAID+AIABAID+AICAgID9gIACAID9AIACAID9AIACAIAEAICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABYAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwBXAAABNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVAYCAgP6AgAEAgP4AgAEAgP6AgID+gIABAID+AIABAID+AICAgID9gIACAID9AIACAID9AIACAIAEgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAXAAAAAAOABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwBbAAABNTMVMTUzFTE1MxUxNTMVBTUzFTM1MxUFNTMVMzUzFQU1MxUhNTMVMTUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUxNTMVMTUzFQGAgICAgP2AgICA/oCAgID+AIABAICA/YCAgICA/YCAAYCA/YCAAYCA/YCAAYCAgIADgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAEQCA/oADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwAAATUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVBzUzFQc1MxUHNTMdATUzFSE1MxUFNTMVMTUzFTE1MxUFNTMVBzUzFQU1MxUBgICAgP4AgAGAgP0AgICAgICAgIABgID+AICAgP8AgICA/wCAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAUAIAAAAMABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAABNTMdATUzFQE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVMTUzFQEAgID+gICAgICA/YCAgICAgICAgP4AgICAgICAgICABICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAUAIAAAAMABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAABNTMVBTUzFQE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVMTUzFQIAgP8AgP6AgICAgID9gICAgICAgICA/gCAgICAgICAgIAEgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAFQCAAAADAAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAAABNTMVBTUzFTM1MxUBNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFTE1MxUxNTMVMTUzFTE1MxUBgID/AICAgP4AgICAgID9gICAgICAgICA/gCAgICAgICAgIAEgICAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAFACAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAATUzFTM1MxUBNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFTE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFTE1MxUxNTMVMTUzFTE1MxUBAICAgP4AgICAgID9gICAgICAgICA/gCAgICAgICAgIAEAICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAADQEAAAACgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMAAAE1Mx0BNTMVATUzFTE1MxUxNTMVBTUzFQc1MxUHNTMVBzUzFQc1MxUFNTMVMTUzFTE1MxUBgICA/oCAgID/AICAgICAgICAgP8AgICABICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgAANAQAAAAKABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwAAATUzFQU1MxUBNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUHNTMVBzUzFQU1MxUxNTMVMTUzFQIAgP8AgP8AgICA/wCAgICAgICAgID/AICAgASAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAOAQAAAAKABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3AAABNTMVBTUzFTM1MxUBNTMVMTUzFTE1MxUFNTMVBzUzFQc1MxUHNTMVBzUzFQU1MxUxNTMVMTUzFQGAgP8AgICA/oCAgID/AICAgICAgICAgP8AgICABICAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAA0BAAAAAoAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzAAABNTMVMzUzFQE1MxUxNTMVMTUzFQU1MxUHNTMVBzUzFQc1MxUHNTMVBTUzFTE1MxUxNTMVAQCAgID+gICAgP8AgICAgICAgICA/wCAgIAEAICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAFQAAAAADgAOAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAAATNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxWAgICAgP4AgAGAgP2AgAIAgPyAgICAgAEAgP0AgAIAgP0AgAGAgP2AgICAgAMAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABkAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AUwBXAFsAXwBjAAABNTMVMzUzFQU1MxUzNTMVATUzFTE1MxUhNTMVBTUzFTM1MxUhNTMVBTUzFTM1MxUhNTMVBTUzFSE1MxUzNTMVBTUzFSE1MxUzNTMVBTUzFSE1MxUxNTMVBTUzFSE1MxUxNTMVAYCAgID+AICAgP4AgIABgID9AICAgAEAgP0AgICAAQCA/QCAAQCAgID9AIABAICAgP0AgAGAgID9AIABgICABICAgICAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABAAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AAABNTMdATUzFQE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVAYCAgP8AgID+gIABAID9gIACAID9AIACAID9AIACAID9gIABAID+gICABICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAQAIAAAAOABQAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFQU1MxUDNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFQIAgP8AgICAgP6AgAEAgP2AgAIAgP0AgAIAgP0AgAIAgP2AgAEAgP6AgIAEgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAEgCAAAADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVMTUzFQU1MxUhNTMVATUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUBgICA/oCAAQCA/oCAgP6AgAEAgP2AgAIAgP0AgAIAgP0AgAIAgP2AgAEAgP6AgIAEgICAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAEgCAAAADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVMzUzFQU1MxUzNTMVATUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUBgICAgP4AgICA/wCAgP6AgAEAgP2AgAIAgP0AgAIAgP0AgAIAgP2AgAEAgP6AgIAEgICAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAEACAAAADgASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AAAE1MxUhNTMVATUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUBAIABAID+gICA/oCAAQCA/YCAAgCA/QCAAgCA/QCAAgCA/YCAAQCA/oCAgAQAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAkAgACAAwADAAADAAcACwAPABMAFwAbAB8AIwAAEzUzFSE1MxUFNTMVMzUzFQU1MxUFNTMVMzUzFQU1MxUhNTMVgIABgID+AICAgP8AgP8AgICA/gCAAYCAAoCAgICAgICAgICAgICAgICAgICAgICAAAAAFgCAAAADgAQAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAAAE1MxUxNTMVMzUzFQU1MxUhNTMVBTUzFSE1MxUzNTMVBTUzFSE1MxUzNTMVBTUzFTM1MxUhNTMVBTUzFTM1MxUhNTMVBTUzFSE1MxUFNTMVMzUzFTE1MxUBgICAgID9gIABAID9gIABAICAgP0AgAEAgICA/QCAgIABAID9AICAgAEAgP2AgAEAgP2AgICAgAOAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABIAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzHQE1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVAYCAgP4AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP2AgICAgASAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABIAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzFQU1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVAgCA/wCA/oCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/QCAAgCA/YCAgICABICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAABQAgAAAA4AFAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAE8AAAE1MxUxNTMVBTUzFSE1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVAYCAgP6AgAEAgP2AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP0AgAIAgP2AgICAgASAgICAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAEgCAAAADgASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVITUzFQE1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUBAIABAID9gIACAID9AIACAID9AIACAID9AIACAID9AIACAID9AIACAID9gICAgIAEAICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAADQAAAAADgAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMAAAE1MxUFNTMVATUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTM1MxUFNTMVBzUzFQc1MxUCAID/AID+AIACgID8gIACgID9AIABgID+AICAgP8AgICAgIAEgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAQAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAEzUzFQc1MxUHNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVBzUzFYCAgICAgICAgP4AgAGAgP2AgAGAgP2AgICAgP4AgICAA4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAAGQAA/4ADgASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwBTAFcAWwBfAGMAAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFQU1MxUBAICAgP4AgAGAgP2AgAGAgP2AgICAgP4AgAGAgP2AgAIAgP0AgAIAgP0AgAIAgP0AgICAgID9AIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABIAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzHQE1MxUBNTMVMTUzFTE1Mx0BNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVAYCAgP6AgICAgP4AgICAgP2AgAGAgP2AgAGAgP4AgICAgAQAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAEgCAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVBTUzFQE1MxUxNTMVMTUzHQE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUCAID/AID/AICAgID+AICAgID9gIABgID9gIABgID+AICAgIAEAICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAEwCAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsAAAE1MxUFNTMVMzUzFQE1MxUxNTMVMTUzHQE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUBgID/AICAgP6AgICAgP4AgICAgP2AgAGAgP2AgAGAgP4AgICAgAQAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAUAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAABNTMVMzUzFQU1MxUzNTMVATUzFTE1MxUxNTMdATUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQGAgICA/gCAgID+gICAgID+AICAgID9gIABgID9gIABgID+AICAgIAEAICAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABIAgAAAAwAEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzFTM1MxUBNTMVMTUzFTE1Mx0BNTMVBTUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVAQCAgID+gICAgID+AICAgID9gIABgID9gIABgID+AICAgIADgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAFACAAAADAAUAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAATUzFQU1MxUzNTMVBTUzFQE1MxUxNTMVMTUzHQE1MxUFNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUBgID/AICAgP8AgP8AgICAgP4AgICAgP2AgAGAgP2AgAGAgP4AgICAgASAgICAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAWAAAAAAOAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAVwAAEzUzFTE1MxUzNTMVMTUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFSE1MxUFNTMVMTUzFTE1MxUxNTMVMTUzFYCAgICAgP6AgAEAgP0AgICAgICA/ICAAQCA/gCAAQCAAQCA/QCAgICAgAKAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAPAID+gAMAAwAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAAAE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFQc1MxUHNTMVITUzFQU1MxUxNTMVMTUzFQU1MxUHNTMVBTUzFQEAgICA/gCAAYCA/YCAgICAgAGAgP4AgICA/wCAgID/AIACgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABIAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzHQE1MxUBNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUhNTMVBTUzFTE1MxUxNTMVAQCAgP8AgICA/gCAAYCA/YCAgICAgP2AgICAAYCA/gCAgIAEAICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABIAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzFQU1MxUDNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUhNTMVBTUzFTE1MxUxNTMVAYCA/wCAgICAgP4AgAGAgP2AgICAgID9gICAgAGAgP4AgICABACAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABMAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwBLAAABNTMVBTUzFTM1MxUBNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUhNTMVBTUzFTE1MxUxNTMVAYCA/wCAgID+gICAgP4AgAGAgP2AgICAgID9gICAgAGAgP4AgICABACAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAABIAgAAAAwAEAAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMARwAAATUzFTM1MxUBNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1MxUxNTMVBTUzFQc1MxUhNTMVBTUzFTE1MxUxNTMVAQCAgID+gICAgP4AgAGAgP2AgICAgID9gICAgAGAgP4AgICAA4CAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAAAAAkBAAAAAgAEgAADAAcACwAPABMAFwAbAB8AIwAAATUzHQE1MxUBNTMVMTUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVAQCAgP8AgICAgICAgICAgICABACAgICAgP8AgICAgICAgICAgICAgICAgICAgAAJAQAAAAIABIAAAwAHAAsADwATABcAGwAfACMAAAE1MxUFNTMVAzUzFTE1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQGAgP8AgICAgICAgICAgICAgIAEAICAgICA/wCAgICAgICAgICAgICAgICAgICAAAAAAAoBAAAAAoAEgAADAAcACwAPABMAFwAbAB8AIwAnAAABNTMVBTUzFTM1MxUBNTMVMTUzFQc1MxUHNTMVBzUzFQc1MxUHNTMVAYCA/wCAgID+gICAgICAgICAgICAgAQAgICAgICAgP8AgICAgICAgICAgICAgICAgICAgAAJAQAAAAKABIAAAwAHAAsADwATABcAGwAfACMAAAE1MxUzNTMVATUzFTE1MxUHNTMVBzUzFQc1MxUHNTMVBzUzFQEAgICA/oCAgICAgICAgICAgIAEAICAgID+gICAgICAgICAgICAgICAgICAgIAAFACAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAEsATwAAATUzFTE1MxUzNTMVBTUzFQU1MxUzNTMVBzUzFQU1MxUxNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUBAICAgID/AID/AICAgICA/gCAgICA/YCAAYCA/YCAAYCA/YCAAYCA/gCAgIAEAICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAEgCAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVMzUzFQU1MxUzNTMVATUzFTE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUBAICAgP4AgICA/oCAgICA/gCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/YCAAYCABACAgICAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAQAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzHQE1MxUBNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQEAgID/AICAgP4AgAGAgP2AgAGAgP2AgAGAgP2AgAGAgP4AgICABACAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAABAAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AAABNTMVBTUzFQE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVAgCA/wCA/wCAgID+AIABgID9gIABgID9gIABgID9gIABgID+AICAgAQAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAABEAgAAAAwAEgAADAAcACwAPABMAFwAbAB8AIwAnACsALwAzADcAOwA/AEMAAAE1MxUFNTMVMzUzFQE1MxUxNTMVMTUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVAYCA/wCAgID+gICAgP4AgAGAgP2AgAGAgP2AgAGAgP2AgAGAgP4AgICABACAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAEgCAAAADAASAAAMABwALAA8AEwAXABsAHwAjACcAKwAvADMANwA7AD8AQwBHAAABNTMVMzUzFQU1MxUzNTMVATUzFTE1MxUxNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVMTUzFTE1MxUBgICAgP4AgICA/oCAgID+AIABgID9gIABgID9gIABgID9gIABgID+AICAgAQAgICAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAQAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFTM1MxUBNTMVMTUzFTE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFQEAgICA/oCAgID+AIABgID9gIABgID9gIABgID9gIABgID+AICAgAOAgICAgP8AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAAAcAgACAAwADAAADAAcACwAPABMAFwAbAAABNTMVATUzFTE1MxUxNTMVMTUzFTE1MxUBNTMVAYCA/oCAgICAgP6AgAKAgID/AICAgICAgICAgID/AICAAAAUAID/gAMAA4AAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAAABNTMVBTUzFTE1MxUxNTMVBTUzFSE1MxUxNTMVBTUzFTM1MxUzNTMVBTUzFTM1MxUzNTMVBTUzFTE1MxUhNTMVBTUzFTE1MxUxNTMVBTUzFQKAgP4AgICA/gCAAQCAgP2AgICAgID9gICAgICA/YCAgAEAgP4AgICA/gCAAwCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAAAAAAQAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzHQE1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQEAgID+gIABgID9gIABgID9gIABgID9gIABgID9gIABgID+AICAgIAEAICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAQAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFQU1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQGAgP8AgP8AgAGAgP2AgAGAgP2AgAGAgP2AgAGAgP2AgAGAgP4AgICAgAQAgICAgID/AICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgAARAIAAAAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAAABNTMVBTUzFTM1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQGAgP8AgICA/gCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/gCAgICABACAgICAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAQAIAAAAMABAAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwAAATUzFTM1MxUBNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFTE1MxUxNTMVMTUzFQEAgICA/gCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/YCAAYCA/gCAgICAA4CAgICA/wCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAAAAAVAID+gAMABIAAAwAHAAsADwATABcAGwAfACMAJwArAC8AMwA3ADsAPwBDAEcASwBPAFMAAAE1MxUFNTMVATUzFSE1MxUFNTMVITUzFQU1MxUhNTMVBTUzFSE1MxUFNTMVITUzFQU1MxUxNTMVMTUzFTE1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MDAxMA51bmljb2RlIzB4MDAxMQ51bmljb2RlIzB4MDAxMg51bmljb2RlIzB4MDAxMw51bmljb2RlIzB4MDAxNA51bmljb2RlIzB4MDAxNQ51bmljb2RlIzB4MDAxNg51bmljb2RlIzB4MDAxNw51bmljb2RlIzB4MDAxOA51bmljb2RlIzB4MDAxOQ51bmljb2RlIzB4MDAxYQ51bmljb2RlIzB4MDAxYg51bmljb2RlIzB4MDAxYw51bmljb2RlIzB4MDAxZA51bmljb2RlIzB4MDAxZQ51bmljb2RlIzB4MDAxZgZkZWxldGUERXVybw51bmljb2RlIzB4MDA4MQ51bmljb2RlIzB4MDA4Mg51bmljb2RlIzB4MDA4Mw51bmljb2RlIzB4MDA4NA51bmljb2RlIzB4MDA4NQ51bmljb2RlIzB4MDA4Ng51bmljb2RlIzB4MDA4Nw51bmljb2RlIzB4MDA4OA51bmljb2RlIzB4MDA4OQ51bmljb2RlIzB4MDA4YQ51bmljb2RlIzB4MDA4Yg51bmljb2RlIzB4MDA4Yw51bmljb2RlIzB4MDA4ZA51bmljb2RlIzB4MDA4ZQ51bmljb2RlIzB4MDA4Zg51bmljb2RlIzB4MDA5MA51bmljb2RlIzB4MDA5MQ51bmljb2RlIzB4MDA5Mg51bmljb2RlIzB4MDA5Mw51bmljb2RlIzB4MDA5NA51bmljb2RlIzB4MDA5NQ51bmljb2RlIzB4MDA5Ng51bmljb2RlIzB4MDA5Nw51bmljb2RlIzB4MDA5OA51bmljb2RlIzB4MDA5OQ51bmljb2RlIzB4MDA5YQ51bmljb2RlIzB4MDA5Yg51bmljb2RlIzB4MDA5Yw51bmljb2RlIzB4MDA5ZA51bmljb2RlIzB4MDA5ZQ51bmljb2RlIzB4MDA5ZgAA') 
+})) 
+-- 
+if not Visuals.AssistCircle then 
+Visuals.AssistCircle = Overlay.new('Circle') 
+end 
+-- 
+if not Visuals.SilentCircle then 
+Visuals.SilentCircle = Overlay.new('Circle') 
+end 
+-- 
+if not Visuals.Tracer then 
+Visuals.Tracer = Overlay.new('Line') 
+end 
+-- 
+if not Visuals.TriggerbotCircle then 
+Visuals.TriggerbotCircle = Overlay.new('Circle') 
+Visuals.TriggerbotCircle.Thickness = 1.5 
+end 
+-- 
+if not Visuals.DebugCircle then 
+Visuals.DebugCircle = Overlay.new('Circle') 
+Visuals.DebugCircle.Filled = true 
+Visuals.DebugCircle.Radius = 5 
+Visuals.DebugCircle.Color = Color3.fromRGB(0, 255, 51) 
+end 
+-- 
+if not Visuals.RaidMenu then 
+Visuals.RaidMenu = Overlay.new('Text') 
+Visuals.RaidMenu.Visible = true 
+Visuals.RaidMenu.Outline = true 
+Visuals.RaidMenu.Size = 9 
+Visuals.RaidMenu.Color = Color3.fromRGB(255, 255, 255) 
+Visuals.RaidMenu.Thickness = 1 
+Visuals.RaidMenu.Transparency = 1 
+end 
+-- 
+if not Visuals.LocationAssist then 
+Visuals.LocationAssist = Overlay.new('Text') 
+Visuals.LocationAssist.Visible = false 
+Visuals.LocationAssist.Outline = true 
+Visuals.LocationAssist.Size = 9 
+Visuals.LocationAssist.Color = Color3.fromRGB(255, 255, 255) 
+Visuals.LocationAssist.Thickness = 1 
+Visuals.LocationAssist.Transparency = 1 
+end 
+-- 
+if not Visuals.Crosshair.Lines then 
+Visuals.Crosshair.Lines = {} 
+end 
+-- 
+if not Visuals.Crosshair.Labels then 
+Visuals.Crosshair.Labels = { 
+Overlay.new('Text'), -- Label 
+Overlay.new('Text'), -- Extension 
+Overlay.new('Text'), -- Name 
+Overlay.new('Text'), -- Health 
+} 
+end 
+-- 
+for Index = 1, 4 do 
+Visuals.Crosshair.Lines[Index] = Overlay.new('Line') 
+Visuals.Crosshair.Lines[Index + 4] = Overlay.new('Line') 
+end 
+end 
+-- 
+do --// Main 
+LPH_JIT_MAX(function() 
+function Lithium:UnloadCheat() 
+for name, connection in pairs(State.Connections) do 
+if connection then 
+connection:Disconnect() 
+end 
+State.Connections[name] = nil 
+end 
+-- 
+Visuals:Unload() 
+Lithium.Locals.Macro = false 
+Lithium.Locals.NoClipMacro = false 
+Lithium.Locals.Aimbot = false 
+Lithium.Locals.SilentAim = false 
+Lithium.Locals.AntiAiming = false 
+Lithium.Locals.Triggerbot = false 
+Lithium.Locals.Triggerbot = false 
+end 
+-- 
+function Lithium:ValidateArguments(Args, RayMethod) 
+local Matches = 0 
+if #Args < RayMethod.ArgCountRequired then 
+return false 
+end 
+for Pos, Argument in next, Args do 
+if typeof(Argument) == RayMethod.Args[Pos] then 
+Matches = Matches + 1 
+end 
+end 
+return Matches >= RayMethod.ArgCountRequired 
+end 
+-- 
+function Lithium:CheckFriend(Player) 
+if Player:IsFriendsWith(Client.UserId) then 
+return false; 
+else 
+return true; 
+end 
+end 
+-- 
+function Lithium:ClientAlive(Humanoid) 
+local Health = Humanoid.Health 
+-- 
+return (Health > 0) 
+end 
+-- 
+function Lithium:GetOrigin(Origin) 
+if Origin == 'Head' then 
+if Client and Client.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Client) 
+local Head = Object:FindFirstChild('Head') 
+-- 
+if Head and Head:IsA('RootPart') then 
+return Head.CFrame.Position 
+end 
+end 
+elseif Origin == 'Torso' then 
+if Client and Client.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Client) 
+-- 
+if RootPart then 
+return RootPart.CFrame.Position 
+end 
+end 
+end 
+-- 
+return Workspace.CurrentCamera.CFrame.Position 
+end 
+-- 
+function Lithium:GetCharacter(Player) 
+return Player.Character 
+end 
+-- 
+function Lithium:ValidateClient(Player) 
+local Object = Lithium:GetCharacter(Player) 
+local Humanoid = (Object and Object:FindFirstChildWhichIsA('Humanoid')) 
+local RootPart = (Humanoid and Humanoid.RootPart) 
+-- 
+return Object, Humanoid, RootPart 
+end 
+-- 
+function Lithium:RayCast(Part, Origin, Ignore, Distance) 
+local Ignore = Ignore or {} 
+local Distance = Distance or 2000 
+-- 
+local Cast = Ray.new(Origin, (Part.Position - Origin).Unit * Distance) 
+local Hit = Workspace:FindPartOnRayWithIgnoreList(Cast, Ignore) 
+if Hit and Hit:IsDescendantOf(Part.Parent) then 
+return true, Hit 
+else 
+return false, Hit 
+end 
+return false, nil 
+end 
+-- 
+function Lithium:TargetInAir(Object, RootPart) 
+local raycastParams = RaycastParams.new() 
+raycastParams.FilterType = Enum.RaycastFilterType.Blacklist 
+raycastParams.FilterDescendantsInstances = {Object} 
+
+local raycastResult = workspace:Raycast(RootPart.Position, Vector3.new(0, -RootPart.Size.Y/2 - 5, 0), raycastParams) 
+return raycastResult == nil 
+end 
+-- 
+function Lithium:GetAimbotTarget(Mode) 
+local Target 
+local Pixels = math.huge 
+local MousePosition = Vector2new(Mouse.X, Mouse.Y) 
+-- 
+if Mode == 'Assist' then 
+for _, Possible in ipairs(Players:GetPlayers()) do 
+if (Possible ~= Client) and Possible and Possible.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Possible) 
+if (Object and Humanoid and RootPart) then 
+local Vector = RootPart.Position 
+local Position, Visible = Camera:WorldToViewportPoint(Vector) 
+local Magnitude = (Vector2new(Position.X, Position.Y) - MousePosition).Magnitude 
+local WallCheck = getgenv().Script.Core['Script Logic']['Global Wall Check'] 
+local TeamCheck = not getgenv().Script.Core['Script Logic']['FFA Mode'] 
+if (TeamCheck and Possible.Team ~= Client.Team or not TeamCheck) and 
+(WallCheck and Lithium:RayCast(RootPart, Lithium:GetOrigin('Camera'), {Lithium:GetCharacter(Client)}) or not WallCheck) and 
+not (CurrentGame.Functions.KnockedFunction(Possible)) and 
+Lithium:ClientAlive(Humanoid) then 
+if Magnitude < Pixels and (Visuals.AssistCircle.Radius) > Magnitude and Visible then 
+Target = Possible 
+Pixels = Magnitude 
+end 
+end 
+end 
+end 
+end 
+end 
+-- 
+local function CalculateDistance(Position) 
+local DistanceX, DistanceY = Abs(Position.X - Mouse.X), Abs(Position.Y - Mouse.Y) 
+return DistanceX^2 + DistanceY^2, DistanceX, DistanceY 
+end 
+-- 
+if Mode == 'Silent' then 
+for _, Possible in ipairs(Players:GetPlayers()) do 
+if (Possible ~= Client) and Possible and Possible.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Possible) 
+if (Object and Humanoid and RootPart) then 
+local CharacterSize = (Camera:WorldToViewportPoint(RootPart.Position - Vector3new(0, 3, 0)).Y - Camera:WorldToViewportPoint(RootPart.Position + Vector3new(0, 2.6, 0)).Y) / 2 
+
+local WidthMultiplier = getgenv().Script.FOVs.Silent.BoxFOV.Width 
+local HeightMultiplier = getgenv().Script.FOVs.Silent.BoxFOV.Height 
+
+local Width, Height = Floor(CharacterSize * WidthMultiplier), Floor(CharacterSize * HeightMultiplier) 
+local Box = Vector2new(Width, Height) 
+local Type = getgenv().Script.Silent.FOVType 
+local RadiusX = Type == 'BoxFOV' and Box.Y / 2 or Visuals.SilentCircle.Radius 
+local RadiusY = Type == 'BoxFOV' and Box.Y / 2 or Visuals.SilentCircle.Radius 
+
+local NearestPoint = Lithium:GetNearestPointOnCharacter(Object, false, getgenv().Script.Silent['Hit Location']['Point Scale'], getgenv().Script.Silent['Hit Location']['Ignore Blank Points'], getgenv().Script.Silent['Hit Location']['Max Nearest Point']) 
+local NearestPointPos = Vector3new(NearestPoint.X, NearestPoint.Y, NearestPoint.Z) 
+local Position, Visible = Camera:WorldToViewportPoint(NearestPointPos) 
+local DistanceSquared, DistanceX, DistanceY = CalculateDistance(Position) 
+
+if Lithium:RayCast(RootPart, Lithium:GetOrigin('Camera'), {Client.Character}) then 
+if RadiusX > DistanceX and RadiusY > DistanceY and DistanceSquared < Pixels and Visible then 
+Pixels = DistanceSquared 
+Target = Possible 
+end 
+end 
+end 
+end 
+end 
+end 
+-- 
+if Mode == 'Triggerbot' then 
+for _, Possible in ipairs(Players:GetPlayers()) do 
+if (Possible ~= Client) and Possible and Possible.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Possible) 
+if (Object and Humanoid and RootPart) then 
+local CharacterSize = (Camera:WorldToViewportPoint(RootPart.Position - Vector3new(0, 3, 0)).Y - Camera:WorldToViewportPoint(RootPart.Position + Vector3new(0, 2.6, 0)).Y) / 2 
+
+local WidthMultiplier = getgenv().Script.FOVs.Triggerbot.BoxFOV.Width 
+local HeightMultiplier = getgenv().Script.FOVs.Triggerbot.BoxFOV.Height 
+
+local Width, Height = Floor(CharacterSize * WidthMultiplier), Floor(CharacterSize * HeightMultiplier) 
+local Box = Vector2new(Width, Height) 
+local Type = getgenv().Script.Triggerbot.FOVType 
+local RadiusX = Type == 'BoxFOV' and Box.Y / 2 or Visuals.TriggerbotCircle.Radius + 15 
+local RadiusY = Type == 'BoxFOV' and Box.Y / 2 or Visuals.TriggerbotCircle.Radius + 15 
+local Closest = Lithium:GetAllBodyParts(Object) 
+local Position, Visible = Camera:WorldToViewportPoint(Closest.Position) 
+local DistanceSquared, DistanceX, DistanceY = CalculateDistance(Position) 
+
+if RadiusX > DistanceX and RadiusY > DistanceY and DistanceSquared < Pixels and Visible then 
+Pixels = DistanceSquared 
+Target = Possible 
+end 
+end 
+end 
+end 
+end 
+-- 
+if Mode == 'Test' then 
+local MousePosition = Vector2.new(Mouse.X, Mouse.Y) 
+
+for _, Possible in ipairs(Players:GetPlayers()) do 
+if Possible and Possible ~= Client and Possible.Character then 
+local Object, _, RootPart = Lithium:ValidateClient(Possible) 
+if (Object and _ and RootPart) then 
+local Position = RootPart.Position 
+local _2DVector, OnScreen = Camera:WorldToViewportPoint(Position) 
+local Pixels2 = (Vector2.new(_2DVector.X, _2DVector.Y) - MousePosition).Magnitude 
+
+if Pixels2 < Pixels and OnScreen and Lithium:RayCast(RootPart, Lithium:GetOrigin('Camera'), {Lithium:GetCharacter(Client)}) and not (CurrentGame.Functions.KnockedFunction(Possible)) then 
+Target = Possible 
+Pixels = Pixels2 
+end 
+end 
+end 
+end 
+end 
+-- 
+return Target 
+end 
+-- 
+function Lithium:FOVCheck(Mode, Player) 
+if Mode == 'Assist' then 
+if not Player then return end; 
+local CurrentPart = tostring(Lithium:GetAllBodyParts(Player.Character)) 
+local Position = Player.Character[CurrentPart].Position 
+local World = Camera:WorldToViewportPoint(Position) 
+local Magnitude = (Vector2new(Mouse.X, Mouse.Y + Offset) - Vector2new(World.X, World.Y)).Magnitude 
+if Magnitude <= (Visuals.AssistCircle.Radius) then 
+return true 
+else 
+return false 
+end 
+end 
+end 
+-- 
+function Lithium:IsFriendly(Player) 
+if Player:IsFriendsWith(Client.UserId) then 
+return false 
+else 
+return true 
+end 
+end 
+-- 
+function Lithium:GetEquippedWeaponName(Player) 
+local Character = Player.Character 
+local tool = Character and Character:FindFirstChildWhichIsA('Tool') or false 
+if tool then 
+if string.find(tool.Name, '%[') and string.find(tool.Name, '%]') and not string.find(tool.name, 'Wallet') and not string.find(tool.Name, 'Phone') then 
+local tname = string.split(string.split(tool.Name, '[')[2], ']')[1] 
+return tname 
+end 
+else 
+return nil 
+end 
+end 
+-- 
+function Lithium:UpdatePing(Enabled) 
+if (Enabled) then 
+local Raw = game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValueString() 
+local Split = string.split(Raw, '(') 
+local Ping = tonumber(Split[1]) 
+if Ping < 150 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['140 150'] 
+elseif Ping < 140 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['130 140'] 
+elseif Ping < 130 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['120 130'] 
+elseif Ping < 120 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['110 120'] 
+elseif Ping < 110 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['100 110'] 
+elseif Ping < 100 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['90 100'] 
+elseif Ping < 90 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['80 90'] 
+elseif Ping < 80 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['70 80'] 
+elseif Ping < 70 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['60 70'] 
+elseif Ping < 60 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['50 60'] 
+elseif Ping < 50 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['40 50'] 
+elseif Ping < 40 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['30 40'] 
+elseif Ping < 30 then 
+getgenv().Script.Silent.Prediction = getgenv().Script.Silent['Ping Prediction']['20-30'] 
+end 
+end 
+end 
+-- 
+function Lithium:GetHitChance(Percent, MissFactor) 
+Percent = Floor(Percent) 
+MissFactor = MissFactor or 0 
+local HitChance = Floor(MRandom() * 100) / 100 
+return HitChance <= (Percent / 100) - MissFactor 
+end 
+-- 
+function Lithium:GetArmor(Player) 
+if (Player) then 
+local Armor = Player.Character.BodyEffects.Armor.Value 
+if Armor then 
+return (Armor) 
+end 
+else 
+return 0 
+end 
+end 
+-- 
+function Lithium:GetObscuringTargets(Max) 
+if Client and Client.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Client) 
+-- 
+if (Object and Humanoid and RootPart) then 
+local Count = 0; 
+local RootPosition = RootPart.Position 
+for _, Player in pairs(Lithium:GetPlayers()) do 
+if Player and Player.Character and Player ~= Client then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Player) 
+if (Object and Humanoid and RootPart) then 
+local PlayerPosition = RootPart.Position 
+local Magnitude = (RootPosition - PlayerPosition).magnitude 
+if Magnitude < Max then 
+Count = Count + 1 
+end 
+end 
+end 
+end 
+-- 
+return Count 
+end 
+end 
+end 
+-- 
+function Lithium:OnPlayerRegister(Player) 
+for _, A in ipairs(Raid.Players) do 
+if A == Player then 
+return true 
+end 
+end 
+return false 
+end 
+-- 
+function Lithium:RegisterPlayer(Player) 
+if getgenv().Script.Visuals['Specific ESP'].Visible then 
+if not Lithium:OnPlayerRegister(Player) then 
+table.insert(Raid.Players, Player) 
+end 
+end 
+end 
+-- 
+function Lithium:ClearPlayerData(Player) 
+for i, p in ipairs(Raid.Players) do 
+if p == Player then 
+table.remove(Raid.Players, i) 
+if Raid.Visuals.Texts[Player] then 
+if type(Raid.Visuals.Texts[Player]) == 'table' and Raid.Visuals.Texts[Player].Remove then 
+Raid.Visuals.Texts[Player]:Remove() 
+end 
+Raid.Visuals.Texts[Player] = nil 
+end 
+if Raid.Visuals.Distance[Player] then 
+if type(Raid.Visuals.Distance[Player]) == 'table' and Raid.Visuals.Distance[Player].Remove then 
+Raid.Visuals.Distance[Player]:Remove() 
+end 
+Raid.Visuals.Distance[Player] = nil 
+end 
+if Raid.Visuals.Lines[Player] then 
+if type(Raid.Visuals.Lines[Player]) == 'table' and Raid.Visuals.Lines[Player].Remove then 
+Raid.Visuals.Lines[Player]:Remove() 
+end 
+Raid.Visuals.Lines[Player] = nil 
+end 
+if Raid.Visuals.Squares[Player] then 
+if type(Raid.Visuals.Squares[Player]) == 'table' and Raid.Visuals.Squares[Player].Remove then 
+Raid.Visuals.Squares[Player]:Remove() 
+end 
+Raid.Visuals.Squares[Player] = nil 
+end 
+if Raid.Visuals.Corners[Player] then 
+for _, line in ipairs(Raid.Visuals.Corners[Player]) do 
+if type(line) == 'table' and line.Remove then 
+line:Remove() 
+end 
+end 
+Raid.Visuals.Corners[Player] = nil 
+end 
+if Raid.Visuals.Outlines[Player] then 
+for _, line in ipairs(Raid.Visuals.Outlines[Player]) do 
+if type(line) == 'table' and line.Remove then 
+line:Remove() 
+end 
+end 
+Raid.Visuals.Outlines[Player] = nil 
+end 
+return 
+end 
+end 
+end 
+-- 
+function Lithium:SelectPriority() 
+if getgenv().Script.Visuals['Specific ESP'].Visible then 
+for _, PossiblePriority in pairs(Players:GetPlayers()) do 
+if PossiblePriority ~= Client then 
+local Character = PossiblePriority.Character 
+if Character and Character:IsDescendantOf(Workspace) then 
+local RootPart = Lithium:GetAllBodyParts(Character) 
+if RootPart then 
+local World = Camera:WorldToViewportPoint(RootPart.Position) 
+local Distance = (Vector2new(Mouse.X, Mouse.Y) - Vector2new(World.X, World.Y)).Magnitude 
+if Distance < 50 then 
+if not Lithium:OnPlayerRegister(PossiblePriority) then 
+Lithium:RegisterPlayer(PossiblePriority) 
+break 
+else 
+Lithium:ClearPlayerData(PossiblePriority) 
+break 
+end 
+end 
+end 
+end 
+end 
+end 
+end 
+end 
+-- 
+function Lithium:ClearPriority() 
+for _, Player in ipairs(Raid.Players) do 
+Lithium:ClearPlayerData(Player) 
+end 
+end 
+-- 
+LPH_NO_VIRTUALIZE(function() 
+function Lithium:GetPlayers() 
+return Players:GetPlayers() 
+end 
+-- 
+function Lithium:IsExploiter(Player, X, Y, Z, UseMagnitude, Magnitude, Force) 
+X = X or 70 
+Y = Y or 100 
+Z = Z or 53 -- z axis should never go over 30? 
+UseMagnitude = UseMagnitude or true 
+Magnitude = Magnitude or 80 
+Force = Force or false 
+-- 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Player) 
+-- 
+if (Object and Humanoid and RootPart) then 
+local Velocity = RootPart.Velocity 
+local Cap = Vector3new(X, Y, Z) 
+-- 
+if Velocity.X >= Cap.X or Velocity.Y >= Cap.Y or Velocity.Z >= Cap.Z then 
+return true 
+end 
+-- 
+if Velocity.Magnitude >= 75 then 
+return true 
+end 
+-- 
+if UseMagnitude and Velocity.Magnitude > Magnitude then 
+return true 
+end 
+-- 
+if Force then 
+return true 
+end 
+end 
+end 
+-- 
+function Lithium:GetVelocity(Mode, Table) 
+if Mode then 
+if Table.Type == 'Abstract' then 
+local Suppression = 1 
+local Aggression = 1 
+local Position = Table.Object.Position 
+local Tick = tick() 
+-- 
+State.Tracked = State.Tracked or {} 
+State.Previous = State.Previous or {} 
+-- 
+table.insert(State.Tracked, Position) 
+table.insert(State.Previous, Tick) 
+-- 
+if #State.Tracked >= 3 then 
+local Indexes = #State.Tracked 
+-- 
+local TimeData = State.Previous 
+local PositionEntries = State.Tracked 
+-- 
+local IndexOne = PositionEntries[Indexes - 2] 
+local IndexTwo = PositionEntries[Indexes - 1] 
+local LastIndex = PositionEntries[Indexes] 
+local TimeOne = TimeData[Indexes - 2] 
+local TimeTwo = TimeData[Indexes - 1] 
+local LastTime = TimeData[Indexes] 
+-- 
+if (TimeTwo - TimeOne) ~= 0 and (LastTime - TimeTwo) ~= 0 then 
+local StartVelocity = (IndexTwo - IndexOne) / (TimeTwo - TimeOne) 
+local EndVelocity = (LastIndex - IndexTwo) / (LastTime - TimeTwo) 
+-- 
+local ResolvedVelocity = (Aggression - Suppression) * StartVelocity + Suppression * EndVelocity 
+-- 
+return ResolvedVelocity 
+else 
+return Table.Object.Velocity 
+end 
+else 
+return Table.Object.Velocity 
+end 
+elseif Table.Type == 'Velocity' then 
+Table.Randomization = Table.Randomization or true 
+if Table.Randomization then 
+local Position = { 
+Current = Table.Object.Position, 
+Tick = tick() 
+} 
+local Displacement, ElapsedFrames, ResolvedVelocity; 
+-- 
+if State.Current and State.Tick then 
+ElapsedFrames = Position.Tick - State.Tick 
+Displacement = Position.Current - State.Current 
+ResolvedVelocity = Displacement 
+else 
+ResolvedVelocity = Table.Object.Velocity 
+end 
+-- 
+State.Current = Position.Current 
+State.Tick = Position.Tick 
+-- 
+if ElapsedFrames and ElapsedFrames ~= 0 then 
+ResolvedVelocity = (1 - 0.354) * ResolvedVelocity + 0.354 * (Displacement / ElapsedFrames) 
+else 
+ResolvedVelocity = Table.Object.Velocity 
+end 
+-- 
+return ResolvedVelocity 
+end 
+end 
+else 
+return Table.Object.Velocity 
+end 
+end 
+-- 
+function Lithium:Filter(Object) 
+if string.find(Object.Name, 'Gun') then 
+return 
+end 
+if Find({'Part', 'MeshPart', 'BasePart'}, Object.ClassName) then 
+return true 
+end 
+end 
+-- 
+function Lithium:GetClosestPartOnCharacter(Player, Table) 
+Table = Table or {'Head'}; 
+-- 
+local SelectedPart = nil; 
+local Distance = math.huge 
+for _, Part in pairs(Table) do 
+local Box = Player.Character:FindFirstChild(Part) 
+if Box then 
+local World = Camera:WorldToViewportPoint(Box.Position) 
+local Difference = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(World.X, World.Y)).Magnitude 
+if Difference < Distance then 
+SelectedPart = Box 
+Distance = Difference 
+end 
+end 
+end 
+return SelectedPart 
+end 
+-- 
+function Lithium:GetAllBodyParts(Object, Hook) 
+local ClosestDistance = 1 / 0 
+local BodyPart = nil 
+-- 
+if (Object and Object:GetChildren()) then 
+for _, Part in next, Object:GetChildren() do 
+if Lithium:Filter(Part) then 
+local Position = Camera:WorldToScreenPoint(Part.Position) 
+local Distance = (Vector2new(Mouse.X, Mouse.Y) - Vector2new(Position.X, Position.Y)).Magnitude 
+-- 
+if (Distance < ClosestDistance) then 
+ClosestDistance = Distance 
+BodyPart = Part 
+end 
+end 
+end 
+end 
+return BodyPart 
+end 
+-- 
+function Lithium:GetNearestPointOnCharacter(Character, Mode, Type, UseCenter, Reduction) 
+local Part = Lithium:GetAllBodyParts(Character) 
+-- 
+if Part ~= nil then 
+if Mode then 
+local LocalPosition = Part.CFrame:pointToObjectSpace(Mouse.Hit.Position) 
+local Size = Part.Size / 2 
+-- 
+local y = Clamp(LocalPosition.y, -Size.y, Size.y) 
+local w = Part.CFrame:pointToWorldSpace(Vector3new(0, y, 0)) 
+-- 
+return w 
+else 
+if Type == 'Legacy' then 
+local LocalPosition = Part.CFrame:pointToObjectSpace(Mouse.Hit.Position) 
+local Size = Part.Size / 2 
+-- 
+local x = Clamp(LocalPosition.x, -Size.x, Size.x) 
+local y = Clamp(LocalPosition.y, -Size.y, Size.y) 
+local z = Clamp(LocalPosition.z, -Size.z, Size.z) 
+local w = Part.CFrame:pointToWorldSpace(Vector3new(x, y, z)) 
+-- 
+return w 
+elseif Type == 'Dynamic' then 
+local ClosestPointConfig = { 
+ReductionPercentage = Reduction, 
+Center = UseCenter, 
+} 
+-- 
+local Center = ClosestPointConfig.Center; 
+local Point = UserInputService:GetMouseLocation() 
+local ReductionPercentage = ClosestPointConfig.ReductionPercentage 
+-- 
+local PointRay = Camera:ViewportPointToRay(Point.X, Point.Y) 
+local Intersection = PointRay.Origin + (PointRay.Direction * PointRay.Direction:Dot(Part.Position - PointRay.Origin)) 
+local Transform = Part.CFrame:PointToObjectSpace(Intersection) 
+local ReducedSize = (Part.Size - (Part.Size * ReductionPercentage / 100)) * (Center and Vector3.new(1, 1, 0) or 1) 
+local HalfSize = ReducedSize / 2 
+-- 
+return Part.CFrame * Vector3.new(Clamp(Transform.X, -HalfSize.X, HalfSize.X), Clamp(Transform.Y, -HalfSize.Y, HalfSize.Y), Clamp(Transform.Z, -HalfSize.Z, HalfSize.Z)) 
+elseif Type == 'Full' then 
+local Hit, Half = Mouse.Hit.Position, Part.Size * 0.25 
+local Transform = Part.CFrame:PointToObjectSpace(Hit) 
+local NearestPosition = 
+Part.CFrame * 
+Vector3.new( 
+Clamp(Transform.X, -Half.X, Half.X), 
+Clamp(Transform.Y, -Half.Y, Half.Y), 
+Clamp(Transform.Z, -Half.Z, Half.Z) 
+) 
+-- 
+return NearestPosition 
+elseif Type == 'Static' then 
+local LocalPosition = Part.CFrame:pointToObjectSpace(Mouse.Hit.Position) 
+local Size = Part.Size / 2 
+-- 
+local x = Clamp(LocalPosition.x, -Size.x, Size.x) 
+local y = Clamp(LocalPosition.y, -Size.y, Size.y) 
+local z = Clamp(LocalPosition.z, -Size.z, Size.z) 
+local w = Part.CFrame:pointToWorldSpace(Vector3.new(x, y, z)) 
+-- 
+return w 
+elseif Type == 'Scalar' then 
+local Hit, Half = Mouse.Hit.p, Part.Size * 0.5 
+local Transform = Part.CFrame:PointToObjectSpace(Hit) 
+local Endpoint = Part.CFrame * Vector3.new( 
+Clamp(Transform.X, - Half.X, Half.X), 
+Clamp(Transform.Y, - Half.Y, Half.Y), 
+Clamp(Transform.Z, - Half.Z, Half.Z) 
+) 
+-- 
+return Endpoint 
+end 
+end 
+end 
+end 
+-- 
+function Lithium:GetEndpoint(PartVelocity, PartPosition, Prediction, Adjustment) 
+local CurrentCameraCFrame = Camera.CFrame 
+local RelativePartVelocity = CurrentCameraCFrame:VectorToObjectSpace(PartVelocity) 
+local PredictionVelocity; 
+-- 
+if Adjustment[1] then 
+PredictionVelocity = RelativePartVelocity * Prediction * Adjustment[2] 
+else 
+PredictionVelocity = RelativePartVelocity * Prediction 
+end 
+-- 
+local PredictedPosition = PartPosition + CurrentCameraCFrame:VectorToWorldSpace(PredictionVelocity) 
+
+return PredictedPosition 
+end 
+-- 
+function Lithium:CanCurve(Object, Hit, Type) 
+if Type == '3D' then 
+local Head = Object:FindFirstChild('Head') 
+if Head then 
+local Head_Angle = Head.Position 
+local Shot_Direction = (Head_Angle - Camera.CFrame.Position).Unit 
+local Degrees = (Hit - Camera.CFrame.Position).Unit 
+local Angle = Deg(Acos(Shot_Direction:Dot(Degrees))) / 10 
+local M_Angle = getgenv().Script.Helpers['Bullet Curvation']['3D'].Angle * 5 
+-- 
+if (Angle < M_Angle) then 
+if (getgenv().Script.Helpers['Bullet Curvation'].Logger) then 
+print('-------------- NEW SHOT --------------') 
+print('Shot was valid (in threshold)') 
+print('Position (Vector3):', Head_Angle) 
+print('Camera Position (Vector3):', Camera.CFrame.Position) 
+print('Shot Direction (Vector3):', Shot_Direction) 
+print('Bullet Path Direction (Vector3):', Degrees) 
+print('Calculated Angle (Number):', Angle) 
+print('Max Allowed Angle (Number):', M_Angle) 
+end 
+return true 
+else 
+if (getgenv().Script.Helpers['Bullet Curvation'].Logger) then 
+print('-------------- NEW SHOT --------------') 
+print('Shot was invalid (out of threshold)') 
+print('Position (Vector3):', Head_Angle) 
+print('Camera Position (Vector3):', Camera.CFrame.Position) 
+print('Shot Direction (Vector3):', Shot_Direction) 
+print('Bullet Path Direction (Vector3):', Degrees) 
+print('Calculated Angle (Number):', Angle) 
+print('Max Allowed Angle (Number):', M_Angle) 
+end 
+end 
+end 
+return false 
+elseif Type == '2D' then 
+return true 
+end 
+end 
+-- 
+function Lithium:GetHitPosition(Mode, Character) 
+if not Character then 
+Utility:UnsafeAction(print, 'Error from Lithium:GetHitPosition\nGiven arg(2) is nil (Player)') 
+return 
+end 
+-- 
+if Mode == 'Assist' then 
+local Prediction = getgenv().Script.Aiming.Prediction 
+local Stickiness = getgenv().Script.Aiming.Stickiness 
+local HitTarget = getgenv().Script.Aiming['Hit Location']['Hit Target'] 
+local Mult = Prediction 
+local Hit; 
+-- 
+if Stickiness ~= 1 then 
+Mult = Prediction * (1 - (Stickiness - 1) / 2) 
+end 
+-- 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Character) 
+if (Object and Humanoid and RootPart) then 
+local Velocity = Lithium:GetVelocity(Lithium:IsExploiter(Character), { 
+Type = 'Abstract', 
+Object = RootPart 
+}) 
+-- 
+if getgenv().Script.Aiming.OverrideYAxis == 'Full' then 
+Mult = Vector3new(Mult, 0, Mult) 
+elseif getgenv().Script.Aiming.OverrideYAxis == 'Partial' then 
+Mult = Vector3new(Mult, RootPart.Velocity / 5, Mult) 
+elseif getgenv().Script.Aiming.OverrideYAxis == 'None' then 
+Mult = Vector3new(Mult, Mult, Mult) 
+end 
+-- 
+if getgenv().Script.Aiming['Prediction Points']['Enabled'] then 
+local NearestBodyPart = Lithium:GetAllBodyParts(Object) 
+if NearestBodyPart then 
+local PartName = NearestBodyPart.Name 
+local PredictionMultiplier = getgenv().Script.Aiming['Prediction Points']['Hit Points'][PartName] 
+if PredictionMultiplier then 
+Mult = Vector3new(PredictionMultiplier, PredictionMultiplier, PredictionMultiplier) 
+end 
+end 
+end 
+-- 
+if getgenv().Script.Helpers.DisableYAxis then 
+Mult = Vector3new(Mult, RootPart.Velocity / 5, Mult) 
+end 
+-- 
+if HitTarget == 'Nearest Point' then 
+local NearestPoint = Lithium:GetNearestPointOnCharacter(Object, false, getgenv().Script.Aiming['Hit Location']['Point Scale'], getgenv().Script.Aiming['Hit Location']['Ignore Blank Points'], getgenv().Script.Aiming['Hit Location']['Max Nearest Point']) 
+Hit = Vector3new(NearestPoint.X, NearestPoint.Y, NearestPoint.Z) 
+end 
+-- 
+if HitTarget == 'Center Point' then 
+local NearestPoint = Lithium:GetNearestPointOnCharacter(Object, true) 
+Hit = Vector3new(NearestPoint.X, NearestPoint.Y, NearestPoint.Z) 
+end 
+-- 
+if HitTarget == 'Nearest Part' then 
+local NearestPart = Lithium:GetAllBodyParts(Object) 
+Hit = NearestPart.Position 
+end 
+-- 
+if HitTarget == 'R15' then 
+local Parts = getgenv().Script.Aiming['Hit Location']['R15'] 
+Hit = Object[tostring(Lithium:GetClosestPartOnCharacter(Character, Parts))].Position 
+end 
+-- 
+local HitPosition = Lithium:GetEndpoint(Velocity, Hit, Mult, getgenv().Script.Aiming['3D Adjustment']) 
+return HitPosition 
+end 
+end 
+-- 
+if Mode == 'Silent' then 
+local Prediction = getgenv().Script.Silent.Prediction 
+local Power = getgenv().Script.Silent['Prediction Adjustment'] 
+local Mult = Prediction 
+local HitTarget = getgenv().Script.Silent['Hit Location']['Hit Target'] 
+local HitPosition; 
+-- 
+Lithium:UpdatePing(getgenv().Script.Silent['Ping Prediction'].Enabled) 
+-- 
+if Power ~= 1 then 
+Mult = Prediction * (1 - (Power - 1) / 2) 
+end 
+-- 
+local Object, _, RootPart = Lithium:ValidateClient(Character) 
+-- 
+if getgenv().Script.Silent['Prediction Points']['Enabled'] then 
+local NearestBodyPart = Lithium:GetAllBodyParts(Object) 
+if NearestBodyPart then 
+local PartName = NearestBodyPart.Name 
+local PredictionMultiplier = getgenv().Script.Silent['Prediction Points']['Hit Points'][PartName] 
+if PredictionMultiplier then 
+Mult = Vector3new(PredictionMultiplier, PredictionMultiplier, PredictionMultiplier) 
+end 
+end 
+end 
+-- 
+if HitTarget == 'Nearest Point' then 
+local NearestPoint = Lithium:GetNearestPointOnCharacter(Object, false, getgenv().Script.Aiming['Hit Location']['Point Scale'], getgenv().Script.Silent['Hit Location']['Ignore Blank Points'], getgenv().Script.Silent['Hit Location']['Max Nearest Point']) 
+HitPosition = Vector3new(NearestPoint.X, NearestPoint.Y, NearestPoint.Z) 
+end 
+-- 
+if HitTarget == 'Nearest Part' then 
+local NearestPart = Lithium:GetAllBodyParts(Object) 
+HitPosition = Object[tostring(NearestPart)].Position 
+end 
+-- 
+if HitTarget == 'Center Point' then 
+local NearestPoint = Lithium:GetNearestPointOnCharacter(Object, true) 
+HitPosition = Vector3new(NearestPoint.X, NearestPoint.Y, NearestPoint.Z) 
+end 
+-- 
+if HitTarget == 'R15' then 
+local Parts = getgenv().Script.Silent['Hit Location']['R15'] 
+HitPosition = Object[tostring(Lithium:GetClosestPartOnCharacter(Character, Parts))].Position 
+end 
+-- 
+local Velocity = Lithium:GetVelocity(Lithium:IsExploiter(Character), { 
+Type = 'Abstract', 
+Object = RootPart 
+}) 
+-- 
+if getgenv().Script.Silent.OverrideYAxis == 'Full' then 
+Mult = Vector3new(Mult, 0, Mult) 
+elseif getgenv().Script.Silent.OverrideYAxis == 'Partial' then 
+Mult = Vector3new(Mult, RootPart.Velocity / 5, Mult) 
+elseif getgenv().Script.Silent.OverrideYAxis == 'None' then 
+Mult = Vector3new(Mult, Mult, Mult) 
+end 
+-- 
+if getgenv().Script.Helpers.DisableYAxis then 
+Mult = Vector3new(Mult, RootPart.Velocity / 5, Mult) 
+end 
+-- 
+local Hit = Lithium:GetEndpoint(Velocity, HitPosition, Mult, getgenv().Script.Silent['3D Adjustment']) 
+return Hit 
+end 
+end 
+-- 
+function Lithium:ActivateAntiAim() 
+local AntiAim = getgenv().Script.Misc.AntiAim 
+local Type = AntiAim.Type 
+if not AntiAim.Enabled or not Lithium.Locals.AntiAiming or not Client or not Client.Character then 
+return 
+end 
+-- 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(Client) 
+if not (Object and Humanoid and RootPart) then 
+return 
+end 
+-- 
+local Velocity = RootPart.Velocity 
+local DetectionRange = Random.new():NextNumber(-2, 2) 
+-- 
+if Type == 'Sides' then 
+local Multiplier = 8 
+local YAxis = 36 + DetectionRange 
+local Spoofed = Vector3new( 
+Clamp((-Velocity.X or Velocity.X) * Multiplier, -27, 27) + DetectionRange, 
+YAxis, 
+Clamp((-Velocity.Z or Velocity.Z) * Multiplier, -27, 27) + DetectionRange 
+) 
+-- 
+RootPart.Velocity = Spoofed 
+elseif Type == 'Prediction Disabler' then 
+RootPart.Velocity = Vector3new(0, 0, 0) 
+end 
+-- 
+RunService.RenderStepped:Wait() 
+RootPart.Velocity = Velocity 
+end 
+-- 
+function Lithium:ActivateAimAssist() 
+if getgenv().Script.Aiming.Enabled then 
+if not Lithium.Locals.Aimbot then 
+return 
+end 
+-- 
+if getgenv().Script.Aiming.Mode == 'Regular' then 
+PriorityRelationAssist = Lithium:GetAimbotTarget('Assist') 
+end 
+-- 
+local Smoothness; 
+local Randomization; 
+if getgenv().Script.Aiming['Legacy Smoothing'] then 
+Smoothness = getgenv().Script.Aiming.Smoothing.Smoothing / 1000 
+else 
+Smoothness = getgenv().Script.Aiming.Smoothing.Smoothing 
+end 
+-- 
+local Shake = getgenv().Script.Aiming.Randomization 
+if PriorityRelationAssist and PriorityRelationAssist.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(PriorityRelationAssist) 
+if Object and Humanoid and RootPart then 
+if not CurrentGame.Functions.KnockedFunction(PriorityRelationAssist) then 
+local Stutter = getgenv().Script.Core['Script Core']['Refresh Rates']['Aimbot'] 
+if not ((not Stutter == 0) and not ((tick() - Lithium.Locals.LastStutter) >= (Stutter / 1000))) then 
+Lithium.Locals.LastStutter = tick() 
+-- 
+local Position, Visible = Camera:WorldToViewportPoint(RootPart.Position) 
+-- 
+if getgenv().Script.Aiming['Conditions']['Visible'] and not Visible then 
+return 
+end 
+-- 
+if getgenv().Script.Aiming['Conditions']['Wall Check'] and not Lithium:RayCast(RootPart, Lithium:GetOrigin('Camera'), {Lithium:GetCharacter(Client)}) then 
+return 
+end 
+-- 
+if not Lithium:ClientAlive(Humanoid) then 
+return 
+end 
+-- 
+if getgenv().Script.Aiming['Conditions']['FOV Check'] and not Lithium:FOVCheck('Assist', PriorityRelationAssist) then 
+return 
+end 
+-- 
+if CurrentGame.Functions.GrabbedFunction(PriorityRelationAssist) then 
+return 
+end 
+-- 
+if not Lithium:GetHitChance(getgenv().Script.Aiming.HitChance.HitChance, getgenv().Script.Aiming.HitChance['Miss Chance']) then 
+return 
+end 
+-- 
+if getgenv().Script.Aiming['Conditions']['Shift Lock'] then 
+if UserInputService.MouseBehavior ~= Enum.MouseBehavior.LockCenter then 
+return 
+end 
+end 
+-- 
+if getgenv().Script.Aiming['Conditions']['Third Person'] then 
+if ((Camera.Focus.p - Camera.CFrame.p).Magnitude > 1) then 
+return 
+end 
+end 
+-- 
+if getgenv().Script.Aiming['Conditions']['Tool Equipped'] then 
+if not Client.Character:FindFirstAncestorWhichIsA('Tool') then 
+return 
+end 
+end 
+-- 
+if getgenv().Script.Aiming['Conditions']['Chat Focused'] then 
+if UserInputService:GetFocusedTextBox() then 
+return 
+end 
+end 
+-- 
+if Lithium:TargetInAir(Object, RootPart) then 
+Randomization = Shake.Enabled and ( 
+Vector3new( 
+MRandom(-Shake.Y.X, Shake.Y.X), 
+MRandom(-Shake.Y.Y, Shake.Y.Y), 
+MRandom(-Shake.Y.Z, Shake.Y.Z) 
+) * 0.1 
+) or Vector3.new(0, 0, 0) 
+else 
+Randomization = Shake.Enabled and ( 
+Vector3new( 
+MRandom(-Shake.X.X, Shake.X.X), 
+MRandom(-Shake.X.Y, Shake.X.Y), 
+MRandom(-Shake.X.Z, Shake.X.Z) 
+) * 0.1 
+) or Vector3.new(0, 0, 0) 
+end 
+-- 
+local HitPosition2 = Lithium:GetHitPosition('Assist', PriorityRelationAssist) + Randomization 
+local Main = CFrame.new(Camera.CFrame.p, HitPosition2) 
+-- 
+Camera.CFrame = Camera.CFrame:Lerp(Main, Smoothness) 
+end 
+end 
+end 
+end 
+end 
+end 
+-- 
+function Lithium:LoadLuas() 
+end 
+-- 
+function Lithium:ToolConnection() 
+if getgenv().Script.Silent.Enabled then 
+local RArgs = {}; 
+local Settings = getgenv().Script.Silent 
+-- 
+if getgenv().Script.Silent.HitScan == 'On Shot' then 
+if Settings.Mode == 'Target' then 
+PriorityRelationSilent = PriorityRelationAssist 
+else 
+PriorityRelationSilent = Lithium:GetAimbotTarget('Silent') 
+end 
+end 
+-- 
+if PriorityRelationSilent and PriorityRelationSilent.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(PriorityRelationSilent) 
+local Screen = Camera:WorldToViewportPoint(RootPart.Position) 
+if not Lithium:RayCast(RootPart, Lithium:GetOrigin('Camera'), {Lithium:GetCharacter(Client)}) then 
+return 
+end 
+-- 
+if CurrentGame.Functions.KnockedFunction(PriorityRelationSilent) then 
+return 
+end 
+-- 
+if CurrentGame.Functions.GrabbedFunction(PriorityRelationSilent) then 
+return 
+end 
+-- 
+if not Lithium:GetHitChance(getgenv().Script.Silent.HitChance.HitChance, getgenv().Script.Silent.HitChance['Miss Chance']) then 
+return 
+end 
+-- 
+local DistanceX = Abs(Screen.X - Mouse.X) 
+local DistanceY = Abs(Screen.Y - Mouse.Y) 
+local Box 
+if Lithium.Locals.Bounding then 
+Box = Vector2new(1000, 1000) 
+else 
+Box = Vector2new(0, 0) 
+end 
+-- 
+local RadiusX = Settings.FOVType == 'BoxFOV' and Box.X or Visuals.SilentCircle.Radius 
+local RadiusY = Settings.FOVType == 'BoxFOV' and Box.Y or Visuals.SilentCircle.Radius 
+-- 
+local Hit = Lithium:GetHitPosition('Silent', PriorityRelationSilent) 
+-- 
+if getgenv().Script.Helpers['Bullet Curvation'].Enabled then 
+if not Lithium:CanCurve(Object, Hit, getgenv().Script.Helpers['Bullet Curvation'].Formula) then 
+return 
+end 
+end 
+-- 
+RArgs = { 
+[1] = CurrentGame.Updater, 
+[2] = Hit 
+} 
+-- 
+if CurrentGame.Name == 'Hood Modded' then 
+RArgs = { 
+[1] = CurrentGame.Updater, 
+[2] = Hit, 
+[3] = 'P' 
+} 
+end 
+-- 
+if CurrentGame.Name == 'Da Hills' then 
+RArgs = { 
+[1] = CurrentGame.Updater, 
+[2] = { 
+[1] = Hit, 
+[2] = Camera.CFrame.Position 
+}, 
+} 
+end 
+-- 
+if (RadiusX > DistanceX and RadiusY > DistanceY and (DistanceX^2 + DistanceY^2) < (1/0)^2) then 
+CurrentGame.Functions.RemotePath():FireServer(unpack(RArgs)) 
+-- 
+if Settings['Draw Hit'] then 
+local DebugPt = Camera:WorldToViewportPoint(Hit) 
+Visuals.DebugCircle.Visible = Lithium.Locals.Visuals 
+Visuals.DebugCircle.Position = Vector2new(DebugPt.X, DebugPt.Y) 
+end 
+wait(3) 
+Visuals.DebugCircle.Visible = false 
+end 
+end 
+end 
+end 
+-- 
+if (CurrentGame.HoodGame) then 
+for i, v in pairs(Client.Backpack:GetChildren()) do 
+if v:IsA('Tool') and not State.ToolConnections[v] then 
+State.ToolConnections[v] = v.Activated:Connect(Lithium.ToolConnection) 
+end 
+end 
+for i, v in pairs(Client.Character:GetChildren()) do 
+if v:IsA('Tool') and not State.ToolConnections[v] then 
+State.ToolConnections[v] = v.Activated:Connect(Lithium.ToolConnection) 
+end 
+end 
+-- 
+Client.Character.ChildAdded:connect(function(v) 
+if v:IsA('Tool') and not State.ToolConnections[v] then 
+State.ToolConnections[v] = v.Activated:Connect(Lithium.ToolConnection) 
+end 
+end) 
+-- 
+Client.CharacterAdded:connect(function(v) 
+for i = 1, # State.ToolConnections, 1 do 
+State.ToolConnections[i]:Disconnect() 
+State.ToolConnections[i] = nil 
+end 
+v.ChildAdded:connect(function(v) 
+if v:IsA('Tool') and not State.ToolConnections[v] then 
+State.ToolConnections[v] = v.Activated:Connect(Lithium.ToolConnection) 
+end 
+end) 
+end) 
+end 
+-- 
+function Lithium:Triggerbot() 
+if getgenv().Script.Triggerbot.Enabled then 
+local Triggerbot = getgenv().Script.Triggerbot 
+if Triggerbot.Activation.Type == 'Toggle' and not Lithium.Locals.Triggerbot then 
+return 
+end 
+-- 
+if Triggerbot.Activation.Type == 'Hold' and not Lithium.Locals.Triggerbot then 
+return 
+end 
+-- 
+local Character = Client.Character 
+local CurrentTool = Character:FindFirstChildWhichIsA('Tool') 
+if not CurrentTool or CurrentTool.Name == '[Knife]' or CurrentTool:FindFirstChild('Eat') then 
+return 
+end 
+
+if not CurrentTool:IsDescendantOf(Character) then 
+return 
+end 
+-- 
+local Cooldown = MRandom(Triggerbot['Cooldown 1'], Triggerbot['Cooldown 2']) 
+PriorityRelationTrigger = Lithium:GetAimbotTarget('Triggerbot') 
+-- 
+if PriorityRelationTrigger and PriorityRelationTrigger.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(PriorityRelationTrigger) 
+if (Object and Humanoid and RootPart) then 
+if (CurrentGame.Functions.KnockedFunction(PriorityRelationTrigger)) then return end 
+if Object:FindFirstChildOfClass('ForceField') then return end 
+-- 
+local ClosestPart = tostring(Lithium:GetAllBodyParts(Object)) 
+local CurrentPart = Object[ClosestPart] 
+-- 
+local HitPosition; 
+local Velocity = Lithium:GetVelocity(Lithium:IsExploiter(PriorityRelationTrigger), { 
+Type = 'Velocity', 
+Object = RootPart 
+}) 
+if Triggerbot['Silent Link'] then 
+HitPosition = Lithium:GetHitPosition('Silent', PriorityRelationTrigger) 
+else 
+HitPosition = CurrentPart.Position + Velocity * Triggerbot.Prediction 
+end 
+-- 
+local function Sensitize(v1, v2) 
+local tolerance = Triggerbot.Tolerance 
+return Abs(v1.X - v2.X) < tolerance and Abs(v1.Y - v2.Y) < tolerance and Abs(v1.Z - v2.Z) < tolerance 
+end 
+-- 
+if ((tick() - Lithium.Locals.TriggerTick) >= (Triggerbot.Interval / 1000)) then 
+Lithium.Locals.TriggerTick = tick() 
+if Sensitize(Mouse.Hit.p, HitPosition) then 
+if CurrentTool then 
+wait(Cooldown) 
+CurrentTool:Activate() 
+end 
+end 
+end 
+end 
+end 
+end 
+end 
+-- 
+do --// ESP 
+local RotationAngle, Tick = -45, tick(); 
+local ScreenGui = Utility:Create('ScreenGui', { 
+Parent = gethui(), 
+Name = 'ESPHolder', 
+}); 
+-- 
+local function Ignore(Player) 
+if ScreenGui:FindFirstChild(Player.Name) then 
+ScreenGui[Player.Name]:Destroy() 
+end 
+end 
+-- 
+local function ESP(Player) 
+if getgenv().Script.Visuals['Global ESP'].Enabled then 
+coroutine.wrap(Ignore)(Player) 
+local Name = Utility:Create('TextLabel', {Parent = ScreenGui, Position = UDim2.new(0.5, 0, 0, -11), Size = UDim2.new(0, 100, 0, 20), AnchorPoint = Vector2new(0.5, 0.5), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 255, 255), FontFace = Fonts[getgenv().Script.Visuals['Global ESP']['Text Font']], TextSize = getgenv().Script.Visuals['Global ESP']['Text Size'], TextStrokeTransparency = 0, TextStrokeColor3 = Color3.fromRGB(0, 0, 0), RichText = true}) 
+local Distance = Utility:Create('TextLabel', {Parent = ScreenGui, Position = UDim2.new(0.5, 0, 0, 11), Size = UDim2.new(0, 100, 0, 20), AnchorPoint = Vector2new(0.5, 0.5), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 255, 255), FontFace = Fonts[getgenv().Script.Visuals['Global ESP']['Text Font']], TextSize = getgenv().Script.Visuals['Global ESP']['Text Size'], TextStrokeTransparency = 0, TextStrokeColor3 = Color3.fromRGB(0, 0, 0), RichText = true}) 
+local Box = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0.75, BorderSizePixel = 0}) 
+local Gradient1 = Utility:Create('UIGradient', {Parent = Box, Enabled = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Filled Color Scheme'], Color = ColorSequence.new{ColorSequenceKeypoint.new(0, getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Fill Color']), ColorSequenceKeypoint.new(1, getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Fill Glow'])}}) 
+local Outline = Utility:Create('UIStroke', {Parent = Box, Enabled = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box'].Gradient, Transparency = 0, Color = Color3.fromRGB(255, 255, 255), LineJoinMode = Enum.LineJoinMode.Miter}) 
+local Gradient2 = Utility:Create('UIGradient', {Parent = Outline, Enabled = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box'].Gradient, Color = ColorSequence.new{ColorSequenceKeypoint.new(0, getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Alpha Color']), ColorSequenceKeypoint.new(1, getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Depth Color'])}}) 
+local Health = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0}) 
+local BehindHealth = Utility:Create('Frame', {Parent = ScreenGui, ZIndex = -1, BackgroundColor3 = Color3.fromRGB(0, 0, 0), BackgroundTransparency = 0}) 
+local HealthGradient = Utility:Create('UIGradient', {Parent = Health, Enabled = getgenv().Script.Visuals['Global ESP'].Drawing.Health.Gradient, Rotation = -90, Color = ColorSequence.new{ColorSequenceKeypoint.new(0, getgenv().Script.Visuals['Global ESP'].Drawing.Health['Alpha Color']), ColorSequenceKeypoint.new(0.5, getgenv().Script.Visuals['Global ESP'].Drawing.Health['Depth Color']), ColorSequenceKeypoint.new(1, getgenv().Script.Visuals['Global ESP'].Drawing.Health['Color Keypoint'])}}) 
+local HealthText = Utility:Create('TextLabel', {Parent = ScreenGui, Position = UDim2.new(0.5, 0, 0, 31), Size = UDim2.new(0, 100, 0, 20), AnchorPoint = Vector2new(0.5, 0.5), BackgroundTransparency = 1, TextColor3 = Color3.fromRGB(255, 255, 255), FontFace = Fonts[getgenv().Script.Visuals['Global ESP']['Text Font']], TextSize = getgenv().Script.Visuals['Global ESP']['Text Size'], TextStrokeTransparency = 0, TextStrokeColor3 = Color3.fromRGB(0, 0, 0)}) 
+local Chams = Utility:Create('Highlight', {Parent = ScreenGui, FillTransparency = 1, OutlineTransparency = 0, OutlineColor = Color3.fromRGB(202, 219, 247), DepthMode = 'AlwaysOnTop'}) 
+local LeftTop = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local LeftSide = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local RightTop = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local RightSide = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local BottomSide = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local BottomDown = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local BottomRightSide = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+local BottomRightDown = Utility:Create('Frame', {Parent = ScreenGui, BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Corner.Color, Position = UDim2.new(0, 0, 0, 0)}) 
+-- 
+local Updater = function() 
+local Connection; 
+local function HideESP() 
+Box.Visible = false; 
+Name.Visible = false; 
+Distance.Visible = false; 
+Health.Visible = false; 
+BehindHealth.Visible = false; 
+HealthText.Visible = false; 
+LeftTop.Visible = false; 
+LeftSide.Visible = false; 
+BottomSide.Visible = false; 
+BottomDown.Visible = false; 
+RightTop.Visible = false; 
+RightSide.Visible = false; 
+BottomRightSide.Visible = false; 
+BottomRightDown.Visible = false; 
+Chams.Enabled = false; 
+if not Player then 
+ScreenGui:Destroy(); 
+Connection:Disconnect(); 
+end 
+end 
+-- 
+Connection = RunService.RenderStepped:Connect(function() 
+if getgenv().Script.Visuals['Global ESP'].Enabled and Lithium.Locals.Visuals then 
+if Player.Character and Player.Character:FindFirstChild('HumanoidRootPart') then 
+local HRP = Player.Character.HumanoidRootPart 
+local Humanoid = Player.Character:WaitForChild('Humanoid'); 
+local Pos, OnScreen = Camera:WorldToScreenPoint(HRP.Position) 
+local Dist = (Camera.CFrame.Position - HRP.Position).Magnitude / 3.5714285714 
+
+if OnScreen and Dist <= getgenv().Script.Visuals['Global ESP']['Max Draw Distance'] then 
+local Size = HRP.Size.Y 
+local scaleFactor = (Size * Camera.ViewportSize.Y) / (Pos.Z * 2) 
+local w, h = 3 * scaleFactor, 4.5 * scaleFactor 
+-- 
+if getgenv().Script.Visuals['Global ESP']['Fade Effect']['On Distance'] then 
+Utility:LerpTransparency(Box, Dist) 
+Utility:LerpTransparency(Outline, Dist) 
+Utility:LerpTransparency(Name, Dist) 
+Utility:LerpTransparency(Distance, Dist) 
+Utility:LerpTransparency(Health, Dist) 
+Utility:LerpTransparency(BehindHealth, Dist) 
+Utility:LerpTransparency(HealthText, Dist) 
+Utility:LerpTransparency(LeftTop, Dist) 
+Utility:LerpTransparency(LeftSide, Dist) 
+Utility:LerpTransparency(BottomSide, Dist) 
+Utility:LerpTransparency(BottomDown, Dist) 
+Utility:LerpTransparency(RightTop, Dist) 
+Utility:LerpTransparency(RightSide, Dist) 
+Utility:LerpTransparency(BottomRightSide, Dist) 
+Utility:LerpTransparency(BottomRightDown, Dist) 
+Utility:LerpTransparency(Chams, Dist) 
+end 
+-- 
+if Player.Character and Player.Character:FindFirstChild('HumanoidRootPart') and Player.Character:FindFirstChild('Humanoid') then 
+do --// Boxes 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Boxes.Enabled then 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' then 
+LeftTop.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+LeftTop.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2) 
+LeftTop.Size = UDim2.new(0, w / 5, 0, 1) 
+
+LeftSide.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+LeftSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2) 
+LeftSide.Size = UDim2.new(0, 1, 0, h / 5) 
+
+BottomSide.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+BottomSide.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y + h / 2) 
+BottomSide.Size = UDim2.new(0, 1, 0, h / 5) 
+BottomSide.AnchorPoint = Vector2new(0, 5) 
+
+BottomDown.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+BottomDown.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y + h / 2) 
+BottomDown.Size = UDim2.new(0, w / 5, 0, 1) 
+BottomDown.AnchorPoint = Vector2new(0, 1) 
+
+RightTop.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+RightTop.Position = UDim2.new(0, Pos.X + w / 2, 0, Pos.Y - h / 2) 
+RightTop.Size = UDim2.new(0, w / 5, 0, 1) 
+RightTop.AnchorPoint = Vector2new(1, 0) 
+
+RightSide.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+RightSide.Position = UDim2.new(0, Pos.X + w / 2 - 1, 0, Pos.Y - h / 2) 
+RightSide.Size = UDim2.new(0, 1, 0, h / 5) 
+RightSide.AnchorPoint = Vector2new(0, 0) 
+
+BottomRightSide.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+BottomRightSide.Position = UDim2.new(0, Pos.X + w / 2, 0, Pos.Y + h / 2) 
+BottomRightSide.Size = UDim2.new(0, 1, 0, h / 5) 
+BottomRightSide.AnchorPoint = Vector2new(1, 1) 
+
+BottomRightDown.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Corner' 
+BottomRightDown.Position = UDim2.new(0, Pos.X + w / 2, 0, Pos.Y + h / 2) 
+BottomRightDown.Size = UDim2.new(0, w / 5, 0, 1) 
+BottomRightDown.AnchorPoint = Vector2new(1, 1) 
+elseif getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Bounding Box' then 
+Box.Position = UDim2.new(0, Pos.X - w / 2, 0, Pos.Y - h / 2) 
+Box.Size = UDim2.new(0, w, 0, h) 
+Box.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Box Type'] == 'Bounding Box'; 
+-- 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box'].Filled.Enabled then 
+Box.BackgroundColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box'].Filled.Color 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Filled Color Scheme'] then 
+Box.BackgroundTransparency = getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box'].Filled.Transparency; 
+else 
+Box.BackgroundTransparency = 1 
+end 
+Box.BorderSizePixel = 1 
+else 
+Box.BackgroundTransparency = 1 
+end 
+-- 
+RotationAngle = RotationAngle + (tick() - Tick) * getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box']['Animate Speed'] * Cos(Pi / 4 * tick() - Pi / 2) 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Boxes['Bounding Box'].Animate then 
+Gradient1.Rotation = RotationAngle 
+Gradient2.Rotation = RotationAngle 
+else 
+Gradient1.Rotation = -45 
+Gradient2.Rotation = -45 
+end 
+Tick = tick() 
+end 
+end 
+end 
+-- 
+do --// Health 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Health.Enabled then 
+local health = Humanoid.Health / Humanoid.MaxHealth; 
+local BarPosition, BarPosition2; 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Health.Position == 'Right' then 
+BarPosition = UDim2.new(0, Pos.X + w / 2 + 6, 0, Pos.Y - h / 2 + h * (1 - health)) 
+BarPosition2 = UDim2.new(0, Pos.X + w / 2 + 6, 0, Pos.Y - h / 2) 
+elseif getgenv().Script.Visuals['Global ESP'].Drawing.Health.Position == 'Left' then 
+BarPosition = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2 + h * (1 - health)) 
+BarPosition2 = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2) 
+end 
+Health.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Health.Enabled; 
+Health.Position = BarPosition 
+Health.Size = UDim2.new(0, getgenv().Script.Visuals['Global ESP'].Drawing.Health.Width, 0, h * health) 
+-- 
+BehindHealth.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Health.Enabled; 
+BehindHealth.Position = BarPosition2 
+BehindHealth.Size = UDim2.new(0, getgenv().Script.Visuals['Global ESP'].Drawing.Health.Width, 0, h) 
+else 
+BehindHealth.Visible = false 
+end 
+-- 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Health['Text'] then 
+local healthPercentage = Floor(Humanoid.Health / Humanoid.MaxHealth * 100) 
+local amountToShift = 15 
+HealthText.Text = tostring(healthPercentage) .. "%" 
+HealthText.Visible = true --Humanoid.Health < Humanoid.MaxHealth 
+if Humanoid.Health < Humanoid.MaxHealth then 
+HealthText.Position = UDim2.new(0, Pos.X - w / 2 - 6, 0, Pos.Y - h / 2 + h * (1 - healthPercentage / 100) + 3) 
+else 
+HealthText.Position = UDim2.new(0, Pos.X - w / 2 - 6 - amountToShift, 0, Pos.Y - h / 2 + h * (1 - healthPercentage / 100) + 3) 
+end 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Health['Health Based'] then 
+local color = healthPercentage >= 0.75 and Color3.fromRGB(0, 255, 0) or healthPercentage >= 0.5 and Color3.fromRGB(255, 255, 0) or healthPercentage >= 0.25 and Color3.fromRGB(255, 170, 0) or Color3.fromRGB(255, 0, 0) 
+HealthText.TextColor3 = color 
+else 
+HealthText.TextColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Health['Text Color'] 
+end 
+else 
+HealthText.Visible = false 
+end 
+end 
+-- 
+do --// Names 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Names.Enabled then 
+Name.Visible = getgenv().Script.Visuals['Global ESP'].Drawing.Names.Enabled 
+Name.Text = Player.DisplayName 
+Name.TextColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Names.Color 
+Name.Position = UDim2.new(0, Pos.X, 0, Pos.Y - h / 2 - 9) 
+else 
+Name.Visible = false 
+end 
+end 
+-- 
+do --// Distance 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Distance.Enabled then 
+Distance.TextColor3 = getgenv().Script.Visuals['Global ESP'].Drawing.Distance.Color 
+if getgenv().Script.Visuals['Global ESP'].Drawing.Distance.Docked then 
+Distance.Visible = false 
+-- 
+Name.Text = string.format( 
+'(%d) %s', 
+getgenv().Script.Visuals['Global ESP'].Drawing.Distance.Color.R * 255, 
+getgenv().Script.Visuals['Global ESP'].Drawing.Distance.Color.G * 255, 
+getgenv().Script.Visuals['Global ESP'].Drawing.Distance.Color.B * 255, 
+Floor(Dist), 
+Player.Name 
+) 
+else 
+Distance.Position = UDim2.new(0, Pos.X, 0, Pos.Y + h / 2 + 7) 
+Distance.Text = string.format('%d meters', Floor(Dist)) 
+Distance.Visible = true 
+end 
+else 
+Distance.Visible = false 
+end 
+end 
+else 
+HideESP(); 
+end 
+else 
+HideESP(); 
+end 
+else 
+HideESP(); 
+end 
+else 
+HideESP(); 
+end 
+end) 
+end 
+coroutine.wrap(Updater)(); 
+end 
+end 
+-- 
+do 
+for _, v in pairs(game:GetService('Players'):GetPlayers()) do 
+coroutine.wrap(ESP)(v) 
+end 
+-- 
+game:GetService('Players').PlayerAdded:Connect(function(v) 
+coroutine.wrap(ESP)(v) 
+end); 
+end; 
+end; 
+end)() 
+end)() 
+end 
+-- 
+do --// Visuals 
+function Visuals:Unload() 
+Visuals.TriggerbotCircle:Destroy() 
+Visuals.DebugCircle:Destroy() 
+Visuals.SilentCircle:Destroy() 
+Visuals.Tracer:Destroy() 
+Visuals.RaidMenu:Destroy() 
+Visuals.LocationAssist:Destroy() 
+-- 
+for _, Line in ipairs(Visuals.BoundingBoxes[1]) do 
+Line:Destroy() 
+end 
+-- 
+for _, Line in ipairs(Visuals.BoundingBoxes[2]) do 
+Line:Destroy() 
+end 
+-- 
+Visuals.BoundingBoxes[1] = {} 
+Visuals.BoundingBoxes[2] = {} 
+-- 
+local Priority = Raid.Players 
+local Table = Raid.Visuals 
+-- 
+for i = #Priority, 1, -1 do 
+local Player = Priority[i] 
+Lithium:ClearPlayerData(Player) 
+end 
+-- 
+for _, lines in pairs(Table.Corners) do 
+for _, Line in ipairs(lines) do 
+Line:Remove() 
+end 
+end 
+for _, lines in pairs(Table.Outlines) do 
+for _, Line in ipairs(lines) do 
+Line:Remove() 
+end 
+end 
+Table.Outlines = {} 
+Table.Corners = {} 
+Table.Distance = {} 
+Table.Texts = {} 
+Raid.Players = {} 
+end 
+-- 
+function Visuals:DrawESP() 
+local RAID_Enabled = getgenv().Script.Visuals['Specific ESP'].Visible 
+local Modules = getgenv().Script.Visuals['Specific ESP'].Modules 
+local Priority = Raid.Players 
+local CanDraw = Lithium.Locals.Visuals 
+local Table = Raid.Visuals 
+-- 
+if RAID_Enabled then 
+for i = #Priority, 1, -1 do 
+local Player = Priority[i] 
+if not Player or not Player.Character then 
+Lithium:ClearPlayerData(Player) 
+else 
+local RootPart = Player.Character and Player.Character:FindFirstChild('HumanoidRootPart') 
+if not RootPart then 
+return 
+end 
+-- 
+if not Client or not Client.Character then 
+return 
+end 
+-- 
+local Distance = Client.Character.HumanoidRootPart and (RootPart.Position - Client.Character.HumanoidRootPart.Position).Magnitude or 0 
+local Position, Visible = Camera:WorldToViewportPoint(RootPart.Position) 
+local CharacterSize = (Camera:WorldToViewportPoint(RootPart.Position - Vector3new(0, 3, 0)).Y - 
+Camera:WorldToViewportPoint(RootPart.Position + Vector3new(0, 2.6, 0)).Y) / 2 
+
+local Flag = not Lithium:IsFriendly(Player) and getgenv().Script.Visuals['Specific ESP'].AllyColor or getgenv().Script.Visuals['Specific ESP'].EnemyColor 
+local Box = true 
+if Box then 
+if not Table.Corners[Player] then 
+Table.Corners[Player] = {} 
+for i = 1, 8 do 
+Table.Corners[Player][i] = Overlay.new('Line') 
+Table.Corners[Player][i].Thickness = 1 
+Table.Corners[Player][i].Transparency = 1 
+Table.Corners[Player][i].Color = Flag 
+end 
+end 
+local BoxWidth = Floor(CharacterSize * 1.1) 
+local BoxHeight = Floor(CharacterSize * 1.9) 
+local BoxPosition = Vector2new(Position.X - BoxWidth / 2, Position.Y - BoxHeight / 2) 
+
+local L_Width = (BoxWidth / 5) 
+local L_Height = (BoxHeight / 6) 
+local L_T = 2 
+
+-- Top left 
+Table.Corners[Player][1].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y - L_T) 
+Table.Corners[Player][1].To = Vector2new(BoxPosition.X + L_Width, BoxPosition.Y - L_T) 
+
+Table.Corners[Player][2].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y - L_T) 
+Table.Corners[Player][2].To = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + L_Height) 
+
+-- Top right 
+Table.Corners[Player][3].From = Vector2new(BoxPosition.X + BoxWidth - L_Width, BoxPosition.Y - L_T) 
+Table.Corners[Player][3].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y - L_T) 
+
+Table.Corners[Player][4].From = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y - L_T) 
+Table.Corners[Player][4].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + L_Height) 
+
+-- Bottom left 
+Table.Corners[Player][5].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight - L_Height) 
+Table.Corners[Player][5].To = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight + L_T) 
+
+Table.Corners[Player][6].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight + L_T) 
+Table.Corners[Player][6].To = Vector2new(BoxPosition.X + L_Width, BoxPosition.Y + BoxHeight + L_T) 
+
+-- Bottom right 
+Table.Corners[Player][7].From = Vector2new(BoxPosition.X + BoxWidth - L_Width, BoxPosition.Y + BoxHeight + L_T) 
+Table.Corners[Player][7].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight + L_T) 
+
+Table.Corners[Player][8].From = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight + L_T) 
+Table.Corners[Player][8].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight - L_Height) 
+
+for _, Line in ipairs(Table.Corners[Player]) do 
+Line.Visible = CanDraw and Visible 
+Line.Color = Flag 
+Line.Transparency = getgenv().Script.Visuals['Specific ESP'].Transparency 
+Line.Thickness = getgenv().Script.Visuals['Specific ESP'].Thickness 
+end 
+end 
+-- 
+if Modules.Name.Visible then 
+local Text = Table.Texts[Player] 
+if not Text then 
+Text = Overlay.new('Text') 
+Text.Size = Modules.Name.Size 
+Text.Outline = Modules.Name.Outline 
+Text.OutlineColor = Modules.Name.OutlineColor 
+Text.Color = Flag 
+Text.Center = true 
+Text.Transparency = Modules.Name.Transparency 
+Table.Texts[Player] = Text 
+end 
+local boxSize = Vector2new(Floor(CharacterSize * 1.8), Floor(CharacterSize * 1.9)) 
+local boxPosition = Vector2new(Floor(Position.X - CharacterSize * 1.8 / 2), Floor(Position.Y - CharacterSize * 1.6 / 2)) 
+
+Text.Visible = CanDraw and Visible or false 
+Text.Text = Player.DisplayName 
+Text.Position = Vector2new(boxPosition.X + boxSize.X / 2, boxPosition.Y + boxSize.Y + 5) 
+end 
+-- 
+if Modules.Distance.Visible then 
+local Text = Table.Distance[Player] 
+if not Text then 
+Text = Overlay.new('Text') 
+Text.Size = Modules.Distance.Size 
+Text.Outline = Modules.Distance.Outline 
+Text.OutlineColor = Modules.Distance.OutlineColor 
+Text.Color = Flag 
+Text.Center = true 
+Text.Transparency = Modules.Distance.Transparency 
+Table.Distance[Player] = Text 
+end 
+local boxSize = Vector2new(Floor(CharacterSize * 1.8), Floor(CharacterSize * 1.9)) 
+local boxPosition = Vector2new(Floor(Position.X - CharacterSize * 1.8 / 2), Floor(Position.Y - CharacterSize * 1.6 / 2)) 
+
+Text.Visible = CanDraw and Visible or false 
+Text.Text = tostring(Floor(Distance)) .. ' std' 
+Text.Position = Vector2new(boxPosition.X + boxSize.X / 2, boxPosition.Y + boxSize.Y + 15) 
+end 
+end 
+end 
+else 
+for _, lines in pairs(Table.Corners) do 
+for _, Line in ipairs(lines) do 
+Line:Remove() 
+end 
+end 
+for _, lines in pairs(Table.Outlines) do 
+for _, Line in ipairs(lines) do 
+Line:Remove() 
+end 
+end 
+Table.Outlines = {} 
+Table.Corners = {} 
+Table.Distance = {} 
+Table.Texts = {} 
+Raid.Players = {} 
+end 
+end 
+-- 
+function Visuals:UpdateBox() 
+if PriorityRelationSilent and PriorityRelationSilent.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(PriorityRelationSilent) 
+if (Object and Humanoid and RootPart) then 
+local Position; 
+if getgenv().Script.FOVs.Silent.BoxFOV['Bind To Silent'] then 
+Position = Lithium:GetHitPosition('Silent', PriorityRelationSilent) 
+else 
+Position = RootPart.Position 
+end 
+local Screen, Visible = Camera:WorldToViewportPoint(Position) 
+if Visible then 
+local Color; 
+if PriorityRelationSilent == PriorityRelationAssist then 
+Color = getgenv().Script.Visuals.Visualization.Silent.BoxFOV.TargetColor 
+else 
+Color = getgenv().Script.Visuals.Visualization.Silent.BoxFOV.Color 
+end 
+-- 
+local CharacterSize = (Camera:WorldToViewportPoint(RootPart.Position - Vector3new(0, 3, 0)).Y - 
+Camera:WorldToViewportPoint(RootPart.Position + Vector3new(0, 2.6, 0)).Y) / 2 
+-- 
+local BoxWidth = Floor(CharacterSize * getgenv().Script.FOVs.Silent.BoxFOV.Width) 
+local BoxHeight = Floor(CharacterSize * getgenv().Script.FOVs.Silent.BoxFOV.Height) 
+local BoxPosition = Vector2new(Screen.X - BoxWidth / 2, Screen.Y - BoxHeight / 2 + 5) 
+-- 
+local CF = Camera.ViewportSize 
+if (Math:FlatComparison(Vector2new(CF.X / 2, CF.Y / 2), BoxPosition, Vector2new(BoxWidth, BoxHeight))) then 
+Lithium.Locals.Bounding = true 
+else 
+Lithium.Locals.Bounding = false 
+end 
+-- 
+local L_Width = (BoxWidth / 5) 
+local L_Height = (BoxHeight / 6) 
+local L_T = 2 
+-- 
+if #Visuals.BoundingBoxes[1] == 0 then 
+for i = 1, 16 do 
+table.insert(Visuals.BoundingBoxes[1], Overlay.new('Line', { 
+Thickness = 1, 
+Color = Color3.fromRGB(120, 168, 231), 
+Transparency = 1 
+})) 
+end 
+end 
+-- Top left 
+Visuals.BoundingBoxes[1][1].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[1][1].To = Vector2new(BoxPosition.X + L_Width, BoxPosition.Y - L_T) 
+
+Visuals.BoundingBoxes[1][2].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[1][2].To = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + L_Height) 
+
+-- Top right 
+Visuals.BoundingBoxes[1][3].From = Vector2new(BoxPosition.X + BoxWidth - L_Width, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[1][3].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y - L_T) 
+
+Visuals.BoundingBoxes[1][4].From = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[1][4].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + L_Height) 
+
+-- Bottom left 
+Visuals.BoundingBoxes[1][5].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight - L_Height) 
+Visuals.BoundingBoxes[1][5].To = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight + L_T) 
+
+Visuals.BoundingBoxes[1][6].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight + L_T) 
+Visuals.BoundingBoxes[1][6].To = Vector2new(BoxPosition.X + L_Width, BoxPosition.Y + BoxHeight + L_T) 
+
+-- Bottom right 
+Visuals.BoundingBoxes[1][7].From = Vector2new(BoxPosition.X + BoxWidth - L_Width, BoxPosition.Y + BoxHeight + L_T) 
+Visuals.BoundingBoxes[1][7].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight + L_T) 
+
+Visuals.BoundingBoxes[1][8].From = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight + L_T) 
+Visuals.BoundingBoxes[1][8].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight - L_Height) 
+-- 
+for _, Line in ipairs(Visuals.BoundingBoxes[1]) do 
+Line.Visible = Lithium.Locals.Visuals and getgenv().Script.Visuals.Visualization.Silent.BoxFOV.Visible 
+Line.Color = Color 
+Line.Transparency = getgenv().Script.Visuals.Visualization.Silent.BoxFOV.Transparency 
+Line.Thickness = getgenv().Script.Visuals.Visualization.Silent.BoxFOV.Thickness 
+end 
+else 
+for _, Line in ipairs(Visuals.BoundingBoxes[1]) do 
+Line:Remove() 
+end 
+Visuals.BoundingBoxes[1] = {} 
+end 
+else 
+for _, Line in ipairs(Visuals.BoundingBoxes[1]) do 
+Line:Remove() 
+end 
+Visuals.BoundingBoxes[1] = {} 
+end 
+else 
+for _, Line in ipairs(Visuals.BoundingBoxes[1]) do 
+Line:Remove() 
+end 
+Visuals.BoundingBoxes[1] = {} 
+end 
+-- 
+if PriorityRelationTrigger and PriorityRelationTrigger.Character then 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(PriorityRelationTrigger) 
+if (Object and Humanoid and RootPart) then 
+local Position = RootPart.Position 
+local Screen, Visible = Camera:WorldToViewportPoint(Position) 
+if Visible then 
+local Color; 
+if PriorityRelationSilent == PriorityRelationAssist then 
+Color = getgenv().Script.Visuals.Visualization.Triggerbot.BoxFOV.TargetColor 
+else 
+Color = Color3.fromRGB(255, 255, 255) 
+end 
+-- 
+local CharacterSize = (Camera:WorldToViewportPoint(RootPart.Position - Vector3new(0, 3, 0)).Y - 
+Camera:WorldToViewportPoint(RootPart.Position + Vector3new(0, 2.6, 0)).Y) / 2 
+-- 
+local BoxWidth = Floor(CharacterSize * getgenv().Script.FOVs.Triggerbot.BoxFOV.Width) 
+local BoxHeight = Floor(CharacterSize * getgenv().Script.FOVs.Triggerbot.BoxFOV.Height) 
+local BoxPosition = Vector2new(Screen.X - BoxWidth / 2, Screen.Y - BoxHeight / 2 + 5) 
+-- 
+local L_Width = (BoxWidth / 5) 
+local L_Height = (BoxHeight / 6) 
+local L_T = 2 
+-- 
+if #Visuals.BoundingBoxes[2] == 0 then 
+for i = 1, 16 do 
+table.insert(Visuals.BoundingBoxes[2], Overlay.new('Line', { 
+Thickness = 1, 
+Color = Color3.fromRGB(120, 168, 231), 
+Transparency = 1 
+})) 
+end 
+end 
+-- Top left 
+Visuals.BoundingBoxes[2][1].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[2][1].To = Vector2new(BoxPosition.X + L_Width, BoxPosition.Y - L_T) 
+
+Visuals.BoundingBoxes[2][2].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[2][2].To = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + L_Height) 
+
+-- Top right 
+Visuals.BoundingBoxes[2][3].From = Vector2new(BoxPosition.X + BoxWidth - L_Width, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[2][3].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y - L_T) 
+
+Visuals.BoundingBoxes[2][4].From = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y - L_T) 
+Visuals.BoundingBoxes[2][4].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + L_Height) 
+
+-- Bottom left 
+Visuals.BoundingBoxes[2][5].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight - L_Height) 
+Visuals.BoundingBoxes[2][5].To = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight + L_T) 
+
+Visuals.BoundingBoxes[2][6].From = Vector2new(BoxPosition.X - L_T, BoxPosition.Y + BoxHeight + L_T) 
+Visuals.BoundingBoxes[2][6].To = Vector2new(BoxPosition.X + L_Width, BoxPosition.Y + BoxHeight + L_T) 
+
+-- Bottom right 
+Visuals.BoundingBoxes[2][7].From = Vector2new(BoxPosition.X + BoxWidth - L_Width, BoxPosition.Y + BoxHeight + L_T) 
+Visuals.BoundingBoxes[2][7].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight + L_T) 
+
+Visuals.BoundingBoxes[2][8].From = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight + L_T) 
+Visuals.BoundingBoxes[2][8].To = Vector2new(BoxPosition.X + BoxWidth + L_T, BoxPosition.Y + BoxHeight - L_Height) 
+-- 
+for _, Line in ipairs(Visuals.BoundingBoxes[2]) do 
+Line.Visible = Lithium.Locals.Visuals and getgenv().Script.Visuals.Visualization.Triggerbot.BoxFOV.Visible 
+Line.Color = Color 
+Line.Transparency = getgenv().Script.Visuals.Visualization.Triggerbot.BoxFOV.Transparency 
+Line.Thickness = getgenv().Script.Visuals.Visualization.Triggerbot.BoxFOV.Thickness 
+end 
+else 
+for _, Line in ipairs(Visuals.BoundingBoxes[2]) do 
+Line:Remove() 
+end 
+Visuals.BoundingBoxes[2] = {} 
+end 
+else 
+for _, Line in ipairs(Visuals.BoundingBoxes[2]) do 
+Line:Remove() 
+end 
+Visuals.BoundingBoxes[2] = {} 
+end 
+else 
+for _, Line in ipairs(Visuals.BoundingBoxes[2]) do 
+Line:Remove() 
+end 
+Visuals.BoundingBoxes[2] = {} 
+end 
+end 
+-- 
+function Visuals:Update() 
+local Stutter = getgenv().Script.Core['Script Core']['Refresh Rates']['Other'] 
+if (tick() - Lithium.Locals.VisualTick) > (Stutter / 1000) then 
+Lithium.Locals.VisualTick = tick(); 
+local Keys = getgenv().Script.Visuals['Visualization'].Silent.CircleFOV 
+local Keys3 = getgenv().Script.Visuals['Visualization'].Triggerbot.CircleFOV 
+local Keys4 = getgenv().Script.Visuals['Visualization'].Assist 
+-- 
+Visuals.SilentCircle.Visible = Lithium.Locals.Visuals and Keys.Visible 
+Visuals.SilentCircle.Transparency = Keys.Transparency 
+Visuals.SilentCircle.Color = Keys.Color 
+Visuals.SilentCircle.Filled = Keys.Filled 
+-- 
+Visuals.AssistCircle.Visible = Lithium.Locals.Visuals and Keys4.Visible 
+Visuals.AssistCircle.Transparency = Keys4.Transparency 
+Visuals.AssistCircle.Color = Keys4.Color 
+Visuals.AssistCircle.Filled = Keys4.Filled 
+Visuals.AssistCircle.Radius = getgenv().Script.Aiming.Radius * 2 
+-- 
+Visuals.TriggerbotCircle.Visible = Lithium.Locals.Visuals and Keys3.Visible 
+Visuals.TriggerbotCircle.Transparency = Keys3.Transparency 
+Visuals.TriggerbotCircle.Color = Keys3.Color 
+Visuals.TriggerbotCircle.Filled = Keys3.Filled 
+-- 
+Visuals.SilentCircle.Position = Vector2new(Mouse.X, Mouse.Y + Offset) 
+Visuals.AssistCircle.Position = Vector2new(Mouse.X, Mouse.Y + Offset) 
+Visuals.TriggerbotCircle.Position = Vector2new(Mouse.X, Mouse.Y + Offset) 
+-- 
+Visuals:UpdateBox() 
+Visuals:DrawESP() 
+-- 
+if getgenv().Script.Visuals.Crosshair.Visible then 
+if tick() - Lithium.Locals.CrossTick > getgenv().Script.Visuals.Crosshair.Stutter then 
+Lithium.Locals.CrossTick = tick() 
+-- 
+local Labels = { 
+Name = Visuals.Crosshair.Labels[1], 
+Extension = Visuals.Crosshair.Labels[2], 
+PlayerName = Visuals.Crosshair.Labels[3], 
+PlayerHealth = Visuals.Crosshair.Labels[4] 
+} 
+-- 
+local TextPosition = (getgenv().Script.Visuals.Crosshair.Docked and Camera.ViewportSize / 2 or UserInputService:GetMouseLocation()) 
+-- 
+Labels.PlayerName.Center, Labels.PlayerHealth.Center = true, true 
+Labels.Name.Outline, Labels.Extension.Outline, Labels.PlayerName.Outline, Labels.PlayerHealth.Outline = true, true, true, true 
+Labels.Name.Size, Labels.Extension.Size, Labels.PlayerName.Size, Labels.PlayerHealth.Size = 9, 9, 9, 9 
+Labels.Name.Text = getgenv().Script.Visuals.Crosshair.Labels.Name.Text 
+Labels.Extension.Text = getgenv().Script.Visuals.Crosshair.Labels.Extension.Text 
+-- 
+Labels.Name.Visible = getgenv().Script.Visuals.Crosshair.Labels.Name.Visible 
+Labels.Extension.Visible = getgenv().Script.Visuals.Crosshair.Labels.Extension.Visible 
+Labels.PlayerName.Visible = getgenv().Script.Visuals.Crosshair.Labels['Current Target'].Visible 
+Labels.PlayerHealth.Visible = getgenv().Script.Visuals.Crosshair.Labels['Current Target Health'].Visible 
+-- 
+Labels.Name.Position = TextPosition + Vector2new(-Labels.Name.TextBounds.X + Labels.Extension.TextBounds.X / 2, getgenv().Script.Visuals.Crosshair.Radius + (getgenv().Script.Visuals.Crosshair.Fluctuate and getgenv().Script.Visuals.Crosshair['Fluctuate Max'] or getgenv().Script.Visuals.Crosshair.Length) + 15) 
+Labels.Extension.Position = Labels.Name.Position + Vector2new(Labels.Name.TextBounds.X) 
+Labels.Extension.Color = getgenv().Script.Visuals.Crosshair.Color 
+Labels.Name.Color = getgenv().Script.Visuals.Crosshair.Color 
+-- 
+Labels.PlayerName.Position = TextPosition + Vector2new(0, getgenv().Script.Visuals.Crosshair.Radius + (getgenv().Script.Visuals.Crosshair.Fluctuate and getgenv().Script.Visuals.Crosshair['Fluctuate Max'] or getgenv().Script.Visuals.Crosshair.Length) + 25) 
+Labels.PlayerName.Color = getgenv().Script.Visuals.Crosshair.Labels['Current Target'].Color 
+-- 
+Labels.PlayerHealth.Position = TextPosition + Vector2new(0, getgenv().Script.Visuals.Crosshair.Radius + (getgenv().Script.Visuals.Crosshair.Fluctuate and getgenv().Script.Visuals.Crosshair['Fluctuate Max'] or getgenv().Script.Visuals.Crosshair.Length) + 35) 
+Labels.PlayerHealth.Color = getgenv().Script.Visuals.Crosshair.Labels['Current Target Health'].Color 
+
+if PriorityRelationSilent and PriorityRelationSilent.Character then 
+local Humanoid = PriorityRelationSilent.Character.Humanoid 
+-- 
+Labels.PlayerName.Text, Labels.PlayerHealth.Text = PriorityRelationSilent.DisplayName, tostring(Floor(Humanoid.Health)) .. '/' .. tostring(Floor(Humanoid.MaxHealth)) 
+else 
+Labels.PlayerName.Text, Labels.PlayerHealth.Text = 'N/A', 'N/A' 
+end 
+-- 
+for LIndex = 1, 4 do 
+local Outlines = Visuals.Crosshair.Lines[LIndex] 
+local Inlines = Visuals.Crosshair.Lines[LIndex + 4] 
+-- 
+local Angle = (LIndex - 1) * 90 
+local Length = getgenv().Script.Visuals.Crosshair.Length 
+-- 
+if getgenv().Script.Visuals.Crosshair.Rotate then 
+local Rotation = -tick() * getgenv().Script.Visuals.Crosshair['Rotate Speed'] % getgenv().Script.Visuals.Crosshair['Max Angle'] 
+Angle = Angle + TweenService:GetValue(Rotation / 360, getgenv().Script.Visuals.Crosshair['Lerp Style'], Enum.EasingDirection.InOut) * 360 
+end 
+-- 
+if getgenv().Script.Visuals.Crosshair.Fluctuate then 
+local RLen = tick() * getgenv().Script.Visuals.Crosshair['Fluctuate Speed'] % 180 
+Length = getgenv().Script.Visuals.Crosshair['Fluctuate Min'] + Sin(Rad(RLen)) * getgenv().Script.Visuals.Crosshair['Fluctuate Max'] 
+end 
+-- 
+Inlines.Visible = true 
+Inlines.Color = getgenv().Script.Visuals.Crosshair.Color 
+Inlines.From = TextPosition + Math:SolveAngle(Angle, getgenv().Script.Visuals.Crosshair.Radius) 
+Inlines.To = TextPosition + Math:SolveAngle(Angle, getgenv().Script.Visuals.Crosshair.Radius + Length) 
+Inlines.Thickness = getgenv().Script.Visuals.Crosshair.Width 
+-- 
+Outlines.Visible = true 
+Outlines.From = TextPosition + Math:SolveAngle(Angle, getgenv().Script.Visuals.Crosshair.Radius - 1) 
+Outlines.To = TextPosition + Math:SolveAngle(Angle, getgenv().Script.Visuals.Crosshair.Radius + Length + 1) 
+Outlines.Thickness = getgenv().Script.Visuals.Crosshair.Width + 1.5 
+end 
+else 
+for LIndex = 1, 4 do 
+Visuals.Crosshair.Lines[LIndex].Visible = false 
+Visuals.Crosshair.Lines[LIndex + 4].Visible = false 
+end 
+end 
+end 
+-- 
+if getgenv().Script.Visuals.Panel.Visible then 
+local AntiAim = (Lithium.Locals.AntiAiming and getgenv().Script.Misc.AntiAim.Enabled and 'On') or 'Off' 
+local AimAssist = (Lithium.Locals.Aimbot and getgenv().Script.Aiming.Enabled and 'On') or 'Off' 
+local SilentAim = (Lithium.Locals.SilentAim and getgenv().Script.Silent.Enabled and 'On') or 'Off' 
+local OverrideYAxis = getgenv().Script.Core.OverrideYAxis 
+local Triggerbot; 
+-- 
+if (getgenv().Script.Triggerbot.Enabled) then 
+if getgenv().Script.Triggerbot.Activation.Type == 'Hold' then 
+Triggerbot = (getgenv().Script.Triggerbot.Enabled and Lithium.Locals.Triggerbot and 'On') or 'Off' 
+end 
+-- 
+if getgenv().Script.Triggerbot.Activation.Type == 'Toggle' then 
+Triggerbot = (getgenv().Script.Triggerbot.Enabled and Lithium.Locals.Triggerbot and 'On') or 'Off' 
+end 
+else 
+Triggerbot = 'Off' 
+end 
+-- 
+Visuals.RaidMenu.Position = Vector2new(getgenv().Script.Visuals.Panel.Position.X, getgenv().Script.Visuals.Panel.Position.Y) 
+Visuals.RaidMenu.Thickness = getgenv().Script.Visuals.Panel.Thickness 
+Visuals.RaidMenu.Transparency = getgenv().Script.Visuals.Panel.Transparency 
+Visuals.RaidMenu.Center = getgenv().Script.Visuals.Panel.Center 
+Visuals.RaidMenu.Color = getgenv().Script.Visuals.Panel.Color 
+Visuals.RaidMenu.Visible = Lithium.Locals.Visuals 
+Visuals.RaidMenu.Text = 'Aim Assist: ' .. AimAssist .. '\nSilent Aim: ' .. SilentAim .. '\nAntiAim: ' .. AntiAim .. '\nOverrideYAxis: ' .. OverrideYAxis .. '\nTriggerbot: ' .. Triggerbot 
+else 
+Visuals.RaidMenu.Visible = false 
+end 
+-- 
+if getgenv().Script.Helpers['Location Assist'].Visible then 
+local Targets = Lithium:GetObscuringTargets(getgenv().Script.Helpers['Location Assist']['Max Scan Radius']) 
+-- 
+if Targets >= getgenv().Script.Helpers['Location Assist']['Min Scan'] then 
+Visuals.LocationAssist.Text = 'Unsafe (' .. tostring(Targets) .. ')' 
+local Unsafe = getgenv().Script.Helpers['Location Assist']['Unsafe Color'] 
+local Original = getgenv().Script.Helpers['Location Assist'].Color 
+local Lerp = Min(1, Targets / 10) 
+Visuals.LocationAssist.Color = Utility:LerpColor(Original, Unsafe, Lerp) 
+else 
+Visuals.LocationAssist.Text = 'Safe' 
+Visuals.LocationAssist.Color = getgenv().Script.Helpers['Location Assist'].Color 
+end 
+-- 
+Visuals.LocationAssist.Position = Vector2new(getgenv().Script.Helpers['Location Assist'].Position.X, getgenv().Script.Helpers['Location Assist'].Position.Y) 
+Visuals.LocationAssist.Thickness = getgenv().Script.Helpers['Location Assist'].Thickness 
+Visuals.LocationAssist.Transparency = getgenv().Script.Helpers['Location Assist'].Transparency 
+Visuals.LocationAssist.Center = getgenv().Script.Helpers['Location Assist'].Center 
+Visuals.LocationAssist.Visible = Lithium.Locals.Visuals 
+else 
+Visuals.LocationAssist.Visible = false 
+end 
+-- 
+if getgenv().Script.FOVs.GunFOV then 
+if PriorityRelationSilent and PriorityRelationSilent.Character and Client and Client.Character then --// Character Drawings 
+local Object, Humanoid, RootPart = Lithium:ValidateClient(PriorityRelationSilent) 
+local Object2, Humanoid2, RootPart2 = Lithium:ValidateClient(Client) 
+
+if Object and Object2 and RootPart and RootPart2 then --// Silent FOV 
+if getgenv().Script.Visuals.Tracer.Visible then 
+local Position, Visible = Camera:WorldToViewportPoint(RootPart.Position) 
+Visuals.Tracer.Visible = Lithium.Locals.Visuals and Visible and getgenv().Script.Visuals.Tracer.Visible 
+Visuals.Tracer.Color = getgenv().Script.Visuals.Tracer.Color 
+Visuals.Tracer.Thickness = getgenv().Script.Visuals.Tracer.Thickness 
+Visuals.Tracer.Transparency = getgenv().Script.Visuals.Tracer.Transparency 
+Visuals.Tracer.From = Vector2new(Mouse.X, Mouse.Y + Offset) 
+Visuals.Tracer.To = Vector2new(Position.X, Position.Y) 
+end 
+-- 
+local Magnitude = (RootPart.Position - RootPart2.Position).Magnitude 
+local CurrentTool = Lithium:GetEquippedWeaponName(Client) 
+if not CurrentTool then return end 
+-- 
+if Magnitude < getgenv().Script['Range Index'].Short then --// Close 
+if CurrentTool == 'Revolver' then -- Revolver 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Revolver[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Revolver[1] * 2 
+elseif CurrentTool == 'Double-Barrel SG' then -- // DoubleBarrel 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.DoubleBarrel[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.DoubleBarrel[1] * 2 
+elseif CurrentTool == 'Shotgun' then -- // Shotgun 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Shotgun[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Shotgun[1] * 2 
+
+elseif CurrentTool == 'TacticalShotgun' then -- // TacticalShotgun 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.TacticalShotgun[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.TacticalShotgun[1] * 2 
+
+elseif CurrentTool == 'SMG' then -- // SMG 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.SMG[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.SMG[1] * 2 
+
+elseif CurrentTool == 'Silencer' then -- // Silencer 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Silencer[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Silencer[1] * 2 
+
+elseif CurrentTool == 'AssaultRifle' then -- // AR 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.AssaultRifle[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.AssaultRifle[1] * 2 
+
+else -- // Other 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Others[1] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Others[1] * 2 
+
+end 
+-- 
+elseif Magnitude < getgenv().Script['Range Index'].Medium then --// Mid 
+if CurrentTool == 'Revolver' then -- Revolver 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Revolver[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Revolver[2] * 2 
+
+elseif CurrentTool == 'Double-Barrel SG' then -- // DoubleBarrel 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.DoubleBarrel[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.DoubleBarrel[2] * 2 
+
+elseif CurrentTool == 'Shotgun' then -- // Shotgun 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Shotgun[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Shotgun[2] * 2 
+
+elseif CurrentTool == 'TacticalShotgun' then -- // TacticalShotgun 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.TacticalShotgun[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.TacticalShotgun[1] * 2 
+
+elseif CurrentTool == 'SMG' then -- // SMG 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.SMG[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.SMG[2] * 2 
+
+elseif CurrentTool == 'Silencer' then -- // Silencer 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Silencer[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Silencer[2] * 2 
+
+elseif CurrentTool == 'AssaultRifle' then -- // AR 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.AssaultRifle[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.AssaultRifle[2] * 2 
+
+else -- // Others 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Others[2] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Others[2] * 2 
+
+end 
+elseif Magnitude < getgenv().Script['Range Index'].Long then --// Far 
+if CurrentTool == 'Revolver' then -- Revolver 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Revolver[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Revolver[3] * 2 
+
+elseif CurrentTool == 'Double-Barrel SG' then -- // DoubleBarrel 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.DoubleBarrel[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.DoubleBarrel[3] * 2 
+
+elseif CurrentTool == 'Shotgun' then -- // Shotgun 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Shotgun[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Shotgun[3] * 2 
+
+elseif CurrentTool == 'TacticalShotgun' then -- // TacticalShotgun 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.TacticalShotgun[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.TacticalShotgun[1] * 2 
+
+elseif CurrentTool == 'SMG' then -- // SMG 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.SMG[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.SMG[3] * 2 
+
+elseif CurrentTool == 'Silencer' then -- // Silencer 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Silencer[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Silencer[3] * 2 
+
+elseif CurrentTool == 'AssaultRifle' then -- // AR 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.AssaultRifle[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.AssaultRifle[3] * 2 
+
+else -- // Others 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.FOVs.Triggerbot.CircleFOV.Others[3] * 2 
+Visuals.SilentCircle.Radius = getgenv().Script.FOVs.Silent.CircleFOV.Others[3] * 2 
+end 
+end 
+else 
+Visuals.TriggerbotCircle.Radius = 100 
+Visuals.SilentCircle.Radius = 100 
+Visuals.Tracer.Visible = false 
+end 
+else 
+Visuals.SilentCircle.Radius = 100 
+Visuals.TriggerbotCircle.Radius = 100 
+Visuals.Tracer.Visible = false 
+end 
+else 
+Visuals.SilentCircle.Radius = getgenv().Script.Silent['Default FOV'] 
+Visuals.TriggerbotCircle.Radius = getgenv().Script.Triggerbot['Default FOV'] 
+end 
+end 
+end 
+end 
+-- 
+do --// Main 
+do --// Connections 
+LPH_JIT_MAX(function() 
+Utility:Connection({ 
+Name = 'Key Press', 
+Flags = getgenv().Script.Core['Script Core']['Connection Flags'].Other, 
+Signal = UserInputService.InputBegan, 
+Callback = LPH_NO_VIRTUALIZE(function(Input, Processed) 
+if not Processed then 
+if UserInputService:GetFocusedTextBox() then return end; 
+local Binds = getgenv().Script.Binds 
+local AimAssist = Enum.KeyCode[Binds.AimAssist:upper()] 
+local LockOff = Enum.KeyCode[Binds.Unlock:upper()] 
+-- 
+if getgenv().Script.Aiming['Double Bind'] then 
+if Input.KeyCode == AimAssist then 
+PriorityRelationAssist = Lithium:GetAimbotTarget('Assist') 
+elseif Input.KeyCode == LockOff then 
+if PriorityRelationAssist ~= nil then 
+PriorityRelationAssist = nil 
+end 
+end 
+else 
+if Input.KeyCode == AimAssist then 
+Lithium.Locals.Pressed = not Lithium.Locals.Pressed 
+if Lithium.Locals.Pressed then 
+PriorityRelationAssist = Lithium:GetAimbotTarget('Assist') 
+else 
+if PriorityRelationAssist ~= nil then 
+PriorityRelationAssist = nil 
+end 
+end 
+end 
+end 
+-- 
+if Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds['Specific ESP']:upper()] then 
+Lithium:SelectPriority() 
+end 
+-- 
+if getgenv().Script.Core['Script Safety']['Soft Panic'].Enabled and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds['Soft Panic']:upper()] then 
+if table.find(getgenv().Script.Core['Script Safety']['Soft Panic'].Disables, 'Visuals') then 
+Lithium.Locals.Visuals = not Lithium.Locals.Visuals 
+end 
+-- 
+if table.find(getgenv().Script.Core['Script Safety']['Soft Panic'].Disables, 'Aimbot') then 
+Lithium.Locals.Aimbot = not Lithium.Locals.Aimbot 
+end 
+-- 
+if table.find(getgenv().Script.Core['Script Safety']['Soft Panic'].Disables, 'Silent Aim') then 
+Lithium.Locals.SilentAim = not Lithium.Locals.SilentAim 
+end 
+end 
+-- 
+if getgenv().Script.Core['Script Safety']['Unload'].Enabled and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds['Unload Cheat']:upper()] then 
+Lithium:UnloadCheat() 
+end 
+-- 
+if getgenv().Script.Misc.AntiAim.Enabled and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.AntiAim:upper()] then 
+Lithium.Locals.AntiAiming = not Lithium.Locals.AntiAiming 
+end 
+-- 
+if Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds['AimAssist Toggle']:upper()] then 
+Lithium.Locals.Aimbot = not Lithium.Locals.Aimbot 
+end 
+-- 
+if Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds['Silent Toggle']:upper()] then 
+Lithium.Locals.SilentAim = not Lithium.Locals.SilentAim 
+end 
+-- 
+if getgenv().Script.Triggerbot.Activation.Type == 'Hold' then 
+if getgenv().Script.Triggerbot.Activation.Mode == 'Mouse' then 
+if Input.UserInputType == Enum.UserInputType[getgenv().Script.Binds.Triggerbot] then 
+Lithium.Locals.Triggerbot = true 
+end 
+else 
+if Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.Triggerbot:upper()] then 
+Lithium.Locals.Triggerbot = true 
+end 
+end 
+end 
+-- 
+if getgenv().Script.Triggerbot.Activation.Type == 'Toggle' and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.Triggerbot:upper()] then 
+Lithium.Locals.Triggerbot = not Lithium.Locals.Triggerbot 
+end 
+-- 
+if getgenv().Script.Misc.InventorySorter and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.InventorySorter:upper()] then 
+local GunOrder = getgenv().Script.Misc.InventorySorter.Priorities 
+local BackPack = Client.Backpack 
+local CurrentTime = tick() 
+local Order_V = 10 - #GunOrder 
+local Cooldown = true 
+-- 
+if Cooldown then 
+local FakeFolder = Instance.new('Folder') 
+FakeFolder.Name = 'FakeFolder' 
+FakeFolder.Parent = Workspace 
+local FakeFolderID = Workspace.FakeFolder 
+-- 
+for _, v in pairs(BackPack:GetChildren()) do 
+if v:IsA('Tool') then 
+v.Parent = Workspace.FakeFolder 
+end 
+end 
+-- 
+for _, v in pairs(GunOrder) do 
+local Gun = FakeFolderID:FindFirstChild(v) 
+if Gun then 
+Gun.Parent = BackPack 
+wait(0.05) 
+else 
+Order_V = Order_V + 1 
+end 
+end 
+-- 
+for _, v in pairs(FakeFolderID:GetChildren()) do 
+if v:FindFirstChild('Drink') or v:FindFirstChild('Eat') then 
+v.Parent = BackPack 
+Order_V = Order_V - 1 
+end 
+end 
+-- 
+if Order_V > 0 then 
+for i = 1, Order_V do 
+local Tool = Instance.new('Tool') 
+Tool.Name = '' 
+Tool.ToolTip = 'PlaceHolder' 
+Tool.GripPos = Vector3new(0, 1, 0) 
+Tool.RequiresHandle = false 
+Tool.Parent = BackPack 
+end 
+end 
+-- 
+for _, v in pairs(FakeFolderID:GetChildren()) do 
+if v:IsA('Tool') then 
+v.Parent = BackPack 
+end 
+end 
+-- 
+for _, v in pairs(BackPack:GetChildren()) do 
+if v.Name == '' then 
+v:Destroy() 
+end 
+end 
+-- 
+FakeFolder:Destroy() 
+end 
+end 
+-- 
+if CurrentGame.HoodGame then --// Macros 
+if getgenv().Script.Misc.Macro.Enabled and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.Macro:upper()] then 
+if getgenv().Script.Misc.Macro['Gun Macro'].Mode == 'Hold' then 
+Lithium.Locals.Macro = true 
+coroutine.wrap(function() 
+while Lithium.Locals.Macro do 
+if getgenv().Script.Misc.Macro['Gun Macro'].Type == 'ThirdPerson' then 
+game:GetService('RunService').Heartbeat:wait() 
+keypress(73) 
+game:GetService('RunService').Heartbeat:wait() 
+keypress(79) 
+game:GetService('RunService').Heartbeat:wait() 
+keyrelease(73) 
+game:GetService('RunService').Heartbeat:wait() 
+keyrelease(79) 
+game:GetService('RunService').Heartbeat:wait() 
+else 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+end 
+end 
+end)() 
+else 
+if getgenv().Script.Misc.Macro['Gun Macro'].Type == 'ThirdPerson' then 
+Lithium.Locals.Macro = not Lithium.Locals.Macro 
+-- 
+repeat 
+game:GetService('RunService').Heartbeat:wait() 
+keypress(73) 
+game:GetService('RunService').Heartbeat:wait() 
+keypress(79) 
+game:GetService('RunService').Heartbeat:wait() 
+keyrelease(73) 
+game:GetService('RunService').Heartbeat:wait() 
+keyrelease(79) 
+game:GetService('RunService').Heartbeat:wait() 
+until not Lithium.Locals.Macro 
+else 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', true, game) 
+wait() 
+game:GetService('VirtualInputManager'):SendMouseWheelEvent('0', '0', false, game) 
+wait() 
+end 
+end 
+end 
+-- 
+if getgenv().Script.Misc.Macro['NoClip Macro'].Enabled and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.NoClip:upper()]then 
+Lithium.Locals.NoClipMacro = not Lithium.Locals.NoClipMacro 
+-- 
+repeat 
+wait(getgenv().Script.Misc.Macro['NoClip Macro'].Delay) 
+keypress(Enum.KeyCode.Three) 
+game:GetService('RunService').Heartbeat:wait() 
+keypress(Enum.KeyCode.Three) 
+wait(getgenv().Script.Misc.Macro['NoClip Macro'].Delay) 
+keyrelease(Enum.KeyCode.Three) 
+wait(getgenv().Script.Misc.Macro['NoClip Macro'].Delay) 
+keyrelease(Enum.KeyCode.Three) 
+wait(getgenv().Script.Misc.Macro['NoClip Macro'].Delay) 
+until not Lithium.Locals.NoClipMacro 
+end 
+end 
+end 
+end) 
+}) 
+-- 
+Utility:Connection({ 
+Name = 'Key Release', 
+Flags = getgenv().Script.Core['Script Core']['Connection Flags'].Other, 
+Signal = UserInputService.InputEnded, 
+Callback = LPH_NO_VIRTUALIZE(function(Input, Processed) 
+if not Processed then 
+if CurrentGame.HoodGame then --// Macros 
+if getgenv().Script.Misc.Macro.Enabled and getgenv().Script.Misc.Macro['Gun Macro'].Mode == 'Hold' and Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.Macro:upper()] then 
+Lithium.Locals.Macro = false 
+end 
+end 
+-- 
+if getgenv().Script.Triggerbot.Activation.Type == 'Hold' then 
+if getgenv().Script.Triggerbot.Activation.Mode == 'Mouse' then 
+if Input.UserInputType == Enum.UserInputType[getgenv().Script.Binds.Triggerbot] then 
+Lithium.Locals.Triggerbot = false 
+end 
+else 
+if Input.KeyCode == Enum.KeyCode[getgenv().Script.Binds.Triggerbot:upper()] then 
+Lithium.Locals.Triggerbot = false 
+end 
+end 
+end 
+end 
+end) 
+}) 
+-- 
+Utility:Connection({ 
+Name = '0x01', 
+Signal = RunService.RenderStepped, 
+Flags = getgenv().Script.Core['Script Core']['Connection Flags'].Main, 
+Callback = LPH_NO_VIRTUALIZE(function() 
+if getgenv().Script.Aiming.Enabled then 
+if getgenv().Script.Aiming.Readjustment then 
+if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then 
+return 
+end 
+end 
+-- 
+Lithium:ActivateAimAssist() 
+end 
+-- 
+if getgenv().Script.Triggerbot.Enabled then 
+Lithium:Triggerbot() 
+end 
+-- 
+if getgenv().Script.Silent.HitScan == 'Automatic' then 
+if getgenv().Script.Silent.Mode == 'Target' then 
+PriorityRelationSilent = PriorityRelationAssist 
+else 
+PriorityRelationSilent = Lithium:GetAimbotTarget('Test') 
+end 
+end 
+-- 
+Visuals:Update() 
+end) 
+}) 
+-- 
+Utility:Connection({ 
+Name = '0x02', 
+Signal = RunService.Heartbeat, 
+Flags = getgenv().Script.Core['Script Core']['Connection Flags'].Other, 
+Callback = LPH_NO_VIRTUALIZE(function() 
+Lithium:ActivateAntiAim() 
+end) 
+}) 
+-- 
+if getgenv().Script.Misc.RemoveSeats then 
+for _, v in pairs(Workspace:GetDescendants()) do 
+if v:IsA('Seat') then 
+v:Destroy() 
+end 
+end 
+end 
+end)() 
+end 
+-- 
+do --// Hooks 
+if getgenv().Script.Universal.Enabled then 
+if not string.find(identifyexecutor(), 'Solara') then 
+do --// Counter blox 
+if CurrentGame.Name == 'Counter Blox' then 
+local Raw = getrawmetatable(game) 
+local NameCall = Raw.__namecall 
+local Old = Raw.__index 
+setreadonly(Raw, false) 
+Raw.__namecall = newcclosure(function(self, ...) 
+local Args, Method = {...}, getnamecallmethod() 
+if Method == 'FindPartOnRayWithIgnoreList' and not checkcaller() then 
+if PriorityRelationSilent and PriorityRelationSilent.Character then 
+local HitPosition = PriorityRelationSilent.Character[getgenv().Script.Universal.HitPart].Position 
+-- 
+Args[1] = Ray.new(workspace.CurrentCamera.CFrame.Position, (HitPosition - workspace.CurrentCamera.CFrame.Position).Unit * 1000) 
+return NameCall(self, unpack(Args)) 
+end 
+end 
+return NameCall(self, ...) 
+end) 
+Raw.__index = newcclosure(function(self, K) 
+if K == 'Clips' then 
+return workspace.Map 
+end 
+return Old(self, K) 
+end) 
+-- 
+setreadonly(Raw, true) 
+else --// Universal 
+local NameCall 
+NameCall = hookmetamethod(game, '__namecall', newcclosure(function(...) 
+local Method = getnamecallmethod() 
+local Arguments = {...} 
+local self = Arguments[1] 
+if self == workspace and not checkcaller() then 
+if Method == 'Raycast' and getgenv().Script.Universal.Method == 'Raycast' then 
+if Shared.ValidateArguments(Arguments, Lithium.Universal.Raycast) then 
+local A_Origin = Arguments[2] 
+local Target = Shared.GetNearestPlayer() 
+if Target and Target.Character and Client and Client.Character then 
+local closestPart = Shared.GetClosestPart(Target, getgenv().Script.Universal.HitParts) 
+if closestPart then 
+Arguments[3] = Shared.GetDirection(A_Origin, closestPart.Position) 
+else 
+Arguments[3] = Shared.GetDirection(A_Origin, Target.Character.Head.Position) 
+end 
+-- 
+return NameCall(unpack(Arguments)) 
+end 
+end 
+end 
+elseif Method == 'FindPartOnRayWithWhitelist' and getgenv().Script.Universal.Method == 'FindPartOnRayWithWhitelist' then 
+if Shared.ValidateArguments(Arguments, Lithium.Universal.FindPartOnRayWithWhitelist) then 
+local Target = Shared.GetNearestPlayer() 
+if Target and Target.Character then 
+local Origin = Arguments[2].Origin 
+local closestPart = Shared.GetClosestPart(Target, getgenv().Script.Universal.HitParts) 
+local Hit; 
+if closestPart then 
+Hit = Shared.GetDirection(Origin, closestPart.Position) 
+else 
+Hit = Shared.GetDirection(Origin, Target.Character.Head.Position) 
+end 
+-- 
+Arguments[2] = Ray.new(Origin, Hit) 
+-- 
+return NameCall(unpack(Arguments)) 
+end 
+end 
+elseif Method == 'FindPartOnRayWithIgnoreList' and getgenv().Script.Universal.Method == 'FindPartOnRayWithIgnoreList' then 
+if Shared.ValidateArguments(Arguments, Lithium.Universal.FindPartOnRayWithIgnoreList) then 
+local Target = Shared.GetNearestPlayer() 
+if Target and Target.Character then 
+local Origin = Arguments[2].Origin 
+local closestPart = Shared.GetClosestPart(Target, getgenv().Script.Universal.HitParts) 
+local Hit; 
+if closestPart then 
+Hit = Shared.GetDirection(Origin, closestPart.Position) 
+else 
+Hit = Shared.GetDirection(Origin, Target.Character.Head.Position) 
+end 
+-- 
+Arguments[2] = Ray.new(Origin, Hit) 
+-- 
+return NameCall(unpack(Arguments)) 
+end 
+end 
+elseif (Method == 'FindPartOnRay' or Method == 'findPartOnRay') and getgenv().Script.Universal.Method:lower() == Method:lower() then 
+if Shared.ValidateArguments(Arguments, Lithium.Universal.FindPartOnRay) then 
+local Target = Shared.GetNearestPlayer() 
+if Target and Target.Character then 
+local Origin = Arguments[2].Origin 
+local closestPart = Shared.GetClosestPart(Target, getgenv().Script.Universal.HitParts) 
+local Hit; 
+if closestPart then 
+Hit = Shared.GetDirection(Origin, closestPart.Position) 
+else 
+Hit = Shared.GetDirection(Origin, Target.Character.Head.Position) 
+end 
+-- 
+Arguments[2] = Ray.new(Origin, Hit) 
+-- 
+return NameCall(unpack(Arguments)) 
+end 
+end 
+end 
+return NameCall(...) 
+end)) 
+end 
+end 
+end 
+end 
+end 
+end 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @ 
+-- @
